@@ -1,5 +1,7 @@
 const NS_SVG = 'http://www.w3.org/2000/svg';
 
+const CELLS = 81;
+
 const sudoku = document.getElementById('sudoku');
 const sudokuHighlights = document.getElementById('sudoku-highlights');
 const sudokuGivens = document.getElementById('sudoku-givens');
@@ -71,22 +73,16 @@ function cornerPos(i, len) {
     dx = (i % 2) * 60 - 30;
     dy = ((i / 2) | 0) * 60 - 30;
   }
-  else if (len <= 6) {
-    dx = (i % 3) * 30 - 30;
-    dy = ((i / 3) | 0) * 60 - 30;
-  }
   else {
-    if (i < 3) {
-      dx = i * 30 - 30;
+    const half = (len / 2) | 0;
+    if (i < half) {
+      const d = 60 / (half - 1);
+      dx = i * d - 30;
       dy = -30;
     }
-    else if (i < 5) {
-      dx = i * 60 - 210;
-      dy = 0;
-    }
     else {
-      const d = 60 / (len - 6);
-      dx = (i - 5) * d - 30;
+      const d = 60 / (len - half - 1);
+      dx = (i - half) * d - 30;
       dy = 30;
     }
   }
@@ -113,7 +109,7 @@ function main(boardKey, user) {
       const uselectedNew = selectedNew[uid] || {};
       const isMe = uid === user.uid;
 
-      for (let id = 0; id < 81; id++) {
+      for (let id = 0; id < CELLS; id++) {
         if (uselected[id] && !uselectedNew[id]) {
           const remove = sudokuHighlights.querySelector(`[data-id="${id}"][data-uid="${uid}"]`);
           if (remove) sudokuHighlights.removeChild(remove);
@@ -144,7 +140,7 @@ function main(boardKey, user) {
 
   refFilled.on('value', snapshot => {
     const filledNew = snapshot.val() || {};
-    for (let id = 0; id < 81; id++) {
+    for (let id = 0; id < CELLS; id++) {
       if (null == data.filled[id] && null != filledNew[id]) {
         const num = filledNew[id];
         const [ x, y ] = id2xy(id);
@@ -177,7 +173,7 @@ function main(boardKey, user) {
       .join('');
 
     const centerNew = snapshot.val() || {};
-    for (let id = 0; id < 81; id++) {
+    for (let id = 0; id < CELLS; id++) {
       if (null == data.center[id] && null != centerNew[id]) {
         const [ x, y ] = id2xy(id);
 
@@ -206,7 +202,7 @@ function main(boardKey, user) {
 
   refCorner.on('value', snapshot => {
     const cornerNew = snapshot.val() || {};
-    for (let id = 0; id < 81; id++) {
+    for (let id = 0; id < CELLS; id++) {
       // Full reset every time.
       const remove = sudokuCorner.querySelector(`[data-id="${id}"]`);
       if (remove) sudokuCorner.removeChild(remove);
@@ -244,7 +240,7 @@ function main(boardKey, user) {
 
   function fillDigit(num) {
     const updates = {};
-    for (let id = 0; id < 81; id++) {
+    for (let id = 0; id < CELLS; id++) {
       if (data.selected[user.uid][id]) {
         updates[id] = num;
       }
@@ -257,7 +253,7 @@ function main(boardKey, user) {
 
     const updates = {};
     if (null == num) {
-      for (let id = 0; id < 81; id++) {
+      for (let id = 0; id < CELLS; id++) {
         if (data.selected[user.uid][id]) {
           updates[id] = null;
         }
@@ -265,7 +261,7 @@ function main(boardKey, user) {
     }
     else {
       let allSet = true;
-      for (let id = 0; id < 81; id++) {
+      for (let id = 0; id < CELLS; id++) {
         if (data.selected[user.uid][id]) {
           allSet &= (data[type][id] || {})[num];
           updates[`${id}/${num}`] = true;

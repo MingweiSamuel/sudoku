@@ -10,7 +10,6 @@ const sudokuCenter = document.getElementById('sudoku-center');
 const sudokuCorner = document.getElementById('sudoku-corner');
 
 const data = {
-  uid: null,
   selected: {},
   filled: {},
   center: {},
@@ -20,27 +19,30 @@ const data = {
 
 
 
-const boardKey = (() => {
+(() => {
   let boardKey;
   if (window.location.hash) {
     boardKey = window.location.hash.slice(1);
   }
   else {
-    boardKey = firebase.database().ref().child('boards').push().key;
+    boardKey = firebase.database().ref('boards').push().key;
     window.location.hash = '#' + boardKey;
   }
 
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/firebase.User
-      main(boardKey, user);
-    } else {
-      // User is signed out
-      // ...
-    }
-  });
-  firebase.auth().signInAnonymously();
+  const cid = firebase.database().ref(`boards/${boardKey}/clients`).push().key;
+  main(boardKey, cid);
+
+  // firebase.auth().onAuthStateChanged((user) => {
+  //   if (user) {
+  //     // User is signed in, see docs for a list of available properties
+  //     // https://firebase.google.com/docs/reference/js/firebase.User
+  //     main(boardKey, user);
+  //   } else {
+  //     // User is signed out
+  //     // ...
+  //   }
+  // });
+  // firebase.auth().signInAnonymously();
 })();
 
 
@@ -54,9 +56,9 @@ function hash(str) {
   return hash;
 }
 
-function uidToColor(uid) {
-  const uidHash = hash(uid);
-  const rgb = hsluv.hsluvToRgb([ uidHash % 360, 80, 60 ]);
+function cidToColor(cid) {
+  const cidHash = hash(cid);
+  const rgb = hsluv.hsluvToRgb([ cidHash % 360, 80, 60 ]);
   return rgb.map(x => 255 * x);
 }
 
@@ -96,8 +98,12 @@ const stringifyNums = nums => Object.entries(nums)
 
 
 
-function main(boardKey, user) {
-  const refSelected = firebase.database().ref(`boards/${boardKey}/selected/${user.uid}`);
+function main(boardKey, cid) {
+  const refClients = firebase.database().ref(`boards/${boardKey}/clients/${cid}`);
+  refClients.set({ connected: true, name: null });
+  refClients.onDisconnect().remove();
+
+  const refSelected = firebase.database().ref(`boards/${boardKey}/selected/${cid}`);
   refSelected.onDisconnect().remove();
 
   const refFilled = firebase.database().ref(`boards/${boardKey}/filled`);
@@ -107,17 +113,17 @@ function main(boardKey, user) {
 
   firebase.database().ref(`boards/${boardKey}/selected`).on('value', snapshot => {
     const selectedNew = snapshot.val() || {};
-    const uids = new Set([ ...Object.keys(data.selected), ...Object.keys(selectedNew) ]);
-    for (const uid of uids) {
+    const cids = new Set([ ...Object.keys(data.selected), ...Object.keys(selectedNew) ]);
+    for (const otherCid of cids) {
 
-      const uselected = data.selected[uid] || {};
-      const uselectedNew = selectedNew[uid] || {};
-      const isMe = uid === user.uid;
+      const uselected = data.selected[otherCid] || {};
+      const uselectedNew = selectedNew[otherCid] || {};
+      const isMe = otherCid === cid;
 
       for (let id = 0; id < CELLS; id++) {
         if (uselected[id]) {
           if (!uselectedNew[id]) {
-            const remove = sudokuHighlights.querySelector(`[data-id="${id}"][data-uid="${uid}"]`);
+            const remove = sudokuHighlights.querySelector(`[data-id="${id}"][data-cid="${otherCid}"]`);
             if (remove) sudokuHighlights.removeChild(remove);
           }
         }
@@ -127,13 +133,13 @@ function main(boardKey, user) {
           const highlight = document.createElementNS(NS_SVG, 'use');
           highlight.setAttribute('href', '#highlight');
           highlight.setAttribute('data-id', id);
-          highlight.setAttribute('data-uid', uid);
+          highlight.setAttribute('data-cid', otherCid);
           highlight.setAttribute('x', 100 * x);
           highlight.setAttribute('y', 100 * y);
 
           let fill = 'rgba(255, 215, 0, 0.5)';
           if (!isMe) {
-            const rgb = uidToColor(uid);
+            const rgb = cidToColor(otherCid);
             fill = `rgba(${rgb.join(',')}, 0.2)`;
           }
           highlight.setAttribute('fill', fill);
@@ -252,7 +258,7 @@ function main(boardKey, user) {
   function fillDigit(num) {
     const updates = {};
     for (let id = 0; id < CELLS; id++) {
-      if (data.selected[user.uid][id]) {
+      if (data.selected[cid][id]) {
         updates[id] = num;
       }
     }
@@ -263,7 +269,7 @@ function main(boardKey, user) {
     const updates = {};
     if (null == num) {
       for (let id = 0; id < CELLS; id++) {
-        if (data.selected[user.uid][id]) {
+        if (data.selected[cid][id]) {
           updates[id] = null;
         }
       }
@@ -271,7 +277,7 @@ function main(boardKey, user) {
     else {
       let allSet = true;
       for (let id = 0; id < CELLS; id++) {
-        if (data.selected[user.uid][id]) {
+        if (data.selected[cid][id]) {
           allSet &= (data[type][id] || {})[num];
           updates[`${id}/${num}`] = true;
         }

@@ -66,8 +66,10 @@ function id2xy(id) {
 
 
 function main(boardKey, user) {
-  const refSelected = `boards/${boardKey}/selected/${user.uid}`;
-  const refFilled = `boards/${boardKey}/filled`;
+  const refSelected = firebase.database().ref(`boards/${boardKey}/selected/${user.uid}`);
+  refSelected.onDisconnect().remove();
+
+  const refFilled = firebase.database().ref(`boards/${boardKey}/filled`);
 
 
   firebase.database().ref(`boards/${boardKey}/selected`).on('value', snapshot => {
@@ -108,7 +110,7 @@ function main(boardKey, user) {
     data.selected = selectedNew;
   });
 
-  firebase.database().ref(refFilled).on('value', snapshot => {
+  refFilled.on('value', snapshot => {
     const filledNew = snapshot.val() || {};
     for (let id = 0; id < 81; id++) {
       if (null == data.filled[id] && null != filledNew[id]) {
@@ -143,17 +145,17 @@ function main(boardKey, user) {
         updates[id] = num;
       }
     }
-    firebase.database().ref(refFilled).update(updates);
+    refFilled.update(updates);
   }
 
   function select({ offsetX, offsetY }) {
     const x = (offsetX / 100) | 0;
     const y = (offsetY / 100) | 0;
     const id = xy2id(x, y);
-    firebase.database().ref(refSelected).child(id).set(true);
+    refSelected.child(id).set(true);
   }
   function unselect() {
-    firebase.database().ref(refSelected).remove();
+    refSelected.remove();
   }
 
 

@@ -5,11 +5,16 @@ body {
 /* .highlight {
     fill: rgba(255, 215, 0, 0.5);
 } */
-.given, .filled {
+.given, .filled, .center, .corner {
     text-anchor: middle;
     dominant-baseline: central;
-    font-size: 50px;
 }
-.filled {
+.given, .filled {
+    font-size: 60px;
+}
+.center, .corner {
+    font-size: 20px;
+}
+.filled, .center, .corner {
     fill: #26e;
 }

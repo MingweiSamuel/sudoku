@@ -130,11 +130,6 @@ function main(gameKey, cid) {
   });
   refClient.onDisconnect().remove();
 
-  const refClientSelected = refClient.child('selected');
-  const refClientCursor = refClient.child('cursor');
-
-  // const refClientActionHistory = refClient.child('actionHistory');
-
   const refBoard = refGame.child('board');
   const boardWatcher = new Watch(refBoard);
 
@@ -242,21 +237,21 @@ function main(gameKey, cid) {
 
   function fill(num, type) {
     const updates = {};
-    const selected = allClientsWatcher.data[cid].selected
+    const selected = Object.entries(allClientsWatcher.data[cid].selected)
       .filter(([ _, isSet ]) => isSet)
       .map(([ key, _ ]) => key);
 
     switch (type) {
       case FILLED:
         for (const id of selected) {
-          updates[id] = num;
+          updates[`${type}/${id}`] = num;
         }
         break;
       case CORNER:
       case CENTER:
         if (null == num) {
           for (const id of selected) {
-            updates[id] = null;
+            updates[`${type}/${id}`] = null;
           }
         }
         else {
@@ -265,7 +260,7 @@ function main(gameKey, cid) {
           let allSet = true;
           for (const id of selected) {
             allSet &&= filledData[id] && filledData[id][num];
-            updates[`${id}/${num}`] = true;
+            updates[`${type}/${id}/${num}`] = true;
           }
           // If they are all set, unset all.
           if (allSet) {
@@ -278,7 +273,7 @@ function main(gameKey, cid) {
       default:
         throw new Error(`Unknown type: ${type}.`);
     }
-    refBoard.child(type).update(updates);
+    boardWatcher.update(updates);
   }
 
   function offset2xy({ offsetX, offsetY }) {
@@ -289,9 +284,19 @@ function main(gameKey, cid) {
 
   function select(x, y, reset = false) {
     const id = xy2id(x, y);
-    if (reset) refClientSelected.set({ [id]: true });
-    else refClientSelected.child(id).set(true);
-    refClientCursor.set(id);
+
+    if (reset) {
+      allClientsWatcher.update({
+        [`${cid}/selected`]: null,
+      });
+    }
+    // else {
+    // }
+
+    allClientsWatcher.update({
+      [`${cid}/selected/${id}`]: true,
+      [`${cid}/cursor`]: id,
+    });
   }
 
 

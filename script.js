@@ -1,9 +1,22 @@
 const NS_SVG = 'http://www.w3.org/2000/svg';
 
+const SIZE = 9;
 const CELLS = 81;
+
+const KEYS = {
+  Delete: null,
+};
+
+const ARROWS = {
+  ArrowUp:    [  0, -1 ],
+  ArrowDown:  [  0,  1 ],
+  ArrowLeft:  [ -1,  0 ],
+  ArrowRight: [  1,  0 ],
+};
 
 const sudoku = document.getElementById('sudoku');
 const sudokuHighlights = document.getElementById('sudoku-highlights');
+const sudokuCursor = document.getElementById('sudoku-cursor');
 const sudokuGivens = document.getElementById('sudoku-givens');
 const sudokuFilled = document.getElementById('sudoku-filled');
 const sudokuCenter = document.getElementById('sudoku-center');
@@ -44,6 +57,10 @@ const data = {
   // });
   // firebase.auth().signInAnonymously();
 })();
+
+function wrap(x) {
+  return ((x % SIZE) + SIZE) % SIZE;
+}
 
 
 function hash(str) {
@@ -99,166 +116,135 @@ const stringifyNums = nums => Object.entries(nums)
 
 
 function main(boardKey, cid) {
-  const refClients = firebase.database().ref(`boards/${boardKey}/clients/${cid}`);
-  refClients.set({ connected: true, name: null });
-  refClients.onDisconnect().remove();
+  const refAllClients = firebase.database().ref(`boards/${boardKey}/clients`);
 
-  const refSelected = firebase.database().ref(`boards/${boardKey}/selected/${cid}`);
-  refSelected.onDisconnect().remove();
+  const refClient = refAllClients.child(cid);
+  refClient.set({ connected: true, name: null });
+  refClient.onDisconnect().remove();
+
+  const refSelected = refClient.child('selected');
+  const selectedData = watch(refSelected);
+  const refCursor = refClient.child('cursor');
+  const cursorData = watch(refCursor);
 
   const refFilled = firebase.database().ref(`boards/${boardKey}/filled`);
   const refCenter = firebase.database().ref(`boards/${boardKey}/center`);
   const refCorner = firebase.database().ref(`boards/${boardKey}/corner`);
 
 
-  firebase.database().ref(`boards/${boardKey}/selected`).on('value', snapshot => {
-    const selectedNew = snapshot.val() || {};
-    const cids = new Set([ ...Object.keys(data.selected), ...Object.keys(selectedNew) ]);
-    for (const otherCid of cids) {
+  bind(refAllClients, sudokuHighlights, {
+    pattern: '*/selected/*',
+    create() {
+      const el = document.createElementNS(NS_SVG, 'use');
+      el.setAttribute('href', '#highlight');
+      return el;
+    },
+    update(el, [ otherCid, id ], val) {
+      const [ x, y ] = id2xy(id);
 
-      const uselected = data.selected[otherCid] || {};
-      const uselectedNew = selectedNew[otherCid] || {};
-      const isMe = otherCid === cid;
-
-      for (let id = 0; id < CELLS; id++) {
-        if (uselected[id]) {
-          if (!uselectedNew[id]) {
-            const remove = sudokuHighlights.querySelector(`[data-id="${id}"][data-cid="${otherCid}"]`);
-            if (remove) sudokuHighlights.removeChild(remove);
-          }
-        }
-        else if (uselectedNew[id]) {
-          const [ x, y ] = id2xy(id);
-
-          const highlight = document.createElementNS(NS_SVG, 'use');
-          highlight.setAttribute('href', '#highlight');
-          highlight.setAttribute('data-id', id);
-          highlight.setAttribute('data-cid', otherCid);
-          highlight.setAttribute('x', 100 * x);
-          highlight.setAttribute('y', 100 * y);
-
-          let fill = 'rgba(255, 215, 0, 0.5)';
-          if (!isMe) {
-            const rgb = cidToColor(otherCid);
-            fill = `rgba(${rgb.join(',')}, 0.2)`;
-          }
-          highlight.setAttribute('fill', fill);
-
-          sudokuHighlights.append(highlight);
-        }
+      let fillColor = 'rgba(255, 215, 0, 0.4)';
+      if (otherCid !== cid) {
+        const rgb = cidToColor(otherCid);
+        fillColor = `rgba(${rgb.join(',')}, 0.15)`;
       }
-    }
-    data.selected = selectedNew;
+
+      el.setAttribute('x', 100 * x);
+      el.setAttribute('y', 100 * y);
+      el.setAttribute('fill', fillColor);
+    },
   });
 
-  refFilled.on('value', snapshot => {
-    const filledNew = snapshot.val() || {};
-    for (let id = 0; id < CELLS; id++) {
-      if (null == data.filled[id]) {
-        if (null != filledNew[id]) {
-          const num = filledNew[id];
-          const [ x, y ] = id2xy(id);
+  bind(refAllClients, sudokuCursor, {
+    pattern: '*/cursor',
+    create() {
+      const el = document.createElementNS(NS_SVG, 'use');
+      el.setAttribute('href', '#cursor');
+      return el;
+    },
+    update(el, [ otherCid ], val) {
+      const [ x, y ] = id2xy(val);
 
-          const el = document.createElementNS(NS_SVG, 'text');
-          el.setAttribute('data-id', id);
-          el.textContent = '' + num;
-          el.setAttribute('class', 'filled');
-          el.setAttribute('x', 100 * x + 50);
-          el.setAttribute('y', 100 * y + 50);
-
-          sudokuFilled.appendChild(el);
-        }
+      let fillColor = '#f80';
+      if (otherCid !== cid) {
+        const rgb = cidToColor(otherCid);
+        fillColor = `rgba(${rgb.join(',')}, 0.3)`;
       }
-      else if (null == filledNew[id]) {
-        const remove = sudokuFilled.querySelector(`[data-id="${id}"]`);
-        if (remove) sudokuFilled.removeChild(remove);
-      }
-      else if (data.filled[id] !== filledNew[id]) {
-        const elem = sudokuFilled.querySelector(`[data-id="${id}"]`);
-        elem.textContent = filledNew[id];
-      }
-    }
-    data.filled = filledNew;
+      
+      el.setAttribute('data-cid', otherCid);
+      el.setAttribute('x', 100 * x);
+      el.setAttribute('y', 100 * y);
+      el.setAttribute('fill', fillColor);
+    },
   });
 
-  refCenter.on('value', snapshot => {
-    const centerNew = snapshot.val() || {};
-    for (let id = 0; id < CELLS; id++) {
-      if (null == data.center[id]) {
-        if (null != centerNew[id]) {
-          const [ x, y ] = id2xy(id);
+  const filledData = bind(refFilled, sudokuFilled, {
+    create() {
+      const el = document.createElementNS(NS_SVG, 'text');
+      el.setAttribute('class', 'filled');
 
-          const el = document.createElementNS(NS_SVG, 'text');
-          el.setAttribute('data-id', id);
-          el.textContent = stringifyNums(centerNew[id]);
-          el.setAttribute('class', 'center');
-          el.setAttribute('x', 100 * x + 50);
-          el.setAttribute('y', 100 * y + 50);
-
-          sudokuCenter.appendChild(el);
-        }
-      }
-      else if (null == centerNew[id]) {
-        const remove = sudokuCenter.querySelector(`[data-id="${id}"]`);
-        if (remove) sudokuCenter.removeChild(remove);
-      }
-      else if (stringifyNums(data.center[id]) !== stringifyNums(centerNew[id])) {
-        const elem = sudokuCenter.querySelector(`[data-id="${id}"]`);
-        elem.textContent = stringifyNums(centerNew[id]);
-      }
-    }
-    data.center = centerNew;
+      return el;
+    },
+    update(el, [ id ], val) {
+      const [ x, y ] = id2xy(id);
+      el.textContent = '' + val;
+      el.setAttribute('x', 100 * x + 50);
+      el.setAttribute('y', 100 * y + 50);
+    },
   });
 
-
-  refCorner.on('value', snapshot => {
-    const cornerNew = snapshot.val() || {};
-    for (let id = 0; id < CELLS; id++) {
-
-      if (null != data.corner[id]) {
-        if (null != cornerNew[id] && stringifyNums(data.corner[id]) === stringifyNums(cornerNew[id])) {
-          // No changes.
-          continue;
-        }
-        const remove = sudokuCorner.querySelector(`[data-id="${id}"]`);
-        if (remove) sudokuCorner.removeChild(remove);
-      }
-
-      if (null != cornerNew[id]) {
-        const [ x, y ] = id2xy(id);
-
-        const g = document.createElementNS(NS_SVG, 'g');
-        g.setAttribute('data-id', id);
-
-        const nums = Object.entries(cornerNew[id])
-          .filter(([ _, flag ]) => flag)
-          .map(([ num ]) => num);
-
-        for (let i = 0; i < nums.length; i++) {
-          const [ dx, dy ] = cornerPos(i, nums.length);
-
-          const el = document.createElementNS(NS_SVG, 'text');
-          el.setAttribute('data-id', id);
-          el.textContent = '' + nums[i];
-          el.setAttribute('class', 'corner');
-          el.setAttribute('x', 100 * x + 50 + dx);
-          el.setAttribute('y', 100 * y + 50 + dy);
-
-          g.appendChild(el);
-        }
-
-        sudokuCorner.appendChild(g);
-      }
-    }
-    data.corner = cornerNew;
+  const centerData = bind(refCenter, sudokuCenter, {
+    create() {
+      const el = document.createElementNS(NS_SVG, 'text');
+      el.setAttribute('class', 'center');
+      return el;
+    },
+    update(el, [ id ], val) {
+      const [ x, y ] = id2xy(id);
+      el.textContent = stringifyNums(val);
+      el.setAttribute('x', 100 * x + 50);
+      el.setAttribute('y', 100 * y + 50);
+    },
   });
 
+  const cornerData = bind(refCorner, sudokuCorner, {
+    create() {
+      return document.createElementNS(NS_SVG, 'g');
+    },
+    update(g, [ id ], val) {
+      while (g.lastChild) g.removeChild(g.lastChild);
+
+      const [ x, y ] = id2xy(id);
+
+      const nums = Object.entries(val)
+        .filter(([ _, flag ]) => flag)
+        .map(([ num ]) => num);
+
+      for (let i = 0; i < nums.length; i++) {
+        const [ dx, dy ] = cornerPos(i, nums.length);
+
+        const el = document.createElementNS(NS_SVG, 'text');
+        el.textContent = '' + nums[i];
+        el.setAttribute('class', 'corner');
+        el.setAttribute('x', 100 * x + 50 + dx);
+        el.setAttribute('y', 100 * y + 50 + dy);
+
+        g.appendChild(el);
+      }
+
+      sudokuCorner.appendChild(g);
+    },
+  });
+
+  const getData = {
+    center: centerData,
+    corner: cornerData,
+  };
 
 
   function fillDigit(num) {
     const updates = {};
     for (let id = 0; id < CELLS; id++) {
-      if (data.selected[cid][id]) {
+      if (selectedData()[id]) {
         updates[id] = num;
       }
     }
@@ -269,7 +255,7 @@ function main(boardKey, cid) {
     const updates = {};
     if (null == num) {
       for (let id = 0; id < CELLS; id++) {
-        if (data.selected[cid][id]) {
+        if (selectedData()[id]) {
           updates[id] = null;
         }
       }
@@ -277,8 +263,8 @@ function main(boardKey, cid) {
     else {
       let allSet = true;
       for (let id = 0; id < CELLS; id++) {
-        if (data.selected[cid][id]) {
-          allSet &= (data[type][id] || {})[num];
+        if (selectedData()[id]) {
+          allSet &= (getData[type]()[id] || {})[num];
           updates[`${id}/${num}`] = true;
         }
       }
@@ -296,14 +282,17 @@ function main(boardKey, cid) {
     })[type].update(updates);
   }
 
-  function select({ offsetX, offsetY }) {
+  function offset2xy({ offsetX, offsetY }) {
     const x = (offsetX / 100) | 0;
     const y = (offsetY / 100) | 0;
-    const id = xy2id(x, y);
-    refSelected.child(id).set(true);
+    return [ x, y ];
   }
-  function unselect() {
-    refSelected.remove();
+
+  function select(x, y, reset = false) {
+    const id = xy2id(x, y);
+    if (reset) refSelected.set({ [id]: true });
+    else refSelected.child(id).set(true);
+    refCursor.set(id);
   }
 
 
@@ -313,15 +302,16 @@ function main(boardKey, cid) {
     sudoku.addEventListener('mousedown', e => {
       if (!selecting) {
         selecting = true;
-        if (!e.shiftKey && !e.ctrlKey)
-          unselect();
-        select(e);
+        const [ x, y ] = offset2xy(e);
+        select(x, y, !e.shiftKey && !e.ctrlKey);
       }
     });
 
     sudoku.addEventListener('mousemove', e => {
-      if (selecting)
-        select(e);
+      if (selecting) {
+        const [ x, y ] = offset2xy(e);
+        select(x, y);
+      }
     });
 
     window.addEventListener('mouseup', e => {
@@ -331,8 +321,25 @@ function main(boardKey, cid) {
 
   const DIGIT_REGEX = /Digit(\d)/;
   window.addEventListener('keydown', e => {
-    let num = null;
-    if ('Delete' !== e.code) {
+    let num;
+    if (e.code in KEYS) {
+      num = KEYS[e.code]
+    }
+    else if (e.code in ARROWS) {
+      e.preventDefault();
+      let x = 0
+      let y = 0;
+      const cursor = cursorData();
+      if (null != cursor) {
+        const [ dx, dy ] = ARROWS[e.code];
+        const [ cx, cy ] = id2xy(cursor);
+        x = wrap(cx + dx);
+        y = wrap(cy + dy);
+      }
+      select(x, y, !e.shiftKey && !e.ctrlKey);
+      return;
+    }
+    else {
       let match = DIGIT_REGEX.exec(e.code);
       if (!match) return;
       num = Number(match[1]);

@@ -1,5 +1,9 @@
 const NS_SVG = 'http://www.w3.org/2000/svg';
 
+const FILLED = 'filled';
+const CORNER = 'corner';
+const CENTER = 'center';
+
 const SIZE = 9;
 const CELLS = 81;
 
@@ -33,29 +37,29 @@ const data = {
 
 
 (() => {
-  let boardKey;
+  let gameKey;
   if (window.location.hash) {
-    boardKey = window.location.hash.slice(1);
+    gameKey = window.location.hash.slice(1);
   }
   else {
-    boardKey = firebase.database().ref('boards').push().key;
-    window.location.hash = '#' + boardKey;
+    gameKey = firebase.database().ref('game').push().key;
+    window.location.hash = '#' + gameKey;
   }
 
-  const cid = firebase.database().ref(`boards/${boardKey}/clients`).push().key;
-  main(boardKey, cid);
+  // const cid = firebase.database().ref(`game/${gameKey}/clients`).push().key;
+  // main(gameKey, cid);
 
-  // firebase.auth().onAuthStateChanged((user) => {
-  //   if (user) {
-  //     // User is signed in, see docs for a list of available properties
-  //     // https://firebase.google.com/docs/reference/js/firebase.User
-  //     main(boardKey, user);
-  //   } else {
-  //     // User is signed out
-  //     // ...
-  //   }
-  // });
-  // firebase.auth().signInAnonymously();
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      // User is signed in, see docs for a list of available properties
+      // https://firebase.google.com/docs/reference/js/firebase.User
+      main(gameKey, user.uid);
+    } else {
+      // User is signed out
+      // ...
+    }
+  });
+  firebase.auth().signInAnonymously();
 })();
 
 function wrap(x) {
@@ -115,25 +119,27 @@ const stringifyNums = nums => Object.entries(nums)
 
 
 
-function main(boardKey, cid) {
-  const refAllClients = firebase.database().ref(`boards/${boardKey}/clients`);
+function main(gameKey, cid) {
+  const refGame = firebase.database().ref(`game/${gameKey}`);
+  const refAllClients = refGame.child('clients');
+  const allClientsWatcher = new Watch(refAllClients);
 
   const refClient = refAllClients.child(cid);
-  refClient.set({ connected: true, name: null });
+  refClient.update({
+    ts: firebase.database.ServerValue.TIMESTAMP,
+  });
   refClient.onDisconnect().remove();
 
-  const refSelected = refClient.child('selected');
-  const selectedData = watch(refSelected);
-  const refCursor = refClient.child('cursor');
-  const cursorData = watch(refCursor);
+  const refClientSelected = refClient.child('selected');
+  const refClientCursor = refClient.child('cursor');
 
-  const refFilled = firebase.database().ref(`boards/${boardKey}/filled`);
-  const refCenter = firebase.database().ref(`boards/${boardKey}/center`);
-  const refCorner = firebase.database().ref(`boards/${boardKey}/corner`);
+  // const refClientActionHistory = refClient.child('actionHistory');
+
+  const refBoard = refGame.child('board');
+  const boardWatcher = new Watch(refBoard);
 
 
-  bind(refAllClients, sudokuHighlights, {
-    pattern: '*/selected/*',
+  allClientsWatcher.watch('*/selected/*', makeBind(sudokuHighlights, {
     create() {
       const el = document.createElementNS(NS_SVG, 'use');
       el.setAttribute('href', '#highlight');
@@ -152,10 +158,9 @@ function main(boardKey, cid) {
       el.setAttribute('y', 100 * y);
       el.setAttribute('fill', fillColor);
     },
-  });
+  }));
 
-  bind(refAllClients, sudokuCursor, {
-    pattern: '*/cursor',
+  allClientsWatcher.watch('*/cursor', makeBind(sudokuCursor, {
     create() {
       const el = document.createElementNS(NS_SVG, 'use');
       el.setAttribute('href', '#cursor');
@@ -175,9 +180,9 @@ function main(boardKey, cid) {
       el.setAttribute('y', 100 * y);
       el.setAttribute('fill', fillColor);
     },
-  });
+  }));
 
-  const filledData = bind(refFilled, sudokuFilled, {
+  boardWatcher.watch(`${FILLED}/*`, makeBind(sudokuFilled, {
     create() {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'filled');
@@ -190,23 +195,9 @@ function main(boardKey, cid) {
       el.setAttribute('x', 100 * x + 50);
       el.setAttribute('y', 100 * y + 50);
     },
-  });
+  }));
 
-  const centerData = bind(refCenter, sudokuCenter, {
-    create() {
-      const el = document.createElementNS(NS_SVG, 'text');
-      el.setAttribute('class', 'center');
-      return el;
-    },
-    update(el, [ id ], val) {
-      const [ x, y ] = id2xy(id);
-      el.textContent = stringifyNums(val);
-      el.setAttribute('x', 100 * x + 50);
-      el.setAttribute('y', 100 * y + 50);
-    },
-  });
-
-  const cornerData = bind(refCorner, sudokuCorner, {
+  boardWatcher.watch(`${CORNER}/*`, makeBind(sudokuCorner, {
     create() {
       return document.createElementNS(NS_SVG, 'g');
     },
@@ -233,53 +224,61 @@ function main(boardKey, cid) {
 
       sudokuCorner.appendChild(g);
     },
-  });
+  }));
 
-  const getData = {
-    center: centerData,
-    corner: cornerData,
-  };
-
-
-  function fillDigit(num) {
-    const updates = {};
-    for (let id = 0; id < CELLS; id++) {
-      if (selectedData()[id]) {
-        updates[id] = num;
-      }
-    }
-    refFilled.update(updates);
-  }
+  boardWatcher.watch(`${CENTER}/*`, makeBind(sudokuCenter, {
+    create() {
+      const el = document.createElementNS(NS_SVG, 'text');
+      el.setAttribute('class', 'center');
+      return el;
+    },
+    update(el, [ id ], val) {
+      const [ x, y ] = id2xy(id);
+      el.textContent = stringifyNums(val);
+      el.setAttribute('x', 100 * x + 50);
+      el.setAttribute('y', 100 * y + 50);
+    },
+  }));
 
   function fill(num, type) {
     const updates = {};
-    if (null == num) {
-      for (let id = 0; id < CELLS; id++) {
-        if (selectedData()[id]) {
-          updates[id] = null;
-        }
-      }
-    }
-    else {
-      let allSet = true;
-      for (let id = 0; id < CELLS; id++) {
-        if (selectedData()[id]) {
-          allSet &= (getData[type]()[id] || {})[num];
-          updates[`${id}/${num}`] = true;
-        }
-      }
-      // If they are all set, set to false.
-      if (allSet) {
-        for (const key of Object.keys(updates)) {
-          updates[key] = null;
-        }
-      }
-    }
+    const selected = allClientsWatcher.data[cid].selected
+      .filter(([ _, isSet ]) => isSet)
+      .map(([ key, _ ]) => key);
 
-    ({
-      center: refCenter,
-      corner: refCorner,
-    })[type].update(updates);
+    switch (type) {
+      case FILLED:
+        for (const id of selected) {
+          updates[id] = num;
+        }
+        break;
+      case CORNER:
+      case CENTER:
+        if (null == num) {
+          for (const id of selected) {
+            updates[id] = null;
+          }
+        }
+        else {
+          const filledData = boardWatcher.data[type] || {};
+
+          let allSet = true;
+          for (const id of selected) {
+            allSet &&= filledData[id] && filledData[id][num];
+            updates[`${id}/${num}`] = true;
+          }
+          // If they are all set, unset all.
+          if (allSet) {
+            for (const key of Object.keys(updates)) {
+              updates[key] = null;
+            }
+          }
+        }
+        break;
+      default:
+        throw new Error(`Unknown type: ${type}.`);
+    }
+    refBoard.child(type).update(updates);
   }
 
   function offset2xy({ offsetX, offsetY }) {
@@ -290,9 +289,9 @@ function main(boardKey, cid) {
 
   function select(x, y, reset = false) {
     const id = xy2id(x, y);
-    if (reset) refSelected.set({ [id]: true });
-    else refSelected.child(id).set(true);
-    refCursor.set(id);
+    if (reset) refClientSelected.set({ [id]: true });
+    else refClientSelected.child(id).set(true);
+    refClientCursor.set(id);
   }
 
 
@@ -329,7 +328,7 @@ function main(boardKey, cid) {
       e.preventDefault();
       let x = 0
       let y = 0;
-      const cursor = cursorData();
+      const cursor = allClientsWatcher.data[cid].cursor;
       if (null != cursor) {
         const [ dx, dy ] = ARROWS[e.code];
         const [ cx, cy ] = id2xy(cursor);
@@ -347,14 +346,14 @@ function main(boardKey, cid) {
 
     e.preventDefault();
 
-    if (e.ctrlKey) {
-      fill(num, 'center');
+    if (e.shiftKey) {
+      fill(num, CORNER);
     }
-    else if (e.shiftKey) {
-      fill(num, 'corner');
+    else if (e.ctrlKey) {
+      fill(num, CENTER);
     }
     else {
-      fillDigit(num);
+      fill(num, FILLED);
     }
   });
 }

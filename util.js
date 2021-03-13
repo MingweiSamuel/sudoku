@@ -52,31 +52,43 @@ function forEachPattern(pattern, oldData, newData, func, path = []) {
     }
 }
 
-function watch(ref, { pattern = '*', onAdd, onRemove, onChange } = {}) {
-    let oldData = undefined;
-    ref.on('value', snapshot => {
-        const newData = snapshot.val();        
-        forEachPattern(pattern, oldData, newData, (path, oldVal, newVal) => {
-            if (null == oldVal) {
-                if (null != newVal) {
-                    onAdd && onAdd({ path, newVal });
+class Watch {
+    constructor(ref) {
+        this.data = undefined;
+        this._patternWatchers = {};
+
+        ref.on('value', snapshot => this._onValue(snapshot.val()));
+    }
+
+    watch(pattern, watcher) {
+        (this._patternWatchers[pattern] || (this._patternWatchers[pattern] = [])).push(watcher);
+    }
+
+    _onValue(newData) {
+        for (const [ pattern, watchers ] of Object.entries(this._patternWatchers)) {
+            forEachPattern(pattern, this.data, newData, (path, oldVal, newVal) => {
+                if (null == oldVal) {
+                    if (null != newVal) {
+                        watchers.forEach(({ onAdd }) =>
+                            onAdd && onAdd({ path, newVal }));
+                    }
                 }
-            }
-            else if (null == newVal) {
-                onRemove && onRemove({ path, oldVal });
-            }
-            else if (!equal(oldVal, newVal)) {
-                onChange && onChange({ path, oldVal, newVal });
-            }
-        });
-        oldData = newData;
-    });
-    return () => oldData;
+                else if (null == newVal) {
+                    watchers.forEach(({ onRemove }) =>
+                        onRemove && onRemove({ path, oldVal }));
+                }
+                else if (!equal(oldVal, newVal)) {
+                    watchers.forEach(({ onChange }) =>
+                        onChange && onChange({ path, oldVal, newVal }));
+                }
+            });
+        }
+        this.data = newData;
+    }
 }
 
-function bind(ref, parent, { pattern = '*', create, update }) {
-    return watch(ref, {
-        pattern,
+function makeBind(parent, { create, update }) {
+    return {
         onAdd({ path, newVal }) {
             const el = create();
             el.setAttribute('data-path', path.join('.'));
@@ -91,5 +103,5 @@ function bind(ref, parent, { pattern = '*', create, update }) {
             const el = parent.querySelector(`[data-path="${path.join('.')}"]`);
             update(el, path, newVal);
         },
-    })
+    };
 }

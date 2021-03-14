@@ -24,6 +24,7 @@ const sudokuHighlights = document.getElementById('sudoku-highlights');
 const sudokuCursor = document.getElementById('sudoku-cursor');
 const sudokuGivens = document.getElementById('sudoku-givens');
 const sudokuFilled = document.getElementById('sudoku-filled');
+const sudokuFilledMask = document.getElementById('sudoku-filled-mask');
 const sudokuCenter = document.getElementById('sudoku-center');
 const sudokuCorner = document.getElementById('sudoku-corner');
 
@@ -175,29 +176,7 @@ function main(gameKey, cid) {
   const boardData = new DataLayer(refBoard);
   window._boardData = boardData;
 
-  // Undo if REDO is false.
-  // Redo if REDO is true.
-  function updateHistory(redo) {
-    const historyEntries = Object.entries(allClientsData.get(cid, redo ? 'historyUndone' : 'history') || {});
-    if (0 === historyEntries.length) return false;
-
-    const [ histKey, histVal ] = historyEntries.reduce((entryA, entryB) => {
-      const order = (entryA[1].ts[0] - entryB[1].ts[0]) || (entryA[1].ts[1] - entryB[1].ts[1]);
-      return (redo !== order > 0) ? entryA : entryB;
-    });
-    const diffData = JSON.parse(histVal.data);
-    // Update board changes.
-    // TODO: USE OTHER TO RESOLVE CONFLICTS.
-    boardData.update(redo ? diffData.forward : diffData.back);
-    // Remove entry from historyUndone.
-    // Add entry to history.
-    allClientsData.update({
-      [`${cid}/history/${histKey}`]: redo ? histVal : null,
-      [`${cid}/historyUndone/${histKey}`]: redo ? null : histVal,
-    });
-    return true;
-  }
-
+  // Client selected highlights.
   allClientsData.watch('*/selected/*', makeBind(sudokuHighlights, {
     create() {
       const el = document.createElementNS(NS_SVG, 'use');
@@ -219,6 +198,7 @@ function main(gameKey, cid) {
     },
   }));
 
+  // Client cursor markers (small triangle in top left).
   allClientsData.watch('*/cursor', makeBind(sudokuCursor, {
     create() {
       const el = document.createElementNS(NS_SVG, 'use');
@@ -241,6 +221,7 @@ function main(gameKey, cid) {
     },
   }));
 
+  // Filled cells.
   boardData.watch(`${FILLED}/*`, makeBind(sudokuFilled, {
     create() {
       const el = document.createElementNS(NS_SVG, 'text');
@@ -254,7 +235,23 @@ function main(gameKey, cid) {
       el.setAttribute('y', 100 * y + 50);
     },
   }));
+  // Filled cells mask, for pencil marks.
+  boardData.watch(`${FILLED}/*`, makeBind(sudokuFilledMask, {
+    create() {
+      const el = document.createElementNS(NS_SVG, 'rect');
+      el.setAttribute('width', '100');
+      el.setAttribute('height', '100');
+      el.setAttribute('fill', 'black');
+      return el;
+    },
+    update(el, [ id ], _val) {
+      const [ x, y ] = id2xy(id);
+      el.setAttribute('x', 100 * x);
+      el.setAttribute('y', 100 * y);
+    },
+  }));
 
+  // Corner pencil marks.
   boardData.watch(`${CORNER}/*`, makeBind(sudokuCorner, {
     create() {
       return document.createElementNS(NS_SVG, 'g');
@@ -274,6 +271,7 @@ function main(gameKey, cid) {
         const el = document.createElementNS(NS_SVG, 'text');
         el.textContent = '' + nums[i];
         el.setAttribute('class', 'corner');
+        el.setAttribute('mask', 'url(#sudoku-filled-mask)');
         el.setAttribute('x', 100 * x + 50 + dx);
         el.setAttribute('y', 100 * y + 50 + dy);
 
@@ -284,10 +282,12 @@ function main(gameKey, cid) {
     },
   }));
 
+  // Center pencil marks.
   boardData.watch(`${CENTER}/*`, makeBind(sudokuCenter, {
     create() {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'center');
+      el.setAttribute('mask', 'url(#sudoku-filled-mask)');
       return el;
     },
     update(el, [ id ], val) {
@@ -297,6 +297,29 @@ function main(gameKey, cid) {
       el.setAttribute('y', 100 * y + 50);
     },
   }));
+
+  // Undo if REDO is false.
+  // Redo if REDO is true.
+  function updateHistory(redo) {
+    const historyEntries = Object.entries(allClientsData.get(cid, redo ? 'historyUndone' : 'history') || {});
+    if (0 === historyEntries.length) return false;
+
+    const [ histKey, histVal ] = historyEntries.reduce((entryA, entryB) => {
+      const order = (entryA[1].ts[0] - entryB[1].ts[0]) || (entryA[1].ts[1] - entryB[1].ts[1]);
+      return (redo !== order > 0) ? entryA : entryB;
+    });
+    const diffData = JSON.parse(histVal.data);
+    // Update board changes.
+    // TODO: USE OTHER TO RESOLVE CONFLICTS.
+    boardData.update(redo ? diffData.forward : diffData.back);
+    // Remove entry from historyUndone.
+    // Add entry to history.
+    allClientsData.update({
+      [`${cid}/history/${histKey}`]: redo ? histVal : null,
+      [`${cid}/historyUndone/${histKey}`]: redo ? null : histVal,
+    });
+    return true;
+  }
 
   function fill(num, type) {
     const update = {};
@@ -349,8 +372,9 @@ function main(gameKey, cid) {
   }
 
   function offset2xy({ offsetX, offsetY }) {
-    const x = (offsetX / 100) | 0;
-    const y = (offsetY / 100) | 0;
+    const { width, height } = sudoku.getBoundingClientRect();
+    const x = (9 * offsetX / width) | 0;
+    const y = (9 * offsetY / height) | 0;
     return [ x, y ];
   }
 

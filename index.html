@@ -14,38 +14,47 @@
 </head>
 
 <body>
-  <svg id="sudoku" width="900" height="900" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <rect class="highlight" id="highlight" width="100" height="100" />
+  <div id="layout">
+    <svg id="sudoku" viewBox="0 0 900 900" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <rect class="highlight" id="highlight" width="100" height="100" />
 
-      <polygon id="cursor" points="0,0 15,0 0,15" />
+        <polygon id="cursor" points="0,0 15,0 0,15" />
 
-      <pattern id="smallGrid" width="100" height="100" patternUnits="userSpaceOnUse">
-        <rect width="100" height="100" fill="none" stroke="#444" stroke-width="2" />
-      </pattern>
+        <pattern id="smallGrid" width="100" height="100" patternUnits="userSpaceOnUse">
+          <rect width="100" height="100" fill="none" stroke="#444" stroke-width="2" />
+        </pattern>
 
-      <pattern id="grid" width="300" height="300" patternUnits="userSpaceOnUse">
-        <rect width="300" height="300" fill="url(#smallGrid)" stroke="#222" stroke-width="4" />
-      </pattern>
-    </defs>
+        <pattern id="grid" width="300" height="300" patternUnits="userSpaceOnUse">
+          <rect width="300" height="300" fill="url(#smallGrid)" stroke="#222" stroke-width="4" />
+        </pattern>
+      </defs>
 
-    <g id="sudoku-highlights"></g>
-    <g id="sudoku-cursor"></g>
-    <g id="sudoku-givens">
-      <!-- <text x="150" y="250" class="given">7</text> -->
-    </g>
-    <g id="sudoku-filled"></g>
-    <g id="sudoku-center">
-    </g>
-    <g id="sudoku-corner">
-      <!-- <text class="corner" x="250" y="420" word-spacing="20">1 2 3</text>
-      <text class="corner" x="250" y="450" word-spacing="55">5 6</text>
-      <text class="corner" x="250" y="480" word-spacing="20">7 8 9</text> -->
-    </g>
-    <g id="sudoku-grid">
-      <rect width="900" height="900" fill="url(#grid)" />
-    </g>
-  </svg>
+      <mask id="sudoku-filled-mask">
+        <rect width="100%" height="100%" fill="white" />
+      </mask>
+
+      <g id="sudoku-highlights"></g>
+      <g id="sudoku-cursor"></g>
+      <g id="sudoku-givens">
+        <!-- <text x="150" y="250" class="given">7</text> -->
+      </g>
+      <g id="sudoku-filled"></g>
+      <g id="sudoku-center">
+      </g>
+      <g id="sudoku-corner">
+        <!-- <text class="corner" x="250" y="420" word-spacing="20">1 2 3</text>
+        <text class="corner" x="250" y="450" word-spacing="55">5 6</text>
+        <text class="corner" x="250" y="480" word-spacing="20">7 8 9</text> -->
+      </g>
+      <g id="sudoku-grid">
+        <rect width="900" height="900" fill="url(#grid)" />
+      </g>
+    </svg>
+    <div id="controls">
+      Controls here :)
+    </div>
+  </div>
   
   <!-- The core Firebase JS SDK is always required and must be listed first -->
   <script src="https://www.gstatic.com/firebasejs/8.3.0/firebase-app.js"></script>

@@ -4,20 +4,26 @@
     left: 50%;
     transform: translate(-50%, -50%);
 
-    display: flex;
-    direction: ltr;
+    /* display: flex;
+    direction: ltr; */
 
     width: min(90vw, 135vh);
     height: min(60vw, 90vh);
 
-    border: 1px solid blue;
+    border: 1px solid red;
 }
-@media (max-aspect-ratio: 0.8) {
+#sudoku {
+    width: 66.66%;
+}
+@media (max-aspect-ratio: 9/10) {
     #layout {
-        flex-direction: column;
+        /* flex-direction: column; */
 
-        width: 80vw;
-        height: 120vw;
+        width: min(90vw, 50vh);
+        height: min(162vw, 90vh);
+    }
+    #sudoku {
+        width: 100%;
     }
 }
 

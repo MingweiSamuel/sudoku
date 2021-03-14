@@ -109,7 +109,9 @@ const stringifyNums = nums => Object.entries(nums)
   .map(([ num ]) => num)
   .join('');
 
-
+function makeTs() {
+  return [ firebase.database.ServerValue.TIMESTAMP, Date.now() ];
+}
 
 function main(gameKey, cid) {
   const refGame = firebase.database().ref(`game/${gameKey}`);
@@ -118,14 +120,52 @@ function main(gameKey, cid) {
 
   const refClient = refAllClients.child(cid);
   refClient.update({
-    ts: firebase.database.ServerValue.TIMESTAMP,
+    // cursor: null,
+    // selected: null,
+    // history: null,
+    // historyUndone: null,
+    online: true,
+    ts: makeTs(),
   });
-  refClient.onDisconnect().remove();
+  refClient.child('online').onDisconnect().set(false);
+
+  // Sticky online (if closed in another tab).
+  allClientsData.watch(`${cid}/online`, {
+    onChange({ newVal }) {
+      if (!newVal) {
+        allClientsData.update({
+          [`${cid}/online`]: true,
+        });
+      }
+    }
+  });
 
   const refBoard = refGame.child('board');
   const boardData = new DataLayer(refBoard);
-  window._boardData = boardData;
+  boardData.onDiff = (data) => {
+    const key = allClientsData.ref.child(`${cid}/history`).push().key;
+    allClientsData.update({
+      [`${cid}/history/${key}`]: {
+        data: JSON.stringify(data),
+        ts: makeTs(),
+      },
+      [`${cid}/historyUndone`]: null,
+    });
+  };
 
+  function undo() {
+    const history = allClientsData.get(cid, 'history');
+    if (!history) return false;
+    const entry = Object.values(history).reduce((newest, next) => {
+      const order = (newest.ts[0] - next.ts[0]) || (newest.ts[1] - next.ts[1]);
+      return order > 0 ? newest : next;
+    });
+    const data = JSON.parse(entry.data);
+    boardData.update(data.back);
+    return true;
+  }
+  window._allClientsData = allClientsData;
+  window._undo = undo;
 
   allClientsData.watch('*/selected/*', makeBind(sudokuHighlights, {
     create() {
@@ -229,15 +269,14 @@ function main(gameKey, cid) {
 
   function fill(num, type) {
     const update = {};
-    const selected = Object.entries(allClientsData.data[cid].selected)
+    const selected = Object.entries(allClientsData.get(cid, 'selected') || {})
       .filter(([ _, isSet ]) => isSet)
       .map(([ key, _ ]) => key);
 
     switch (type) {
       case FILLED:
-        const val = DataLayer.makeTaggedValue(num);
         for (const id of selected) {
-          update[`${type}/${id}`] = val;
+          update[`${type}/${id}`] = num;
         }
         break;
       case CORNER:
@@ -283,7 +322,7 @@ function main(gameKey, cid) {
         [`${cid}/selected`]: null,
       });
     }
-    else if (allClientsData.data[cid].selected[id]) {
+    else if (allClientsData.get(cid, 'selected', 'id')) {
       // Short circuit if not reseting and already selected.
       return;
     }
@@ -328,7 +367,7 @@ function main(gameKey, cid) {
       e.preventDefault();
       let x = 0
       let y = 0;
-      const cursor = allClientsData.data[cid].cursor;
+      const cursor = allClientsData.get(cid, 'cursor');
       if (null != cursor) {
         const [ dx, dy ] = ARROWS[e.code];
         const [ cx, cy ] = id2xy(cursor);

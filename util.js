@@ -61,7 +61,7 @@ function combineUpdates(target, update) {
 }
 
 function applyUpdate(readonlyTarget, update) {
-    const out = JSON.parse(JSON.stringify(readonlyTarget));
+    const out = JSON.parse(JSON.stringify(readonlyTarget)) || {};
     for (const [ key, val ] of Object.entries(update)) {
         const path = key.split('/');
         const leaf = path.pop();
@@ -145,17 +145,6 @@ function forEachPattern(pattern, oldData, newData, func, path = []) {
 }
 
 class DataLayer {
-    static FLAG_KEY = '_taggedVal';
-    static VALUE_KEY = '_value';
-
-    static makeTaggedValue(val) {
-        return {
-            [this.FLAG_KEY]: true,
-            [this.VALUE_KEY]: val,
-            nonce: (0xFFFFFFFF * Math.random()) | 0,
-        };
-    }
-
     constructor(ref, delay = 250) {
         this.ref = ref;
         this.data = undefined;
@@ -163,6 +152,7 @@ class DataLayer {
         this._watchers = {};
         this._updates = null;
         this._updatesInflight = null;
+        this._onDiff = null;
 
         this.ref.on('value', snapshot => {
             let newData = snapshot.val();
@@ -178,6 +168,12 @@ class DataLayer {
         });
     }
 
+    get(...path) {
+        let target = this.data;
+        while (target && path.length) target = target[path.shift()];
+        return target;
+    }
+
     watch(pattern, watcher) {
         (this._watchers[pattern] || (this._watchers[pattern] = [])).push(watcher);
     }
@@ -186,8 +182,7 @@ class DataLayer {
         const { forward, back } = diffUpdate(this.data, update);
         if (0 === Object.keys(forward).length)
             return;
-
-        console.log(forward, back);
+        this.onDiff({ forward, back });
 
 
         // Enqueue updates.
@@ -210,16 +205,13 @@ class DataLayer {
         this._onChange(newData);
     }
 
+    onDiff({ forward, back }) {
+        // Override this function.
+    }
+
     _onChange(newData) {
         for (const [ pattern, watchers ] of Object.entries(this._watchers)) {
             forEachPattern(pattern, this.data, newData, (path, oldVal, newVal) => {
-                if (oldVal && oldVal[DataLayer.FLAG_KEY]) {
-                    oldVal = oldVal[DataLayer.VALUE_KEY];
-                }
-                if (newVal && newVal[DataLayer.FLAG_KEY]) {
-                    newVal = newVal[DataLayer.VALUE_KEY];
-                }
-
                 if (null == oldVal) {
                     if (null != newVal) {
                         watchers.forEach(({ onAdd }) =>

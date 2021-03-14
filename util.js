@@ -152,7 +152,6 @@ class DataLayer {
         this._watchers = {};
         this._updates = null;
         this._updatesInflight = null;
-        this._onDiff = null;
 
         this.ref.on('value', snapshot => {
             let newData = snapshot.val();
@@ -182,8 +181,6 @@ class DataLayer {
         const { forward, back } = diffUpdate(this.data, update);
         if (0 === Object.keys(forward).length)
             return;
-        this.onDiff({ forward, back });
-
 
         // Enqueue updates.
         if (null == this._updates) {
@@ -203,10 +200,8 @@ class DataLayer {
         // Update local model.
         const newData = applyUpdate(this.data, forward);
         this._onChange(newData);
-    }
 
-    onDiff({ forward, back }) {
-        // Override this function.
+        return { forward, back };
     }
 
     _onChange(newData) {

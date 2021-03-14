@@ -81,6 +81,11 @@ function xy2id(x, y) {
 function id2xy(id) {
   return [ id % 9, (id / 9) | 0 ];
 }
+function bx2id(box, idx) {
+  const boxId = 27 * ((box / 3) | 0) + 3 * (box % 3);
+  const idxId =  9 * ((idx / 3) | 0) +     (idx % 3);
+  return boxId + idxId;
+}
 
 function cornerPos(i, len) {
   let dx, dy;
@@ -102,6 +107,32 @@ function cornerPos(i, len) {
     }
   }
   return [ dx, dy ];
+}
+
+// TODO: Use this!
+function checkGrid(filled) {
+  const bad = new Set();
+  const coordFns = [
+    xy2id, // Rows.
+    (i, j) => xy2id(j, i), // Cols.
+    bx2id, // Boxes.
+  ];
+  for (const coordFn of coordFns) {
+    for (let i = 0; i < SIZE; i++) {
+      const valToId = {};
+      for (let j = 0; j < SIZE; j++) {
+        const id = coordFn(i, j);
+        const val = filled[id];
+        if (!val) bad.add(id);
+        else if (val in valToId) {
+          bad.add(valToId[val]);
+          bad.add(id);
+        }
+        else valToId[val] = id;
+      }
+    }
+  }
+  return bad;
 }
 
 const stringifyNums = nums => Object.entries(nums)
@@ -142,30 +173,30 @@ function main(gameKey, cid) {
 
   const refBoard = refGame.child('board');
   const boardData = new DataLayer(refBoard);
-  boardData.onDiff = (data) => {
-    const key = allClientsData.ref.child(`${cid}/history`).push().key;
-    allClientsData.update({
-      [`${cid}/history/${key}`]: {
-        data: JSON.stringify(data),
-        ts: makeTs(),
-      },
-      [`${cid}/historyUndone`]: null,
-    });
-  };
+  window._boardData = boardData;
 
-  function undo() {
-    const history = allClientsData.get(cid, 'history');
-    if (!history) return false;
-    const entry = Object.values(history).reduce((newest, next) => {
-      const order = (newest.ts[0] - next.ts[0]) || (newest.ts[1] - next.ts[1]);
-      return order > 0 ? newest : next;
+  // Undo if REDO is false.
+  // Redo if REDO is true.
+  function updateHistory(redo) {
+    const historyEntries = Object.entries(allClientsData.get(cid, redo ? 'historyUndone' : 'history') || {});
+    if (0 === historyEntries.length) return false;
+
+    const [ histKey, histVal ] = historyEntries.reduce((entryA, entryB) => {
+      const order = (entryA[1].ts[0] - entryB[1].ts[0]) || (entryA[1].ts[1] - entryB[1].ts[1]);
+      return (redo !== order > 0) ? entryA : entryB;
     });
-    const data = JSON.parse(entry.data);
-    boardData.update(data.back);
+    const diffData = JSON.parse(histVal.data);
+    // Update board changes.
+    // TODO: USE OTHER TO RESOLVE CONFLICTS.
+    boardData.update(redo ? diffData.forward : diffData.back);
+    // Remove entry from historyUndone.
+    // Add entry to history.
+    allClientsData.update({
+      [`${cid}/history/${histKey}`]: redo ? histVal : null,
+      [`${cid}/historyUndone/${histKey}`]: redo ? null : histVal,
+    });
     return true;
   }
-  window._allClientsData = allClientsData;
-  window._undo = undo;
 
   allClientsData.watch('*/selected/*', makeBind(sudokuHighlights, {
     create() {
@@ -305,7 +336,16 @@ function main(gameKey, cid) {
       default:
         throw new Error(`Unknown type: ${type}.`);
     }
-    boardData.update(update);
+    // Update and add update to history.
+    const history = boardData.update(update);
+    const key = allClientsData.ref.child(`${cid}/history`).push().key;
+    allClientsData.update({
+      [`${cid}/history/${key}`]: {
+        data: JSON.stringify(history),
+        ts: makeTs(),
+      },
+      [`${cid}/historyUndone`]: null,
+    });
   }
 
   function offset2xy({ offsetX, offsetY }) {
@@ -376,6 +416,19 @@ function main(gameKey, cid) {
       }
       select(x, y, !e.shiftKey && !e.ctrlKey);
       return;
+    }
+    else if ('KeyZ' === e.code) {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        updateHistory(e.shiftKey);
+      }
+      return;
+    }
+    else if ('KeyY' === e.code) {
+      if (e.ctrlKey) {
+        e.preventDefault();
+        updateHistory(true);
+      }
     }
     else {
       let match = DIGIT_REGEX.exec(e.code);

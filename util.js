@@ -21,9 +21,9 @@ function equal(a, b) {
     }
 }
 
-function combineUpdates(target, updates) {
+function combineUpdates(target, update) {
     outer:
-    for (const [ key, val ] of Object.entries(updates)) {
+    for (const [ key, val ] of Object.entries(update)) {
         const path = key.split('/');
         const leaf = path.pop();
         let seg;
@@ -60,9 +60,9 @@ function combineUpdates(target, updates) {
     }
 }
 
-function applyUpdates(readonlyTarget, updates) {
+function applyUpdate(readonlyTarget, update) {
     const out = JSON.parse(JSON.stringify(readonlyTarget));
-    for (const [ key, val ] of Object.entries(updates)) {
+    for (const [ key, val ] of Object.entries(update)) {
         const path = key.split('/');
         const leaf = path.pop();
         let target = out;
@@ -77,6 +77,35 @@ function applyUpdates(readonlyTarget, updates) {
         }
     }
     return out;
+}
+
+function diffUpdate(dataTarget, update) {
+    const forward = {};
+    const back = {};
+    for (const [ key, val ] of Object.entries(update)) {
+        const path = key.split('/');
+        let oldVal = dataTarget;
+        for (const seg of path) {
+            oldVal = oldVal && oldVal[seg];
+        }
+
+        // Pure add.
+        if (null == oldVal) {
+            forward[key] = val; // Forward: add.
+            back[key] = null; // Back: remove.
+        }
+        // Pure remove.
+        else if (null == val) {
+            forward[key] = null; // Forward: remove.
+            back[key] = oldVal; // Back: add.
+        }
+        // Change.
+        else if (!equal(oldVal, val)) {
+            forward[key] = val;
+            back[key] = oldVal;
+        }
+    }
+    return { forward, back };
 }
 
 function forEachPattern(pattern, oldData, newData, func, path = []) {
@@ -115,8 +144,19 @@ function forEachPattern(pattern, oldData, newData, func, path = []) {
     }
 }
 
-class Watch {
-    constructor(ref, delay = 200) {
+class DataLayer {
+    static FLAG_KEY = '_taggedVal';
+    static VALUE_KEY = '_value';
+
+    static makeTaggedValue(val) {
+        return {
+            [this.FLAG_KEY]: true,
+            [this.VALUE_KEY]: val,
+            nonce: (0xFFFFFFFF * Math.random()) | 0,
+        };
+    }
+
+    constructor(ref, delay = 250) {
         this.ref = ref;
         this.data = undefined;
         this._delay = delay;
@@ -127,11 +167,11 @@ class Watch {
         this.ref.on('value', snapshot => {
             let newData = snapshot.val();
 
-            if (this._updates) {
-                newData = applyUpdates(newData, this._updates);
-            }
             if (this._updatesInflight) {
-                newData = applyUpdates(newData, this._updatesInflight);
+                newData = applyUpdate(newData, this._updatesInflight);
+            }
+            if (this._updates) {
+                newData = applyUpdate(newData, this._updates);
             }
 
             this._onChange(newData);
@@ -142,30 +182,44 @@ class Watch {
         (this._watchers[pattern] || (this._watchers[pattern] = [])).push(watcher);
     }
 
-    update(updates) {
+    update(update) {
+        const { forward, back } = diffUpdate(this.data, update);
+        if (0 === Object.keys(forward).length)
+            return;
+
+        console.log(forward, back);
+
+
         // Enqueue updates.
         if (null == this._updates) {
             this._updates = {};
             setTimeout(() => {
                 this._updatesInflight = this._updates;
                 this._updates = null;
-                this.ref.update(this._updatesInflight, (err) => {
-                    if (err) console.error('Update Error', err);
-                    // else this._updates = null;
+                this.ref.update(this._updatesInflight, e => {
+                    // TODO?
+                    if (e) console.error('Update error!', e);
                     this._updatesInflight = null;
                 });
             }, this._delay);
         }
-        combineUpdates(this._updates, updates);
+        combineUpdates(this._updates, forward);
 
         // Update local model.
-        const newData = applyUpdates(this.data, updates);
+        const newData = applyUpdate(this.data, forward);
         this._onChange(newData);
     }
 
     _onChange(newData) {
         for (const [ pattern, watchers ] of Object.entries(this._watchers)) {
             forEachPattern(pattern, this.data, newData, (path, oldVal, newVal) => {
+                if (oldVal && oldVal[DataLayer.FLAG_KEY]) {
+                    oldVal = oldVal[DataLayer.VALUE_KEY];
+                }
+                if (newVal && newVal[DataLayer.FLAG_KEY]) {
+                    newVal = newVal[DataLayer.VALUE_KEY];
+                }
+
                 if (null == oldVal) {
                     if (null != newVal) {
                         watchers.forEach(({ onAdd }) =>

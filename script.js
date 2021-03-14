@@ -4,6 +4,7 @@ const FILLED = 'filled';
 const CORNER = 'corner';
 const CENTER = 'center';
 
+const NUMS = [ null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 const SIZE = 9;
 const CELLS = 81;
 
@@ -25,15 +26,6 @@ const sudokuGivens = document.getElementById('sudoku-givens');
 const sudokuFilled = document.getElementById('sudoku-filled');
 const sudokuCenter = document.getElementById('sudoku-center');
 const sudokuCorner = document.getElementById('sudoku-corner');
-
-const data = {
-  selected: {},
-  filled: {},
-  center: {},
-  corner: {},
-};
-
-
 
 
 (() => {
@@ -122,7 +114,7 @@ const stringifyNums = nums => Object.entries(nums)
 function main(gameKey, cid) {
   const refGame = firebase.database().ref(`game/${gameKey}`);
   const refAllClients = refGame.child('clients');
-  const allClientsWatcher = new Watch(refAllClients);
+  const allClientsData = new DataLayer(refAllClients);
 
   const refClient = refAllClients.child(cid);
   refClient.update({
@@ -131,10 +123,11 @@ function main(gameKey, cid) {
   refClient.onDisconnect().remove();
 
   const refBoard = refGame.child('board');
-  const boardWatcher = new Watch(refBoard);
+  const boardData = new DataLayer(refBoard);
+  window._boardData = boardData;
 
 
-  allClientsWatcher.watch('*/selected/*', makeBind(sudokuHighlights, {
+  allClientsData.watch('*/selected/*', makeBind(sudokuHighlights, {
     create() {
       const el = document.createElementNS(NS_SVG, 'use');
       el.setAttribute('href', '#highlight');
@@ -155,7 +148,7 @@ function main(gameKey, cid) {
     },
   }));
 
-  allClientsWatcher.watch('*/cursor', makeBind(sudokuCursor, {
+  allClientsData.watch('*/cursor', makeBind(sudokuCursor, {
     create() {
       const el = document.createElementNS(NS_SVG, 'use');
       el.setAttribute('href', '#cursor');
@@ -177,11 +170,10 @@ function main(gameKey, cid) {
     },
   }));
 
-  boardWatcher.watch(`${FILLED}/*`, makeBind(sudokuFilled, {
+  boardData.watch(`${FILLED}/*`, makeBind(sudokuFilled, {
     create() {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'filled');
-
       return el;
     },
     update(el, [ id ], val) {
@@ -192,7 +184,7 @@ function main(gameKey, cid) {
     },
   }));
 
-  boardWatcher.watch(`${CORNER}/*`, makeBind(sudokuCorner, {
+  boardData.watch(`${CORNER}/*`, makeBind(sudokuCorner, {
     create() {
       return document.createElementNS(NS_SVG, 'g');
     },
@@ -221,7 +213,7 @@ function main(gameKey, cid) {
     },
   }));
 
-  boardWatcher.watch(`${CENTER}/*`, makeBind(sudokuCenter, {
+  boardData.watch(`${CENTER}/*`, makeBind(sudokuCenter, {
     create() {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'center');
@@ -236,36 +228,37 @@ function main(gameKey, cid) {
   }));
 
   function fill(num, type) {
-    const updates = {};
-    const selected = Object.entries(allClientsWatcher.data[cid].selected)
+    const update = {};
+    const selected = Object.entries(allClientsData.data[cid].selected)
       .filter(([ _, isSet ]) => isSet)
       .map(([ key, _ ]) => key);
 
     switch (type) {
       case FILLED:
+        const val = DataLayer.makeTaggedValue(num);
         for (const id of selected) {
-          updates[`${type}/${id}`] = num;
+          update[`${type}/${id}`] = val;
         }
         break;
       case CORNER:
       case CENTER:
         if (null == num) {
           for (const id of selected) {
-            updates[`${type}/${id}`] = null;
+            update[`${type}/${id}`] = null;
           }
         }
         else {
-          const filledData = boardWatcher.data[type] || {};
+          const filledData = boardData.data[type] || {};
 
           let allSet = true;
           for (const id of selected) {
             allSet &&= filledData[id] && filledData[id][num];
-            updates[`${type}/${id}/${num}`] = true;
+            update[`${type}/${id}/${num}`] = true;
           }
           // If they are all set, unset all.
           if (allSet) {
-            for (const key of Object.keys(updates)) {
-              updates[key] = null;
+            for (const key of Object.keys(update)) {
+              update[key] = null;
             }
           }
         }
@@ -273,7 +266,7 @@ function main(gameKey, cid) {
       default:
         throw new Error(`Unknown type: ${type}.`);
     }
-    boardWatcher.update(updates);
+    boardData.update(update);
   }
 
   function offset2xy({ offsetX, offsetY }) {
@@ -286,14 +279,16 @@ function main(gameKey, cid) {
     const id = xy2id(x, y);
 
     if (reset) {
-      allClientsWatcher.update({
+      allClientsData.update({
         [`${cid}/selected`]: null,
       });
     }
-    // else {
-    // }
+    else if (allClientsData.data[cid].selected[id]) {
+      // Short circuit if not reseting and already selected.
+      return;
+    }
 
-    allClientsWatcher.update({
+    allClientsData.update({
       [`${cid}/selected/${id}`]: true,
       [`${cid}/cursor`]: id,
     });
@@ -333,7 +328,7 @@ function main(gameKey, cid) {
       e.preventDefault();
       let x = 0
       let y = 0;
-      const cursor = allClientsWatcher.data[cid].cursor;
+      const cursor = allClientsData.data[cid].cursor;
       if (null != cursor) {
         const [ dx, dy ] = ARROWS[e.code];
         const [ cx, cy ] = id2xy(cursor);

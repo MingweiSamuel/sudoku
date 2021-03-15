@@ -530,7 +530,7 @@ function main(gameKey, cid) {
     document.getElementById('button-redo').addEventListener('click', e => updateHistory(true));
     document.getElementById('button-check').addEventListener('click', e => {
       const bad = checkGrid(_boardData.data.filled);
-      if (0 === bad.length) {
+      if (0 === bad.size) {
         alert('Looks good!');
       }
       else {

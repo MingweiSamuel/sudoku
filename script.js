@@ -482,7 +482,6 @@ function main(gameKey, cid) {
   }
 
   let fillMode = FILLED;
-  let fillModeOld = null;
 
   function setFillMode(mode) {
     let el = null;
@@ -524,20 +523,12 @@ function main(gameKey, cid) {
     window.addEventListener('keydown', e => {
       let num;
 
-      if (e.key in MODE_KEYS) {
-        e.preventDefault();
-        if (null == fillModeOld)
-          fillModeOld = fillMode;
-        setFillMode(MODE_KEYS[e.key]);
-        return;
-      }
       if ('Space' === e.code) {
         e.preventDefault();
 
-        let idx = MODES.indexOf(fillModeOld || fillMode) + 1 - (2 * e.shiftKey) + MODES.length;
+        let idx = MODES.indexOf(fillMode) + 1 - (2 * e.shiftKey) + MODES.length;
         idx = idx % MODES.length;
 
-        fillModeOld = null;
         setFillMode(MODES[idx]);
 
         return;
@@ -587,30 +578,14 @@ function main(gameKey, cid) {
 
       if (e.shiftKey) {
         fill(num, CORNER);
-        fillModeOld = FILLED; // Reset if user is using keys.
+        setFillMode(FILLED);
       }
       else if (e.ctrlKey || e.altKey) {
         fill(num, CENTER);
-        fillModeOld = FILLED; // Reset if user is using keys.
+        setFillMode(FILLED);
       }
       else {
-        fill(num, FILLED);
-      }
-    });
-
-    window.addEventListener('keyup', e => {
-      if (e.key in MODE_KEYS) {
-        e.preventDefault();
-        if (e.shiftKey) {
-          setFillMode(CORNER);
-        }
-        else if (e.ctrlKey || e.altKey) {
-          setFillMode(CENTER);
-        }
-        else if (fillModeOld) {
-          setFillMode(fillModeOld);
-          fillModeOld = null;
-        }
+        fill(num, fillMode);
       }
     });
   }

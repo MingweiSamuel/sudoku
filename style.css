@@ -20,7 +20,7 @@ body {
     width: 66.6667%;
     height: 100%;
 
-    background-color: black;
+    background-color: #111;
     padding: 0.15em;
 }
 .layout-controls {
@@ -58,6 +58,30 @@ body {
         padding-bottom: 60%;
 
         font-size: min(1.8vw, 1.125vh);
+    }
+}
+@media print {
+    .layout {
+        top: 0;
+        transform: translateX(-50%);
+
+        width: min(100vw, 100vh);
+        height: min(100vw, 100vh);
+    }
+    .layout-sudoku {
+        width: 100%;
+        height: 100%;
+
+        background: none;
+    }
+    .layout-controls,
+    #sudoku-highlights,
+    #sudoku-cursor {
+        display: none;
+    }
+
+    .center, .corner {
+        opacity: 0.5;
     }
 }
 
@@ -151,8 +175,12 @@ body {
     display: block;
 }
 .icon .icon-fill {
+    fill: #fff;
+}
+.control-btn-inv .icon .icon-fill {
     fill: #36A;
 }
+
 .icon-round {
     stroke-linejoin: round;
     stroke-linecap: round;

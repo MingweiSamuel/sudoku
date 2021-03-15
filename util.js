@@ -180,7 +180,7 @@ class DataLayer {
     update(update) {
         const { forward, back } = diffUpdate(this.data, update);
         if (0 === Object.keys(forward).length)
-            return;
+            return null;
 
         // Enqueue updates.
         if (null == this._updates) {

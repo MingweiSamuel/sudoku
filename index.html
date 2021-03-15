@@ -68,7 +68,7 @@
     <div class="layout-controls">
       <div class="fullsize controls">
         <!-- First row. -->
-        <button class="control-btn control-btn-inv" style="grid-area: 1 / 1 / 2 / 2;">
+        <button class="control-btn button-mode" style="grid-area: 1 / 1 / 2 / 2;" data-mode="filled" title="Full Digits">
           <div class="icon">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <mask id="center">
@@ -80,7 +80,7 @@
             </svg>
           </div>
         </button>
-        <button class="control-btn control-btn-inv" style="grid-area: 1 / 2 / 2 / 3;">
+        <button class="control-btn control-btn-inv button-mode" style="grid-area: 1 / 2 / 2 / 3;" data-mode="corner" title="Corner Marks [shift+]">
           <div class="icon">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <mask id="center">
@@ -88,12 +88,12 @@
                 <rect fill="black" width="42" height="42" x="29" y="29" rx="3" />
               </mask>
               <rect class="icon-fill" width="60" height="60" x="20" y="20" rx="9" mask="url(#center)" />
-              <text class="icon-fill" x="38" y="41" font-size="24" text-anchor="middle" dominant-baseline="central">7</text>
-              <text class="icon-fill" x="62" y="41" font-size="24" text-anchor="middle" dominant-baseline="central">8</text>
+              <text class="icon-fill" x="38" y="40" font-size="22" text-anchor="middle" dominant-baseline="central">7</text>
+              <text class="icon-fill" x="62" y="40" font-size="22" text-anchor="middle" dominant-baseline="central">8</text>
             </svg>
           </div>
         </button>
-        <button class="control-btn control-btn-inv" style="grid-area: 1 / 3 / 2 / 4;">
+        <button class="control-btn control-btn-inv button-mode" style="grid-area: 1 / 3 / 2 / 4;" data-mode="center" title="Center Marks [alt+]">
           <div class="icon">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <mask id="center">
@@ -101,11 +101,11 @@
                 <rect fill="black" width="42" height="42" x="29" y="29" rx="3" />
               </mask>
               <rect class="icon-fill" width="60" height="60" x="20" y="20" rx="9" mask="url(#center)" />
-              <text class="icon-fill" x="50" y="50" font-size="24" text-anchor="middle" dominant-baseline="central">78</text>
+              <text class="icon-fill" x="50" y="50" font-size="22" text-anchor="middle" dominant-baseline="central">78</text>
             </svg>
           </div>
         </button>
-        <button class="control-btn control-btn-inv" style="grid-area: 1 / 4 / 2 / 5;">
+        <button class="control-btn control-btn-inv" style="grid-area: 1 / 4 / 2 / 5;" title="Color Highlights">
           <div class="icon">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <mask id="center">
@@ -120,20 +120,20 @@
         </button>
         <!-- Gap. -->
         <!-- Third row. -->
-        <button class="control-btn" style="grid-area: 3 / 1 / 4 / 2;" title="0 [`]">0</button>
-        <button class="control-btn" style="grid-area: 3 / 2 / 4 / 3;" title="1">1</button>
-        <button class="control-btn" style="grid-area: 3 / 3 / 4 / 4;" title="2">2</button>
-        <button class="control-btn" style="grid-area: 3 / 4 / 4 / 5;" title="3">3</button>
+        <button class="control-btn button-input" style="grid-area: 3 / 1 / 4 / 2;" data-input="0" title="0 [`~]">0</button>
+        <button class="control-btn button-input" style="grid-area: 3 / 2 / 4 / 3;" data-input="1" title="1">1</button>
+        <button class="control-btn button-input" style="grid-area: 3 / 3 / 4 / 4;" data-input="2" title="2">2</button>
+        <button class="control-btn button-input" style="grid-area: 3 / 4 / 4 / 5;" data-input="3" title="3">3</button>
         <!-- Fourth row. -->
-        <button class="control-btn" style="grid-area: 4 / 2 / 5 / 3;" title="4 [q]">4</button>
-        <button class="control-btn" style="grid-area: 4 / 3 / 5 / 4;" title="5 [w]">5</button>
-        <button class="control-btn" style="grid-area: 4 / 4 / 5 / 5;" title="6 [e]">6</button>
+        <button class="control-btn button-input" style="grid-area: 4 / 2 / 5 / 3;" data-input="4" title="4 [q]">4</button>
+        <button class="control-btn button-input" style="grid-area: 4 / 3 / 5 / 4;" data-input="5" title="5 [w]">5</button>
+        <button class="control-btn button-input" style="grid-area: 4 / 4 / 5 / 5;" data-input="6" title="6 [e]">6</button>
         <!-- Fifth row. -->
-        <button class="control-btn" style="grid-area: 5 / 2 / 6 / 3;" title="7 [a]">7</button>
-        <button class="control-btn" style="grid-area: 5 / 3 / 6 / 4;" title="8 [s]">8</button>
-        <button class="control-btn" style="grid-area: 5 / 4 / 6 / 5;" title="9 [d]">9</button>
+        <button class="control-btn button-input" style="grid-area: 5 / 2 / 6 / 3;" data-input="7" title="7 [a]">7</button>
+        <button class="control-btn button-input" style="grid-area: 5 / 3 / 6 / 4;" data-input="8" title="8 [s]">8</button>
+        <button class="control-btn button-input" style="grid-area: 5 / 4 / 6 / 5;" data-input="9" title="9 [d]">9</button>
         <!-- Delete button. -->
-        <button class="control-btn" style="grid-area: 4 / 1 / 6 / 2;" title="Delete [del]">
+        <button class="control-btn button-input" style="grid-area: 4 / 1 / 6 / 2;" data-input="null" title="Delete [del]">
           <div class="icon">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <!-- <polygon class="icon-fill" points="100" /> -->
@@ -145,7 +145,7 @@
         </button>
         <!-- Gap. -->
         <!-- Seventh row. -->
-        <button class="control-btn" style="grid-area: 7 / 1 / 8 / 2;" title="Undo [ctrl][z]">
+        <button id="button-undo" class="control-btn" style="grid-area: 7 / 1 / 8 / 2;" title="Undo [ctrl][z]">
           <div class="icon">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <path fill="none" stroke="white" stroke-width="6" stroke-linecap="round" d="M 70,55 A 25 25 0 0 0 30,55" />
@@ -153,7 +153,7 @@
             </svg>
           </div>
         </button>
-        <button class="control-btn" style="grid-area: 7 / 2 / 8 / 3;" title="Redo [ctrl][shift][z]">
+        <button id="button-redo" class="control-btn" style="grid-area: 7 / 2 / 8 / 3;" title="Redo [ctrl][shift][z]">
           <div class="icon">
             <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <path class="icon-round" fill="none"  stroke="white" stroke-width="6" d="M 70,55 A 25 25 0 0 0 30,55" />

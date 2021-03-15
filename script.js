@@ -3,12 +3,13 @@ const NS_SVG = 'http://www.w3.org/2000/svg';
 const FILLED = 'filled';
 const CORNER = 'corner';
 const CENTER = 'center';
+const MODES = [ FILLED, CORNER, CENTER ];
 
 const NUMS = [ null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 const SIZE = 9;
 const CELLS = 81;
 
-const KEYS = {
+const CODES = {
   Delete: null,
   Backspace: null,
   Backquote: 0,
@@ -26,6 +27,14 @@ const ARROWS = {
   ArrowLeft:  [ -1,  0 ],
   ArrowRight: [  1,  0 ],
 };
+
+const MODE_KEYS = {
+  Shift: CORNER,
+  Control: CENTER,
+  Alt: CENTER,
+};
+
+const DIGIT_REGEX = /Digit(\d)/;
 
 const sudoku = document.getElementById('sudoku');
 const sudokuHighlights = document.getElementById('sudoku-highlights');
@@ -326,6 +335,15 @@ function main(gameKey, cid) {
       const order = (entryA[1].ts[0] - entryB[1].ts[0]) || (entryA[1].ts[1] - entryB[1].ts[1]);
       return (redo !== order > 0) ? entryA : entryB;
     });
+
+    // Ignore empty entries (bug).
+    if (!histVal.data) {
+      allClientsData.update({
+        [`${cid}/${redo ? 'historyUndone' : 'history'}/${histKey}`]: null,
+      });
+      updateHistory(redo);
+    }
+
     const diffData = JSON.parse(histVal.data);
     // Update board changes.
     // TODO: USE OTHER TO RESOLVE CONFLICTS.
@@ -379,14 +397,16 @@ function main(gameKey, cid) {
     }
     // Update and add update to history.
     const history = boardData.update(update);
-    const key = allClientsData.ref.child(`${cid}/history`).push().key;
-    allClientsData.update({
-      [`${cid}/history/${key}`]: {
-        data: JSON.stringify(history),
-        ts: makeTs(),
-      },
-      [`${cid}/historyUndone`]: null,
-    });
+    if (history) {
+      const key = allClientsData.ref.child(`${cid}/history`).push().key;
+      allClientsData.update({
+        [`${cid}/history/${key}`]: {
+          data: JSON.stringify(history),
+          ts: makeTs(),
+        },
+        [`${cid}/historyUndone`]: null,
+      });
+    }
   }
 
   function offset2xy({ offsetX, offsetY }) {
@@ -419,7 +439,7 @@ function main(gameKey, cid) {
   }
 
 
-  (() => {
+  {
     let selecting = false;
 
     sudoku.addEventListener('mousedown', e => {
@@ -440,7 +460,9 @@ function main(gameKey, cid) {
     window.addEventListener('mouseup', e => {
       selecting = false;
     });
+  }
 
+  {
     function handleTouch(e, reset = false) {
       e.preventDefault();
 
@@ -457,67 +479,139 @@ function main(gameKey, cid) {
     }
     sudoku.addEventListener('touchstart', e => handleTouch(e, 1 === e.targetTouches.length));
     sudoku.addEventListener('touchmove', e => handleTouch(e));
-  })();
+  }
 
-  const DIGIT_REGEX = /Digit(\d)/;
-  window.addEventListener('keydown', e => {
-    let num;
-    if (e.code in KEYS) {
-      num = KEYS[e.code]
-    }
-    else if ('Alt' === e.code || 'AltLeft' === e.code || 'AltRight' === e.code) {
-      e.preventDefault();
-      return;
-    }
-    else if (e.code in ARROWS) {
-      e.preventDefault();
-      let x = 0
-      let y = 0;
-      const cursor = allClientsData.get(cid, 'cursor');
-      if (null != cursor) {
-        const [ dx, dy ] = ARROWS[e.code];
-        const [ cx, cy ] = id2xy(cursor);
-        x = wrap(cx + dx);
-        y = wrap(cy + dy);
-      }
-      select(x, y, !e.shiftKey && !e.ctrlKey && !e.altKey);
-      return;
-    }
-    else if ('KeyZ' === e.code) {
-      if (e.ctrlKey) {
-        e.preventDefault();
-        updateHistory(e.shiftKey);
-      }
-      return;
-    }
-    else if ('KeyY' === e.code) {
-      if (e.ctrlKey) {
-        e.preventDefault();
-        updateHistory(true);
-      }
+  let fillMode = FILLED;
+  let fillModeOld = null;
+
+  function setFillMode(mode) {
+    let el = null;
+    if ('string' !== typeof mode) {
+      el = mode;
+      mode = el.getAttribute('data-mode');
     }
     else {
-      let match = DIGIT_REGEX.exec(e.code);
-      if (!match) return;
-      num = Number(match[1]);
+      el = document.querySelector(`.button-mode[data-mode="${mode}"]`);
     }
 
-    e.preventDefault();
+    fillMode = mode;
 
-    if (e.shiftKey) {
-      fill(num, CORNER);
+    for (const button of document.getElementsByClassName('button-mode')) {
+      button.classList.add('control-btn-inv');
     }
-    else if (e.ctrlKey || e.altKey) {
-      fill(num, CENTER);
-    }
-    else {
-      fill(num, FILLED);
-    }
-  });
+    el.classList.remove('control-btn-inv');
+  }
 
-  window.addEventListener('keyup', e => {
-    if ('Alt' === e.code || 'AltLeft' === e.code || 'AltRight' === e.code) {
+  {
+    document.getElementById('button-undo').addEventListener('click', e => updateHistory(false));
+    document.getElementById('button-redo').addEventListener('click', e => updateHistory(true));
+
+    for (const button of document.getElementsByClassName('button-mode')) {
+      button.addEventListener('click', e => setFillMode(e.currentTarget));
+    }
+
+
+    const onInput = e => {
+      const val = JSON.parse(e.currentTarget.getAttribute('data-input'));
+      fill(val, fillMode);
+    };
+    for (const button of document.getElementsByClassName('button-input')) {
+      button.addEventListener('click', onInput);
+    }
+  }
+
+  {
+    window.addEventListener('keydown', e => {
+      let num;
+
+      if (e.key in MODE_KEYS) {
+        e.preventDefault();
+        if (null == fillModeOld)
+          fillModeOld = fillMode;
+        setFillMode(MODE_KEYS[e.key]);
+        return;
+      }
+      if ('Space' === e.code) {
+        e.preventDefault();
+
+        let idx = MODES.indexOf(fillModeOld || fillMode) + 1 - (2 * e.shiftKey) + MODES.length;
+        idx = idx % MODES.length;
+
+        fillModeOld = null;
+        setFillMode(MODES[idx]);
+
+        return;
+      }
+
+      if (e.code in CODES) {
+        num = CODES[e.code]
+      }
+      else if ('Alt' === e.code || 'AltLeft' === e.code || 'AltRight' === e.code) {
+        e.preventDefault();
+        return;
+      }
+      else if (e.code in ARROWS) {
+        e.preventDefault();
+        let x = 0
+        let y = 0;
+        const cursor = allClientsData.get(cid, 'cursor');
+        if (null != cursor) {
+          const [ dx, dy ] = ARROWS[e.code];
+          const [ cx, cy ] = id2xy(cursor);
+          x = wrap(cx + dx);
+          y = wrap(cy + dy);
+        }
+        select(x, y, !e.shiftKey && !e.ctrlKey && !e.altKey);
+        return;
+      }
+      else if ('KeyZ' === e.code) {
+        if (e.ctrlKey) {
+          e.preventDefault();
+          updateHistory(e.shiftKey);
+        }
+        return;
+      }
+      else if ('KeyY' === e.code) {
+        if (e.ctrlKey) {
+          e.preventDefault();
+          updateHistory(true);
+        }
+      }
+      else {
+        let match = DIGIT_REGEX.exec(e.code);
+        if (!match) return;
+        num = Number(match[1]);
+      }
+
       e.preventDefault();
-    }
-  });
+
+      if (e.shiftKey) {
+        fill(num, CORNER);
+        fillModeOld = FILLED; // Reset if user is using keys.
+      }
+      else if (e.ctrlKey || e.altKey) {
+        fill(num, CENTER);
+        fillModeOld = FILLED; // Reset if user is using keys.
+      }
+      else {
+        fill(num, FILLED);
+      }
+    });
+
+    window.addEventListener('keyup', e => {
+      if (e.key in MODE_KEYS) {
+        e.preventDefault();
+        if (e.shiftKey) {
+          setFillMode(CORNER);
+        }
+        else if (e.ctrlKey || e.altKey) {
+          setFillMode(CENTER);
+        }
+        else if (fillModeOld) {
+          setFillMode(fillModeOld);
+          fillModeOld = null;
+        }
+      }
+    });
+  }
 }

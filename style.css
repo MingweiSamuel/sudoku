@@ -1,41 +1,133 @@
-#layout {
+* {
+    box-sizing: border-box;
+}
+
+.layout {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 
-    /* display: flex;
-    direction: ltr; */
-
     width: min(90vw, 135vh);
     height: min(60vw, 90vh);
-
-    border: 1px solid red;
 }
-#sudoku {
+.layout-sudoku {
+    position: absolute;
+
     width: 66.66%;
 }
-@media (max-aspect-ratio: 9/10) {
-    #layout {
-        /* flex-direction: column; */
+.layout-controls {
+    position: absolute;
 
-        width: min(90vw, 50vh);
-        height: min(162vw, 90vh);
+    top: 50%;
+    bottom: unset;
+    left: unset;
+    right: 0;
+    transform: translateY(-50%);
+
+    width: 30%;
+    height: 0;
+    padding-bottom: 40%;
+
+    font-size: min(1.2vw, 1.8vh);
+
+    border: 1px solid magenta;
+}
+@media (max-aspect-ratio: 9/10) {
+    .layout {
+        width: min(90vw, 54vh);
+        height: min(150vw, 90vh);
     }
-    #sudoku {
+    .layout-sudoku {
         width: 100%;
     }
+    .layout-controls {
+        top: unset;
+        bottom: 0;
+        left: 50%;
+        right: unset;
+        transform: translateX(-50%);
+
+        width: 45%;
+        padding-bottom: 60%;
+
+        font-size: min(1.8vw, 1.125vh);
+    }
 }
+
+.fullsize {
+    position: absolute;
+    
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+}
+
+
+
+
+.control-btn {
+    display: block;
+    border: none;
+    padding: 0;
+    margin: 0;
+    text-decoration: none;
+    background: #0069ed;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 100%;
+    line-height: 100%;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.1s ease-in-out;
+
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+.control-btn:hover,
+.control-btn:focus {
+    background: #0053ba;
+}
+
+.btn-mode-container {
+    position: relative;
+    width: 25%;
+    height: 0;
+    padding-bottom: 22%;
+
+    margin: 1%;
+    float: left;
+}
+
+.btn-numpad-container {
+    font-size: 200%;
+
+    position: relative;
+    width: 22%;
+    height: 0;
+    padding-bottom: 22%;
+
+    margin: 1%;
+    float: left;
+}
+
+
+
+
+
 
 .given, .filled, .center, .corner {
     text-anchor: middle;
     dominant-baseline: central;
 }
 .given, .filled {
-    font-size: 60px;
+    font-size: 65px;
 }
 .center, .corner {
-    font-size: 20px;
+    font-size: 25px;
 }
 .filled, .center, .corner {
     fill: #26e;

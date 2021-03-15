@@ -292,9 +292,18 @@ function main(gameKey, cid) {
     },
     update(el, [ id ], val) {
       const [ x, y ] = id2xy(id);
-      el.textContent = stringifyNums(val);
+      const text = stringifyNums(val);
+      el.textContent = text;
       el.setAttribute('x', 100 * x + 50);
       el.setAttribute('y', 100 * y + 50);
+      if (text.length >= 8) {
+        el.setAttribute('textLength', 95);
+        el.setAttribute('lengthAdjust', 'spacingAndGlyphs');
+      }
+      else {
+        el.removeAttribute('textLength');
+        el.removeAttribute('lengthAdjust');
+      }
     },
   }));
 

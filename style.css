@@ -38,6 +38,15 @@ body {
 
     font-size: min(1.2vw, 1.8vh);
 }
+.layout-timer {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    transform: translateX(-100%);
+
+    font-size: min(3.6vw, 5.4vh);
+}
+
 @media (max-aspect-ratio: 9/10) {
     .layout {
         width: min(90vw, 54vh);
@@ -58,6 +67,13 @@ body {
         padding-bottom: 60%;
 
         font-size: min(1.8vw, 1.125vh);
+    }
+    .layout-timer {
+        position: absolute;
+        top: 65%;
+        transform: translateX(-100%);
+    
+        font-size: min(5.4vw, 3.375vh);
     }
 }
 @media print {

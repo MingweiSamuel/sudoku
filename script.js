@@ -45,6 +45,8 @@ const sudokuFilledMask = document.getElementById('sudoku-filled-mask');
 const sudokuCenter = document.getElementById('sudoku-center');
 const sudokuCorner = document.getElementById('sudoku-corner');
 
+const timer = document.getElementById('timer');
+
 
 (() => {
   let gameKey;
@@ -177,6 +179,25 @@ function main(gameKey, cid) {
     ts: makeTs(),
   });
   refClient.child('online').onDisconnect().set(false);
+
+  // Setup timer.
+  (() => {
+    const elapsedSeconds = refClient.child('elapsedSeconds');
+    elapsedSeconds.once('value', snapshot => {
+      let elapsedSeconds = snapshot.val();
+      setInterval(() => {
+        elapsedSeconds++;
+        const minutes = '' + ((elapsedSeconds / 60) | 0);
+        const seconds = '' + (elapsedSeconds % 60);
+        timer.textContent = `${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+      }, 1000);
+      setInterval(() => {
+        allClientsData.update({
+          [`${cid}/elapsedSeconds`]: elapsedSeconds,
+        });
+      }, 10000);
+    });
+  })();
 
   // Sticky online (if closed in another tab).
   allClientsData.watch(`${cid}/online`, {

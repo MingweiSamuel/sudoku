@@ -513,8 +513,17 @@ function main(gameKey, cid) {
         alert('Looks good!');
       }
       else {
-
-        alert('Uh oh!');
+        let lastId;
+        const selected = {};
+        for (const id of bad) {
+          selected[id] = true;
+          lastId = id;
+        }
+        allClientsData.update({
+          [`${cid}/selected`]: selected,
+          [`${cid}/cursor`]: lastId,
+        });
+        alert("Something's wrong!");
       }
     });
 

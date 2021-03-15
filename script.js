@@ -10,6 +10,14 @@ const CELLS = 81;
 
 const KEYS = {
   Delete: null,
+  Backspace: null,
+  Backquote: 0,
+  KeyQ: 4,
+  KeyW: 5,
+  KeyE: 6,
+  KeyA: 7,
+  KeyS: 8,
+  KeyD: 9,
 };
 
 const ARROWS = {
@@ -178,23 +186,24 @@ function main(gameKey, cid) {
 
   // Client selected highlights.
   allClientsData.watch('*/selected/*', makeBind(sudokuHighlights, {
-    create() {
+    create([ otherCid, id ]) {
       const el = document.createElementNS(NS_SVG, 'use');
-      el.setAttribute('href', '#highlight');
-      return el;
-    },
-    update(el, [ otherCid, id ], val) {
-      const [ x, y ] = id2xy(id);
 
-      let fillColor = 'rgba(255, 215, 0, 0.4)';
       if (otherCid !== cid) {
         const rgb = cidToColor(otherCid);
-        fillColor = `rgba(${rgb.join(',')}, 0.15)`;
+        el.setAttribute('fill', `rgb(${rgb.join(',')})`);
+        el.setAttribute('href', '#highlight');
+      }
+      else {
+        el.setAttribute('fill', 'rgb(255, 215, 0)');
+        el.setAttribute('href', '#highlight-self');
       }
 
+      const [ x, y ] = id2xy(id);
       el.setAttribute('x', 100 * x);
       el.setAttribute('y', 100 * y);
-      el.setAttribute('fill', fillColor);
+
+      return el;
     },
   }));
 
@@ -208,10 +217,10 @@ function main(gameKey, cid) {
     update(el, [ otherCid ], val) {
       const [ x, y ] = id2xy(val);
 
-      let fillColor = '#f80';
+      let fillColor = '#fa0';
       if (otherCid !== cid) {
         const rgb = cidToColor(otherCid);
-        fillColor = `rgba(${rgb.join(',')}, 0.3)`;
+        fillColor = `rgba(${rgb.join(',')}, 0.4)`;
       }
       
       el.setAttribute('data-cid', otherCid);
@@ -388,6 +397,8 @@ function main(gameKey, cid) {
   }
 
   function select(x, y, reset = false) {
+    if (x < 0 || SIZE <= x || y < 0 || SIZE <= y) return false;
+
     const id = xy2id(x, y);
 
     if (reset) {
@@ -397,13 +408,14 @@ function main(gameKey, cid) {
     }
     else if (allClientsData.get(cid, 'selected', 'id')) {
       // Short circuit if not reseting and already selected.
-      return;
+      return false;
     }
 
     allClientsData.update({
       [`${cid}/selected/${id}`]: true,
       [`${cid}/cursor`]: id,
     });
+    return true;
   }
 
 
@@ -414,7 +426,7 @@ function main(gameKey, cid) {
       if (!selecting) {
         selecting = true;
         const [ x, y ] = offset2xy(e);
-        select(x, y, !e.shiftKey && !e.ctrlKey);
+        select(x, y, !e.shiftKey && !e.ctrlKey && !e.altKey);
       }
     });
 
@@ -428,6 +440,23 @@ function main(gameKey, cid) {
     window.addEventListener('mouseup', e => {
       selecting = false;
     });
+
+    function handleTouch(e, reset = false) {
+      e.preventDefault();
+
+      const { top, left } = sudoku.getBoundingClientRect();
+
+      for (let i = 0; i < e.targetTouches.length; i++) {
+        const touch = e.targetTouches.item(i);
+        const [ x, y ] = offset2xy({
+          offsetX: touch.clientX - left,
+          offsetY: touch.clientY - top,
+        });
+        select(x, y, reset);
+      }
+    }
+    sudoku.addEventListener('touchstart', e => handleTouch(e, 1 === e.targetTouches.length));
+    sudoku.addEventListener('touchmove', e => handleTouch(e));
   })();
 
   const DIGIT_REGEX = /Digit(\d)/;
@@ -435,6 +464,10 @@ function main(gameKey, cid) {
     let num;
     if (e.code in KEYS) {
       num = KEYS[e.code]
+    }
+    else if ('Alt' === e.code || 'AltLeft' === e.code || 'AltRight' === e.code) {
+      e.preventDefault();
+      return;
     }
     else if (e.code in ARROWS) {
       e.preventDefault();
@@ -447,7 +480,7 @@ function main(gameKey, cid) {
         x = wrap(cx + dx);
         y = wrap(cy + dy);
       }
-      select(x, y, !e.shiftKey && !e.ctrlKey);
+      select(x, y, !e.shiftKey && !e.ctrlKey && !e.altKey);
       return;
     }
     else if ('KeyZ' === e.code) {
@@ -474,11 +507,17 @@ function main(gameKey, cid) {
     if (e.shiftKey) {
       fill(num, CORNER);
     }
-    else if (e.ctrlKey) {
+    else if (e.ctrlKey || e.altKey) {
       fill(num, CENTER);
     }
     else {
       fill(num, FILLED);
+    }
+  });
+
+  window.addEventListener('keyup', e => {
+    if ('Alt' === e.code || 'AltLeft' === e.code || 'AltRight' === e.code) {
+      e.preventDefault();
     }
   });
 }

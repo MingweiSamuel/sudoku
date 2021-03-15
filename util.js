@@ -61,7 +61,7 @@ function combineUpdates(target, update) {
 }
 
 function applyUpdate(readonlyTarget, update) {
-    const out = JSON.parse(JSON.stringify(readonlyTarget)) || {};
+    const out = readonlyTarget && JSON.parse(JSON.stringify(readonlyTarget)) || {};
     for (const [ key, val ] of Object.entries(update)) {
         const path = key.split('/');
         const leaf = path.pop();
@@ -230,9 +230,9 @@ class DataLayer {
 function makeBind(parent, { create, update }) {
     return {
         onAdd({ path, newVal }) {
-            const el = create();
+            const el = create(path);
             el.setAttribute('data-path', path.join('.'));
-            update(el, path, newVal);
+            update && update(el, path, newVal);
             parent.appendChild(el);
         },
         onRemove({ path, oldVal }) {
@@ -242,7 +242,7 @@ function makeBind(parent, { create, update }) {
         },
         onChange({ path, oldVal, newVal }) {
             const el = parent.querySelector(`[data-path="${path.join('.')}"]`);
-            update(el, path, newVal);
+            update && update(el, path, newVal);
         },
     };
 }

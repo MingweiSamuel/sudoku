@@ -17,8 +17,11 @@ body {
 }
 .layout-sudoku {
     position: absolute;
+    width: 66.6667%;
+    height: 100%;
 
-    width: 66.66%;
+    background-color: black;
+    padding: 0.15em;
 }
 .layout-controls {
     position: absolute;
@@ -42,6 +45,7 @@ body {
     }
     .layout-sudoku {
         width: 100%;
+        height: 60%;
     }
     .layout-controls {
         top: unset;
@@ -70,9 +74,9 @@ body {
 .controls {
     display: grid;
 
-    grid-template-rows: 1fr 0 1fr 1fr 1fr 0 1fr;
+    grid-template-rows: 1fr 1.4% 1fr 1fr 1fr 1.4% 1fr;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    row-gap: 2%;
+    row-gap: 1.5%;
     column-gap: 2%;
 
     font-size: 200%;

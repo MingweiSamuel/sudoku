@@ -38,9 +38,10 @@
           </pattern>
 
           <pattern id="grid" width="300" height="300" patternUnits="userSpaceOnUse">
-            <rect width="300" height="300" fill="url(#smallGrid)" stroke="#222" stroke-width="4" />
+            <rect width="300" height="300" fill="url(#smallGrid)" stroke="#111" stroke-width="4" />
           </pattern>
         </defs>
+        <rect width="100%" height="100%" fill="white"/>
 
         <mask id="sudoku-filled-mask">
           <rect width="100%" height="100%" fill="white" />
@@ -69,7 +70,7 @@
         <!-- First row. -->
         <button class="control-btn control-btn-inv" style="grid-area: 1 / 1 / 2 / 2;">
           <div class="icon">
-            <svg id="sudoku" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <mask id="center">
                 <rect fill="white" width="100" height="100" />
                 <rect fill="black" width="42" height="42" x="29" y="29" rx="3" />
@@ -81,7 +82,7 @@
         </button>
         <button class="control-btn control-btn-inv" style="grid-area: 1 / 2 / 2 / 3;">
           <div class="icon">
-            <svg id="sudoku" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <mask id="center">
                 <rect fill="white" width="100" height="100" />
                 <rect fill="black" width="42" height="42" x="29" y="29" rx="3" />
@@ -94,7 +95,7 @@
         </button>
         <button class="control-btn control-btn-inv" style="grid-area: 1 / 3 / 2 / 4;">
           <div class="icon">
-            <svg id="sudoku" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <mask id="center">
                 <rect fill="white" width="100" height="100" />
                 <rect fill="black" width="42" height="42" x="29" y="29" rx="3" />
@@ -106,7 +107,7 @@
         </button>
         <button class="control-btn control-btn-inv" style="grid-area: 1 / 4 / 2 / 5;">
           <div class="icon">
-            <svg id="sudoku" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <mask id="center">
                 <rect fill="white" width="100" height="100" />
                 <rect fill="black" width="42" height="42" x="29" y="29" rx="3" />
@@ -134,7 +135,7 @@
         <!-- Delete button. -->
         <button class="control-btn" style="grid-area: 4 / 1 / 6 / 2;" title="Delete [del]">
           <div class="icon">
-            <svg id="sudoku" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <!-- <polygon class="icon-fill" points="100" /> -->
               <path class="icon-round" fill="none" stroke="white" stroke-width="6" d="M 20,50 L 40,30 L 80,30 L 80,70 L 40,70 Z" />
               <path class="icon-round" fill="none" stroke="white" stroke-width="6" d="M 50,40 L 70,60" />
@@ -146,7 +147,7 @@
         <!-- Seventh row. -->
         <button class="control-btn" style="grid-area: 7 / 1 / 8 / 2;" title="Undo [ctrl][z]">
           <div class="icon">
-            <svg id="sudoku" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <path fill="none" stroke="white" stroke-width="6" stroke-linecap="round" d="M 70,55 A 25 25 0 0 0 30,55" />
               <path fill="white" stroke="white" stroke-width="3" stroke-linejoin="round" d="M 22,63 L 38,63 L 22,47 Z" />
             </svg>
@@ -154,7 +155,7 @@
         </button>
         <button class="control-btn" style="grid-area: 7 / 2 / 8 / 3;" title="Redo [ctrl][shift][z]">
           <div class="icon">
-            <svg id="sudoku" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <path class="icon-round" fill="none"  stroke="white" stroke-width="6" d="M 70,55 A 25 25 0 0 0 30,55" />
               <path class="icon-round" fill="white" stroke="white" stroke-width="3" d="M 78,63 L 62,63 L 78,47 Z" />
             </svg>
@@ -162,7 +163,7 @@
         </button>
         <button class="control-btn" style="grid-area: 7 / 4 / 8 / 5;" title="Check">
           <div class="icon">
-            <svg id="sudoku" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <path class="icon-round" fill="none" stroke="white" stroke-width="6" d="M 30,55 L 42,67 L 75,37" />
             </svg>
           </div>

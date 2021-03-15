@@ -21,7 +21,8 @@ function equal(a, b) {
     }
 }
 
-function combineUpdates(target, update) {
+function combineUpdates(readonlyTarget, update) {
+    const target = readonlyTarget && JSON.parse(JSON.stringify(readonlyTarget)) || {};
     outer:
     for (const [ key, val ] of Object.entries(update)) {
         const path = key.split('/');
@@ -33,17 +34,13 @@ function combineUpdates(target, update) {
         while (null != (seg = path.shift())) {
             subpath += (subpath ? '/' : '') + seg;
             if (subpath in target) {
-                if (null === target[subpath]) target[subpath] = {};
-                if ('object' === typeof target[subpath]) {
-                    let subtarget = target[subpath];
-                    while (null != (seg = path.shift())) {
-                        subtarget = (subtarget[seg] || (subtarget[seg] = {}));
-                    }
-                    subtarget[leaf] = val;
+                if ('object' !== typeof target[subpath]) target[subpath] = {};
+
+                let subtarget = target[subpath];
+                while (null != (seg = path.shift())) {
+                    subtarget = (subtarget[seg] || (subtarget[seg] = {}));
                 }
-                else {
-                    delete target[subpath];
-                }
+                subtarget[leaf] = val;
                 continue outer;
             }
         }
@@ -58,6 +55,7 @@ function combineUpdates(target, update) {
         // And just apply normally.
         target[key] = val;
     }
+    return target;
 }
 
 function applyUpdate(readonlyTarget, update) {
@@ -195,10 +193,12 @@ class DataLayer {
                 });
             }, this._delay);
         }
-        combineUpdates(this._updates, forward);
+        this._updates = combineUpdates(this._updates, forward);
 
         // Update local model.
         const newData = applyUpdate(this.data, forward);
+
+
         this._onChange(newData);
 
         return { forward, back };

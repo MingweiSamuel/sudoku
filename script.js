@@ -423,13 +423,16 @@ function main(gameKey, cid) {
 
     if (reset) {
       allClientsData.update({
-        [`${cid}/selected`]: null,
+        [`${cid}/selected`]: { [id]: true },
+        [`${cid}/cursor`]: id,
       });
+      return true;
     }
-    else if (allClientsData.get(cid, 'selected', 'id')) {
-      // Short circuit if not reseting and already selected.
-      return false;
-    }
+
+    // // Short circuit if not reseting and already selected.
+    // if (allClientsData.get(cid, 'selected', 'id')) {
+    //   return false;
+    // }
 
     allClientsData.update({
       [`${cid}/selected/${id}`]: true,
@@ -504,6 +507,16 @@ function main(gameKey, cid) {
   {
     document.getElementById('button-undo').addEventListener('click', e => updateHistory(false));
     document.getElementById('button-redo').addEventListener('click', e => updateHistory(true));
+    document.getElementById('button-check').addEventListener('click', e => {
+      const bad = checkGrid(_boardData.data.filled);
+      if (0 === bad.length) {
+        alert('Looks good!');
+      }
+      else {
+
+        alert('Uh oh!');
+      }
+    });
 
     for (const button of document.getElementsByClassName('button-mode')) {
       button.addEventListener('click', e => setFillMode(e.currentTarget));

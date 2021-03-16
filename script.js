@@ -129,6 +129,22 @@ function cornerPos(i, len) {
   return [ dx, dy ];
 }
 
+function formatSecs(secs) {
+  const nums = [];
+  // Seconds.
+  nums.unshift(secs % 60);
+  secs = (secs / 60) | 0;
+  // Minutes.
+  nums.unshift(secs % 60);
+  secs = (secs / 60) | 0;
+  // Hours.
+  if (secs) nums.unshift(secs);
+
+  return nums
+    .map(n => n.toString())
+    .map((s, i) => i ? s.padStart(2, '0') : s).join(':');
+}
+
 // TODO: Use this!
 function checkGrid(filled) {
   const bad = new Set();
@@ -187,9 +203,7 @@ function main(gameKey, cid) {
       let elapsedSeconds = snapshot.val();
       setInterval(() => {
         elapsedSeconds++;
-        const minutes = '' + ((elapsedSeconds / 60) | 0);
-        const seconds = '' + (elapsedSeconds % 60);
-        timer.textContent = `${minutes.padStart(2, '0')}:${seconds.padStart(2, '0')}`;
+        timer.textContent = formatSecs(elapsedSeconds);
       }, 1000);
       setInterval(() => {
         allClientsData.update({

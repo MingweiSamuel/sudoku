@@ -10,8 +10,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <script>
-    if (location.protocol === 'http:') {
-      location.replace(`https:${location.href.slice(location.protocol.length)}`);
+    if ('http://www.mingweisamuel.com' === location.origin) {
+      location.replace(`https:${location.href.slice(5)}`);
     }
   </script>
 

@@ -91,6 +91,7 @@ body {
         background: none;
     }
     .layout-controls,
+    .layout-timer,
     #sudoku-highlights,
     #sudoku-cursor {
         display: none;
@@ -199,9 +200,6 @@ body {
     stroke-linejoin: round;
     stroke-linecap: round;
 }
-/* .control-btn:hover .icon .icon-fill {
-    fill: #47C;
-} */
 
 
 

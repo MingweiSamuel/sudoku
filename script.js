@@ -459,14 +459,14 @@ function main(gameKey, cid) {
     return [ x, y ];
   }
 
-  function select(x, y, reset = false) {
+  function select(x, y, reset = false, mode = true) {
     if (x < 0 || SIZE <= x || y < 0 || SIZE <= y) return false;
 
     const id = xy2id(x, y);
 
     if (reset) {
       allClientsData.update({
-        [`${cid}/selected`]: { [id]: true },
+        [`${cid}/selected`]: { [id]: mode },
         [`${cid}/cursor`]: id,
       });
       return true;
@@ -478,7 +478,7 @@ function main(gameKey, cid) {
     // }
 
     allClientsData.update({
-      [`${cid}/selected/${id}`]: true,
+      [`${cid}/selected/${id}`]: mode,
       [`${cid}/cursor`]: id,
     });
     return true;
@@ -486,25 +486,37 @@ function main(gameKey, cid) {
 
 
   {
-    let selecting = false;
+    let selectingMode = 0; // 0 for none, 1 for selecting, 2 for deselecting.
 
     sudoku.addEventListener('mousedown', e => {
-      if (!selecting) {
-        selecting = true;
+      if (0 === selectingMode) {
         const [ x, y ] = offset2xy(e);
-        select(x, y, !e.shiftKey && !e.ctrlKey && !e.altKey);
+        if (0b0001 === e.buttons) {
+          selectingMode = 1;
+          select(x, y, !e.shiftKey && !e.ctrlKey && !e.altKey);
+        }
+        else if (0b0010 === e.buttons) {
+          selectingMode = 2;
+          select(x, y, false, null)
+        }
       }
     });
 
     sudoku.addEventListener('mousemove', e => {
-      if (selecting) {
+      if (0 !== selectingMode) {
         const [ x, y ] = offset2xy(e);
-        select(x, y);
+        select(x, y, false, 1 === selectingMode ? true : null);
       }
     });
 
     window.addEventListener('mouseup', e => {
-      selecting = false;
+      if (0 !== selectingMode) {
+        selectingMode = 0;
+      }
+    });
+
+    sudoku.addEventListener('contextmenu', e => {
+      e.preventDefault();
     });
   }
 

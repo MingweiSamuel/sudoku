@@ -383,9 +383,15 @@ function main(gameKey, cid) {
     const selected = Object.entries(allClientsData.get(cid, 'selected') || {})
       .filter(([ _, isSet ]) => isSet)
       .map(([ key, _ ]) => key);
+  
+    const markData = boardData.data[type] || {};
 
     switch (type) {
       case FILLED:
+        if (null == num && selected.every(id => null == markData[id])) {
+          fill(null, CORNER);
+          return;
+        }
         for (const id of selected) {
           update[`${type}/${id}`] = num;
         }
@@ -393,16 +399,17 @@ function main(gameKey, cid) {
       case CORNER:
       case CENTER:
         if (null == num) {
+          if (selected.every(id => null == markData[id])) {
+            type = CORNER === type ? CENTER : CORNER;
+          }
           for (const id of selected) {
             update[`${type}/${id}`] = null;
           }
         }
         else {
-          const filledData = boardData.data[type] || {};
-
           let allSet = true;
           for (const id of selected) {
-            allSet &&= filledData[id] && filledData[id][num];
+            allSet &&= markData[id] && markData[id][num];
             update[`${type}/${id}/${num}`] = true;
           }
           // If they are all set, unset all.

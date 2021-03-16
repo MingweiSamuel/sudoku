@@ -132,11 +132,11 @@ body {
 
 .control-btn {
     display: block;
-    border: none;
     padding: 0;
     margin: 0;
     text-decoration: none;
     background: #36A;
+    border: 0.01em solid #36A;
     color: #ffffff;
     font-family: inherit;
     font-weight: inherit;

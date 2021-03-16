@@ -4,6 +4,9 @@ const GIVENS = 'givens';
 const FILLED = 'filled';
 const CORNER = 'corner';
 const CENTER = 'center';
+
+const COLORS = 'colors'; // UNUSED
+
 const MODES = [ FILLED, CORNER, CENTER ];
 
 const DELETE_ORDER = {
@@ -11,6 +14,14 @@ const DELETE_ORDER = {
   [FILLED]: CORNER,
   [CORNER]: CENTER,
   [CENTER]: CORNER,
+};
+
+const BLOCKED_BY_GIVENS = {
+  [GIVENS]: false,
+  [FILLED]: true,
+  [CORNER]: true,
+  [CENTER]: true,
+  [COLORS]: false,
 };
 
 const NUMS = [ null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
@@ -436,9 +447,13 @@ function main(gameKey, cid) {
 
   function fill(num, type) {
     const update = {};
+
+    const blockedGivens = BLOCKED_BY_GIVENS[type] && boardData.get('givens');
     const selected = Object.entries(allClientsData.get(cid, 'selected') || {})
       .filter(([ _, isSet ]) => isSet)
-      .map(([ key, _ ]) => key);
+      .map(([ id, _ ]) => id)
+      .filter(id => !blockedGivens || !blockedGivens[id]);
+
     if (!selected.length) return;
   
     const markData = (boardData.data || {})[type] || {};

@@ -587,7 +587,7 @@ function main(gameKey, cid) {
     window.addEventListener('keydown', e => {
       let num;
 
-      if ('Space' === e.code) {
+      if ('Space' === e.code || 'Tab' === e.code) {
         e.preventDefault();
 
         let idx = MODES.indexOf(fillMode) + 1 - (2 * e.shiftKey) + MODES.length;

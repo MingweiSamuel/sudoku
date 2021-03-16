@@ -397,8 +397,9 @@ function main(gameKey, cid) {
     const selected = Object.entries(allClientsData.get(cid, 'selected') || {})
       .filter(([ _, isSet ]) => isSet)
       .map(([ key, _ ]) => key);
+    if (!selected.length) return;
   
-    const markData = boardData.data[type] || {};
+    const markData = (boardData.data || {})[type] || {};
 
     switch (type) {
       case FILLED:

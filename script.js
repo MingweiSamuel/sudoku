@@ -4,7 +4,6 @@ const GIVENS = 'givens';
 const FILLED = 'filled';
 const CORNER = 'corner';
 const CENTER = 'center';
-
 const COLORS = 'colors'; // UNUSED
 
 const MODES = [ FILLED, CORNER, CENTER ];
@@ -24,7 +23,6 @@ const BLOCKED_BY_GIVENS = {
   [COLORS]: false,
 };
 
-const NUMS = [ null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 const SIZE = 9;
 const CELLS = 81;
 

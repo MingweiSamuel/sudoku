@@ -89,6 +89,8 @@ function diffUpdate(dataTarget, update) {
 
         // Pure add.
         if (null == oldVal) {
+            if (null == val) continue; // Short circuit nothing delete.
+
             forward[key] = val; // Forward: add.
             back[key] = null; // Back: remove.
         }
@@ -103,6 +105,7 @@ function diffUpdate(dataTarget, update) {
             back[key] = oldVal;
         }
     }
+
     return { forward, back };
 }
 

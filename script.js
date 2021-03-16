@@ -607,7 +607,7 @@ function main(gameKey, cid) {
     document.getElementById('button-undo').addEventListener('click', e => updateHistory(false));
     document.getElementById('button-redo').addEventListener('click', e => updateHistory(true));
     document.getElementById('button-check').addEventListener('click', e => {
-      const bad = checkGrid(_boardData.data.filled);
+      const bad = checkGrid(Object.assign({}, _boardData.data.givens, _boardData.data.filled));
       if (0 === bad.size) {
         alert('Looks good!');
       }

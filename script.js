@@ -1,26 +1,27 @@
 const NS_SVG = 'http://www.w3.org/2000/svg';
 
-const GIVENS = 'givens';
-const FILLED = 'filled';
-const CORNER = 'corner';
-const CENTER = 'center';
-const COLORS = 'colors'; // UNUSED
+const MODE_GIVENS = 'givens';
+const MODE_FILLED = 'filled';
+const MODE_CORNER = 'corner';
+const MODE_CENTER = 'center';
+const MODE_COLORS = 'colors'; // UNUSED
 
-const MODES = [ FILLED, CORNER, CENTER ];
+const MODES = [ MODE_FILLED, MODE_CORNER, MODE_CENTER ];
 
 const DELETE_ORDER = {
-  [GIVENS]: FILLED,
-  [FILLED]: CORNER,
-  [CORNER]: CENTER,
-  [CENTER]: CORNER,
+  [MODE_GIVENS]: MODE_FILLED,
+  [MODE_COLORS]: MODE_FILLED,
+  [MODE_FILLED]: MODE_CORNER,
+  [MODE_CORNER]: MODE_CENTER,
+  [MODE_CENTER]: MODE_CORNER,
 };
 
 const BLOCKED_BY_GIVENS = {
-  [GIVENS]: false,
-  [FILLED]: true,
-  [CORNER]: true,
-  [CENTER]: true,
-  [COLORS]: false,
+  [MODE_GIVENS]: false,
+  [MODE_FILLED]: true,
+  [MODE_CORNER]: true,
+  [MODE_CENTER]: true,
+  [MODE_COLORS]: false,
 };
 
 const SIZE = 9;
@@ -46,9 +47,9 @@ const ARROWS = {
 };
 
 const MODE_KEYS = {
-  Shift: CORNER,
-  Control: CENTER,
-  Alt: CENTER,
+  Shift: MODE_CORNER,
+  Control: MODE_CENTER,
+  Alt: MODE_CENTER,
 };
 
 const DIGIT_REGEX = /Digit(\d)/;
@@ -295,7 +296,7 @@ function main(gameKey, cid) {
   }));
 
   // Given cells.
-  boardData.watch(`${GIVENS}/*`, makeBind(sudokuGivens, {
+  boardData.watch(`${MODE_GIVENS}/*`, makeBind(sudokuGivens, {
     create() {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'givens');
@@ -309,7 +310,7 @@ function main(gameKey, cid) {
     },
   }));
   // Given cells mask, for filled cells and pencil marks.
-  boardData.watch(`${GIVENS}/*`, makeBind(sudokuGivensMask, {
+  boardData.watch(`${MODE_GIVENS}/*`, makeBind(sudokuGivensMask, {
     create([ id ]) {
       const el = document.createElementNS(NS_SVG, 'rect');
       el.setAttribute('width', '100');
@@ -325,7 +326,7 @@ function main(gameKey, cid) {
   }));
 
   // Filled cells.
-  boardData.watch(`${FILLED}/*`, makeBind(sudokuFilled, {
+  boardData.watch(`${MODE_FILLED}/*`, makeBind(sudokuFilled, {
     create() {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'filled');
@@ -340,7 +341,7 @@ function main(gameKey, cid) {
     },
   }));
   // Filled cells mask, for pencil marks.
-  boardData.watch(`${FILLED}/*`, makeBind(sudokuFilledMask, {
+  boardData.watch(`${MODE_FILLED}/*`, makeBind(sudokuFilledMask, {
     create([ id ]) {
       const el = document.createElementNS(NS_SVG, 'rect');
       el.setAttribute('width', '100');
@@ -356,7 +357,7 @@ function main(gameKey, cid) {
   }));
 
   // Corner pencil marks.
-  boardData.watch(`${CORNER}/*`, makeBind(sudokuCorner, {
+  boardData.watch(`${MODE_CORNER}/*`, makeBind(sudokuCorner, {
     create() {
       return document.createElementNS(NS_SVG, 'g');
     },
@@ -387,7 +388,7 @@ function main(gameKey, cid) {
   }));
 
   // Center pencil marks.
-  boardData.watch(`${CENTER}/*`, makeBind(sudokuCenter, {
+  boardData.watch(`${MODE_CENTER}/*`, makeBind(sudokuCenter, {
     create() {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'center');
@@ -457,8 +458,8 @@ function main(gameKey, cid) {
     const markData = (boardData.data || {})[type] || {};
 
     switch (type) {
-      case GIVENS:
-      case FILLED:
+      case MODE_GIVENS:
+      case MODE_FILLED:
         if (null == num && selected.every(id => null == markData[id])) {
           fill(null, DELETE_ORDER[type]);
           return;
@@ -467,8 +468,8 @@ function main(gameKey, cid) {
           update[`${type}/${id}`] = num;
         }
         break;
-      case CORNER:
-      case CENTER:
+      case MODE_CORNER:
+      case MODE_CENTER:
         if (null == num) {
           if (selected.every(id => null == markData[id])) {
             type = DELETE_ORDER[type];
@@ -595,7 +596,7 @@ function main(gameKey, cid) {
     sudoku.addEventListener('touchmove', e => handleTouch(e));
   }
 
-  let fillMode = FILLED;
+  let fillMode = MODE_FILLED;
 
   function setFillMode(mode) {
     let el = null;
@@ -711,12 +712,12 @@ function main(gameKey, cid) {
       e.preventDefault();
 
       if (e.shiftKey) {
-        fill(num, CORNER);
-        setFillMode(FILLED);
+        fill(num, MODE_CORNER);
+        setFillMode(MODE_FILLED);
       }
       else if (e.ctrlKey || e.altKey) {
-        fill(num, CENTER);
-        setFillMode(FILLED);
+        fill(num, MODE_CENTER);
+        setFillMode(MODE_FILLED);
       }
       else {
         fill(num, fillMode);

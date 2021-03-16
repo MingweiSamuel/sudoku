@@ -1,0 +1,40 @@
+{
+  "rules": {
+  	"game": {
+      "$gameId": {
+        ".read": true,
+        "frozen": {
+          ".write": "null != auth.uid && !data.exists()"
+        },
+				"clients": {
+          "$userId": {
+            ".write": "$userId === auth.uid",
+            "ts": {
+              "0": {
+	              ".validate": "newData.val() === now"
+              }
+            },
+            "selected": {
+              ".write": "($userId === auth.uid) || (now - data.parent().child('ts').val() >= 60000)"
+            },
+            "actionHistory": {
+            },
+            "actionStack": {
+            },
+          }
+        },
+        "board": {
+          ".write": "null != auth.uid && true != data.parent().child('frozen').val()",
+          "filled": {
+          },
+          "center": {
+          },
+          "corner": {
+          }
+        }
+      }
+    },
+    // ".read": "now < 1618038000000",  // 2021-4-10
+    // ".write": "now < 1618038000000",  // 2021-4-10
+  }
+}

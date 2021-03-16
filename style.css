@@ -206,12 +206,15 @@ body {
 
 
 
-.given, .filled, .center, .corner {
+.givens, .filled, .center, .corner {
     text-anchor: middle;
     dominant-baseline: central;
 }
-.given, .filled {
+.givens, .filled {
     font-size: 65px;
+}
+.givens {
+    fill: #222;
 }
 .center, .corner {
     font-size: 25px;

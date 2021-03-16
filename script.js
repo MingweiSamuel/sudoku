@@ -1,9 +1,17 @@
 const NS_SVG = 'http://www.w3.org/2000/svg';
 
+const GIVENS = 'givens';
 const FILLED = 'filled';
 const CORNER = 'corner';
 const CENTER = 'center';
 const MODES = [ FILLED, CORNER, CENTER ];
+
+const DELETE_ORDER = {
+  [GIVENS]: FILLED,
+  [FILLED]: CORNER,
+  [CORNER]: CENTER,
+  [CENTER]: CORNER,
+};
 
 const NUMS = [ null, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ];
 const SIZE = 9;
@@ -40,6 +48,7 @@ const sudoku = document.getElementById('sudoku');
 const sudokuHighlights = document.getElementById('sudoku-highlights');
 const sudokuCursor = document.getElementById('sudoku-cursor');
 const sudokuGivens = document.getElementById('sudoku-givens');
+const sudokuGivensMask = document.getElementById('sudoku-givens-mask');
 const sudokuFilled = document.getElementById('sudoku-filled');
 const sudokuFilledMask = document.getElementById('sudoku-filled-mask');
 const sudokuCenter = document.getElementById('sudoku-center');
@@ -201,10 +210,12 @@ function main(gameKey, cid) {
     const elapsedSeconds = refClient.child('elapsedSeconds');
     elapsedSeconds.once('value', snapshot => {
       let elapsedSeconds = snapshot.val();
+      // Update UI every second.
       setInterval(() => {
         elapsedSeconds++;
         timer.textContent = formatSecs(elapsedSeconds);
       }, 1000);
+      // Save time every 10 seconds.
       setInterval(() => {
         allClientsData.update({
           [`${cid}/elapsedSeconds`]: elapsedSeconds,
@@ -274,11 +285,42 @@ function main(gameKey, cid) {
     },
   }));
 
+  // Given cells.
+  boardData.watch(`${GIVENS}/*`, makeBind(sudokuGivens, {
+    create() {
+      const el = document.createElementNS(NS_SVG, 'text');
+      el.setAttribute('class', 'givens');
+      return el;
+    },
+    update(el, [ id ], val) {
+      const [ x, y ] = id2xy(id);
+      el.textContent = '' + val;
+      el.setAttribute('x', 100 * x + 50);
+      el.setAttribute('y', 100 * y + 50);
+    },
+  }));
+  // Given cells mask, for filled cells and pencil marks.
+  boardData.watch(`${GIVENS}/*`, makeBind(sudokuGivensMask, {
+    create([ id ]) {
+      const el = document.createElementNS(NS_SVG, 'rect');
+      el.setAttribute('width', '100');
+      el.setAttribute('height', '100');
+      el.setAttribute('fill', 'black');
+      
+      const [ x, y ] = id2xy(id);
+      el.setAttribute('x', 100 * x);
+      el.setAttribute('y', 100 * y);
+
+      return el;
+    },
+  }));
+
   // Filled cells.
   boardData.watch(`${FILLED}/*`, makeBind(sudokuFilled, {
     create() {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'filled');
+      el.setAttribute('mask', 'url(#sudoku-givens-mask)');
       return el;
     },
     update(el, [ id ], val) {
@@ -290,17 +332,17 @@ function main(gameKey, cid) {
   }));
   // Filled cells mask, for pencil marks.
   boardData.watch(`${FILLED}/*`, makeBind(sudokuFilledMask, {
-    create() {
+    create([ id ]) {
       const el = document.createElementNS(NS_SVG, 'rect');
       el.setAttribute('width', '100');
       el.setAttribute('height', '100');
       el.setAttribute('fill', 'black');
-      return el;
-    },
-    update(el, [ id ], _val) {
+      
       const [ x, y ] = id2xy(id);
       el.setAttribute('x', 100 * x);
       el.setAttribute('y', 100 * y);
+
+      return el;
     },
   }));
 
@@ -402,9 +444,10 @@ function main(gameKey, cid) {
     const markData = (boardData.data || {})[type] || {};
 
     switch (type) {
+      case GIVENS:
       case FILLED:
         if (null == num && selected.every(id => null == markData[id])) {
-          fill(null, CORNER);
+          fill(null, DELETE_ORDER[type]);
           return;
         }
         for (const id of selected) {
@@ -415,7 +458,7 @@ function main(gameKey, cid) {
       case CENTER:
         if (null == num) {
           if (selected.every(id => null == markData[id])) {
-            type = CORNER === type ? CENTER : CORNER;
+            type = DELETE_ORDER[type];
           }
           for (const id of selected) {
             update[`${type}/${id}`] = null;
@@ -556,8 +599,9 @@ function main(gameKey, cid) {
     for (const button of document.getElementsByClassName('button-mode')) {
       button.classList.add('control-btn-inv');
     }
-    el.classList.remove('control-btn-inv');
+    el && el.classList.remove('control-btn-inv');
   }
+  window._setFillMode = setFillMode;
 
   {
     document.getElementById('button-undo').addEventListener('click', e => updateHistory(false));

@@ -4,9 +4,9 @@ const MODE_GIVENS = 'givens';
 const MODE_FILLED = 'filled';
 const MODE_CORNER = 'corner';
 const MODE_CENTER = 'center';
-const MODE_COLORS = 'colors'; // UNUSED
+const MODE_COLORS = 'colors';
 
-const MODES = [ MODE_FILLED, MODE_CORNER, MODE_CENTER ];
+const MODES = [ MODE_FILLED, MODE_CORNER, MODE_CENTER, MODE_COLORS ];
 
 const DELETE_ORDER = {
   [MODE_GIVENS]: MODE_FILLED,
@@ -52,9 +52,31 @@ const MODE_KEYS = {
   Alt: MODE_CENTER,
 };
 
+const COLORS = [
+  [ 1, 1, 1, 1 ],
+  [ 0.7, 0.7, 0.7, 0.6 ],
+  [ 0.4, 0.4, 0.4, 0.6 ],
+  [ 0.07, 0.07, 0.07, 1 ],
+  hsluv.hsluvToRgb([  11, 100, 60 ]),
+  hsluv.hsluvToRgb([  43, 100, 70 ]),
+  hsluv.hsluvToRgb([  70, 100, 85 ]),
+  hsluv.hsluvToRgb([ 123, 100, 70 ]),
+  hsluv.hsluvToRgb([ 225, 100, 70 ]),
+  hsluv.hsluvToRgb([ 290, 100, 65 ]),
+];
+
+COLORS.forEach(row => {
+  for (let i = 0; i < 3; i++) {
+    row[i] *= 255;
+    row[i] |= 0;
+  }
+  row.length < 4 && row.push(0.6);
+});
+
 const DIGIT_REGEX = /Digit(\d)/;
 
 const sudoku = document.getElementById('sudoku');
+const sudokuColors = document.getElementById('sudoku-colors');
 const sudokuHighlights = document.getElementById('sudoku-highlights');
 const sudokuCursor = document.getElementById('sudoku-cursor');
 const sudokuGivens = document.getElementById('sudoku-givens');
@@ -389,18 +411,21 @@ function main(gameKey, cid) {
 
   // Center pencil marks.
   boardData.watch(`${MODE_CENTER}/*`, makeBind(sudokuCenter, {
-    create() {
+    create([ id ]) {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'center');
       el.setAttribute('mask', 'url(#sudoku-filled-mask)');
+      
+      const [ x, y ] = id2xy(id);
+      el.setAttribute('x', 100 * x + 50);
+      el.setAttribute('y', 100 * y + 50);
+
       return el;
     },
     update(el, [ id ], val) {
-      const [ x, y ] = id2xy(id);
       const text = stringifyNums(val);
       el.textContent = text;
-      el.setAttribute('x', 100 * x + 50);
-      el.setAttribute('y', 100 * y + 50);
+
       if (text.length >= 8) {
         el.setAttribute('textLength', 95);
         el.setAttribute('lengthAdjust', 'spacingAndGlyphs');
@@ -409,6 +434,24 @@ function main(gameKey, cid) {
         el.removeAttribute('textLength');
         el.removeAttribute('lengthAdjust');
       }
+    },
+  }));
+
+  // Center pencil marks.
+  boardData.watch(`${MODE_COLORS}/*`, makeBind(sudokuColors, {
+    create([ id ]) {
+      const el = document.createElementNS(NS_SVG, 'use');
+      el.setAttribute('href', '#colors');
+
+      const [ x, y ] = id2xy(id);
+      el.setAttribute('x', 100 * x);
+      el.setAttribute('y', 100 * y);
+
+      return el;
+    },
+    update(el, [ id ], val) {
+      const color = COLORS[val];
+      el.setAttribute('fill', `rgba(${color.join(',')})`);
     },
   }));
 
@@ -460,6 +503,7 @@ function main(gameKey, cid) {
     switch (type) {
       case MODE_GIVENS:
       case MODE_FILLED:
+      case MODE_COLORS:
         if (null == num && selected.every(id => null == markData[id])) {
           fill(null, DELETE_ORDER[type]);
           return;
@@ -606,6 +650,14 @@ function main(gameKey, cid) {
     }
     else {
       el = document.querySelector(`.button-mode[data-mode="${mode}"]`);
+    }
+
+    for (const inputButton of document.getElementsByClassName('button-input')) {
+      const num = JSON.parse(inputButton.getAttribute('data-input'));
+      if (null != num) {
+        inputButton.style.color = MODE_COLORS === mode ? `rgb(${COLORS[num].slice(0, 3).join(',')})` : null;
+        inputButton.innerText = MODE_COLORS === mode ? '\u25A8' : num;
+      }
     }
 
     fillMode = mode;

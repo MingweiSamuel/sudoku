@@ -8,13 +8,12 @@ const MODE_COLORS = 'colors';
 
 const MODES = [ MODE_FILLED, MODE_CORNER, MODE_CENTER, MODE_COLORS ];
 
-const DELETE_ORDER = {
-  [MODE_GIVENS]: MODE_FILLED,
-  [MODE_COLORS]: MODE_FILLED,
-  [MODE_FILLED]: MODE_CORNER,
-  [MODE_CORNER]: MODE_CENTER,
-  [MODE_CENTER]: MODE_CORNER,
-};
+const DELETE_ORDER = [
+  MODE_FILLED,
+  MODE_CORNER,
+  MODE_CENTER,
+  MODE_COLORS,
+];
 
 const BLOCKED_BY_GIVENS = {
   [MODE_GIVENS]: false,
@@ -488,6 +487,15 @@ function main(gameKey, cid) {
   }
 
   function fill(num, type) {
+    const madeChange = fillHelper(num, type);
+    if (null == num && !madeChange) {
+      for (const deleteType of DELETE_ORDER) {
+        if (fillHelper(null, deleteType)) break;
+      }
+    }
+  }
+
+  function fillHelper(num, type) {
     const update = {};
 
     const blockedGivens = BLOCKED_BY_GIVENS[type] && boardData.get('givens');
@@ -499,14 +507,12 @@ function main(gameKey, cid) {
     if (!selected.length) return;
   
     const markData = (boardData.data || {})[type] || {};
-
     switch (type) {
       case MODE_GIVENS:
       case MODE_FILLED:
       case MODE_COLORS:
         if (null == num && selected.every(id => null == markData[id])) {
-          fill(null, DELETE_ORDER[type]);
-          return;
+          return false; // Delete nothing.
         }
         for (const id of selected) {
           update[`${type}/${id}`] = num;
@@ -516,7 +522,7 @@ function main(gameKey, cid) {
       case MODE_CENTER:
         if (null == num) {
           if (selected.every(id => null == markData[id])) {
-            type = DELETE_ORDER[type];
+            return false; // Delete nothing.
           }
           for (const id of selected) {
             update[`${type}/${id}`] = null;
@@ -541,16 +547,16 @@ function main(gameKey, cid) {
     }
     // Update and add update to history.
     const history = boardData.update(update);
-    if (history) {
-      const key = allClientsData.ref.child(`${cid}/history`).push().key;
-      allClientsData.update({
-        [`${cid}/history/${key}`]: {
-          data: JSON.stringify(history),
-          ts: makeTs(),
-        },
-        [`${cid}/historyUndone`]: null,
-      });
-    }
+    if (!history) return false;
+    const key = allClientsData.ref.child(`${cid}/history`).push().key;
+    allClientsData.update({
+      [`${cid}/history/${key}`]: {
+        data: JSON.stringify(history),
+        ts: makeTs(),
+      },
+      [`${cid}/historyUndone`]: null,
+    });
+    return true;
   }
 
   function offset2xy({ offsetX, offsetY }) {

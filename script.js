@@ -559,11 +559,21 @@ function main(gameKey, cid) {
     return true;
   }
 
-  function offset2xy({ offsetX, offsetY }) {
+  function loc2xy(xOff, yOff, limitCircle) {
     const { width, height } = sudoku.getBoundingClientRect();
-    const x = (9 * offsetX / width) | 0;
-    const y = (9 * offsetY / height) | 0;
-    return [ x, y ];
+    if (xOff < 0 || yOff < 0) return null;
+    const xf = SIZE * xOff / width;
+    const yf = SIZE * yOff / height;
+    if (SIZE <= xf || SIZE <= yf) return null;
+
+    if (limitCircle) {
+      // Limit to circles.
+      const xr = xf % 1 - 0.5;
+      const yr = yf % 1 - 0.5;
+      if (0.25 < xr * xr + yr * yr) return null;
+    }
+
+    return [ xf | 0, yf | 0 ];
   }
 
   function select(x, y, reset = false, mode = true) {
@@ -597,22 +607,24 @@ function main(gameKey, cid) {
 
     sudoku.addEventListener('mousedown', e => {
       if (0 === selectingMode) {
-        const [ x, y ] = offset2xy(e);
+        const xy = loc2xy(e.offsetX, e.offsetY, false);
+        if (!xy) return;
         if (0b0001 === e.buttons) {
           selectingMode = 1;
-          select(x, y, !e.shiftKey && !e.ctrlKey && !e.altKey);
+          select(...xy, !e.shiftKey && !e.ctrlKey && !e.altKey);
         }
         else if (0b0010 === e.buttons) {
           selectingMode = 2;
-          select(x, y, false, null)
+          select(...xy, false, null)
         }
       }
     });
 
     sudoku.addEventListener('mousemove', e => {
       if (0 !== selectingMode) {
-        const [ x, y ] = offset2xy(e);
-        select(x, y, false, 1 === selectingMode ? true : null);
+        const xy = loc2xy(e.offsetX, e.offsetY, true);
+        if (!xy) return;
+        select(...xy, false, 1 === selectingMode ? true : null);
       }
     });
 
@@ -635,11 +647,9 @@ function main(gameKey, cid) {
 
       for (let i = 0; i < e.targetTouches.length; i++) {
         const touch = e.targetTouches.item(i);
-        const [ x, y ] = offset2xy({
-          offsetX: touch.clientX - left,
-          offsetY: touch.clientY - top,
-        });
-        select(x, y, reset);
+        const xy = loc2xy(touch.clientX - left, touch.clientY - top, true);
+        if (!xy) continue;
+        select(...xy, reset);
       }
     }
     sudoku.addEventListener('touchstart', e => handleTouch(e, 1 === e.targetTouches.length));

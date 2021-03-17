@@ -53,16 +53,16 @@ const MODE_KEYS = {
 };
 
 const COLORS = [
-  [ 1, 1, 1, 1 ],
-  [ 0.7, 0.7, 0.7, 0.6 ],
-  [ 0.4, 0.4, 0.4, 0.6 ],
   [ 0.07, 0.07, 0.07, 1 ],
-  hsluv.hsluvToRgb([  11, 100, 60 ]),
-  hsluv.hsluvToRgb([  43, 100, 70 ]),
-  hsluv.hsluvToRgb([  70, 100, 85 ]),
-  hsluv.hsluvToRgb([ 123, 100, 70 ]),
-  hsluv.hsluvToRgb([ 225, 100, 70 ]),
-  hsluv.hsluvToRgb([ 290, 100, 65 ]),
+  [ 0.4, 0.4, 0.4, 0.6 ],
+  [ 0.7, 0.7, 0.7, 0.6 ],
+  hsluv.hsluvToRgb([  10, 100, 60 ]),
+  hsluv.hsluvToRgb([  40, 100, 65 ]),
+  hsluv.hsluvToRgb([  70, 100, 90 ]).concat(0.8),
+  hsluv.hsluvToRgb([ 120, 100, 80 ]),
+  hsluv.hsluvToRgb([ 230, 100, 85 ]),
+  hsluv.hsluvToRgb([ 260, 100, 55 ]),
+  hsluv.hsluvToRgb([ 300, 100, 70 ]),
 ];
 
 COLORS.forEach(row => {

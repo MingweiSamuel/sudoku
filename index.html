@@ -22,6 +22,67 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <svg id="icons" xmlns="http://www.w3.org/2000/svg" width="1" height="1">
+    <defs>
+      <mask id="center-mask">
+        <rect fill="white" width="100" height="100" />
+        <rect fill="black" width="42" height="42" x="29" y="29" rx="3" />
+      </mask>
+      <mask id="centerLock-mask">
+        <rect fill="white" width="100" height="100" />
+        <rect fill="black" width="42" height="36" x="29" y="35" rx="3" />
+        <path fill="black" d="M 49,28 A 3 3 0 1 1 51,28 L 53,33 L 47,33 Z" />
+      </mask>
+    </defs>
+    <symbol id="icon-filled" viewBox="0 0 100 100">
+      <rect width="60" height="60" x="20" y="20" rx="9" mask="url(#center-mask)" />
+      <text x="50" y="50" font-size="42" text-anchor="middle" dominant-baseline="central">7</text>
+    </symbol>
+    <symbol id="icon-corner" viewBox="0 0 100 100">
+      <rect width="60" height="60" x="20" y="20" rx="9" mask="url(#center-mask)" />
+      <text x="38" y="40" font-size="22" text-anchor="middle" dominant-baseline="central">7</text>
+      <text x="62" y="40" font-size="22" text-anchor="middle" dominant-baseline="central">8</text>
+    </symbol>
+    <symbol id="icon-center" viewBox="0 0 100 100">
+      <rect width="60" height="60" x="20" y="20" rx="9" mask="url(#center-mask)" />
+      <text x="50" y="50" font-size="22" text-anchor="middle" dominant-baseline="central">78</text>
+    </symbol>
+    <symbol id="icon-colors" viewBox="0 0 100 100">
+      <rect fill="rgb(254, 82, 93)" width="48" height="48" x="26" y="26" />
+      <polygon fill="rgb(254, 224, 118)" points="31,74 55,26 74,26 74,74" />
+      <polygon fill="rgb(78, 122, 255)" points="45,74 69,26 74,26 74,74" />
+      <rect width="60" height="60" x="20" y="20" rx="9" mask="url(#center-mask)" />
+    </symbol>
+    <symbol id="icon-givens" viewBox="0 0 100 100">
+      <rect class="icon-fill" width="60" height="60" x="20" y="20" rx="9" mask="url(#centerLock-mask)" />
+      <text class="icon-fill" x="50" y="53" font-size="40" text-anchor="middle" dominant-baseline="central">7</text>
+    </symbol>
+
+    <symbol id="icon-delete" viewBox="0 0 100 100">
+      <path class="icon-round" fill="none" stroke-width="6" d="M 20,50 L 40,30 L 80,30 L 80,70 L 40,70 Z" />
+      <path class="icon-round" fill="none" stroke-width="6" d="M 50,40 L 70,60" />
+      <path class="icon-round" fill="none" stroke-width="6" d="M 70,40 L 50,60" />
+    </symbol>
+    <symbol id="icon-undo" viewBox="0 0 100 100">
+      <path fill="none" stroke-width="6" stroke-linecap="round" d="M 73,55 A 25 25 0 0 0 33,55" />
+      <path stroke-width="3" stroke-linejoin="round" d="M 25,63 L 41,63 L 25,47 Z" />
+    </symbol>
+    <symbol id="icon-redo" viewBox="0 0 100 100">
+      <path class="icon-round" fill="none"  stroke-width="6" d="M 67,55 A 25 25 0 0 0 27,55" />
+      <path class="icon-round" fill="white" stroke-width="3" d="M 75,63 L 59,63 L 75,47 Z" />
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 100 100">
+      <path class="icon-round" fill="none" stroke-width="6" d="M 30,55 L 42,67 L 75,37" />
+    </symbol>
+    
+    <symbol id="icon-pause" viewBox="0 0 100 100">
+      <polygon class="icon-fill" points="33,30 43,30 43,70 33,70"></polygon>
+      <polygon class="icon-fill" points="57,30 67,30 67,70 57,70"></polygon>
+    </symbol>
+    <symbol id="icon-play" viewBox="0 0 100 100">
+      <polygon class="icon-fill" points="35,30 70,50 35,70"></polygon>
+    </symbol>
+  </svg>  
   <div class="layout">
     <div class="layout-sudoku">
       <svg id="sudoku" viewBox="0 0 900 900" xmlns="http://www.w3.org/2000/svg">
@@ -72,56 +133,17 @@
     <div class="layout-controls">
       <div class="fullsize controls">
         <!-- First row. -->
-        <button class="control-btn button-mode" style="grid-area: 1 / 1 / 2 / 2;" data-mode="filled" title="Full Digits">
-          <div class="icon">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <mask id="center">
-                <rect fill="white" width="100" height="100" />
-                <rect fill="black" width="42" height="42" x="29" y="29" rx="3" />
-              </mask>
-              <rect class="icon-fill" width="60" height="60" x="20" y="20" rx="9" mask="url(#center)" />
-              <text class="icon-fill" x="50" y="50" font-size="42" text-anchor="middle" dominant-baseline="central">7</text>
-            </svg>
-          </div>
+        <button class="control-btn button-mode" style="grid-area: 1 / 1 / 2 / 2;" data-mode="filled" title="Full digits">
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-filled" /></svg>
         </button>
-        <button class="control-btn control-btn-inv button-mode" style="grid-area: 1 / 2 / 2 / 3;" data-mode="corner" title="Corner Marks [shift+]">
-          <div class="icon">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <mask id="center">
-                <rect fill="white" width="100" height="100" />
-                <rect fill="black" width="42" height="42" x="29" y="29" rx="3" />
-              </mask>
-              <rect class="icon-fill" width="60" height="60" x="20" y="20" rx="9" mask="url(#center)" />
-              <text class="icon-fill" x="38" y="40" font-size="22" text-anchor="middle" dominant-baseline="central">7</text>
-              <text class="icon-fill" x="62" y="40" font-size="22" text-anchor="middle" dominant-baseline="central">8</text>
-            </svg>
-          </div>
+        <button class="control-btn button-mode control-btn-inv" style="grid-area: 1 / 2 / 2 / 3;" data-mode="corner" title="Corner marks [shift+]">
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-corner" /></svg>
         </button>
-        <button class="control-btn control-btn-inv button-mode" style="grid-area: 1 / 3 / 2 / 4;" data-mode="center" title="Center Marks [alt+]">
-          <div class="icon">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <mask id="center">
-                <rect fill="white" width="100" height="100" />
-                <rect fill="black" width="42" height="42" x="29" y="29" rx="3" />
-              </mask>
-              <rect class="icon-fill" width="60" height="60" x="20" y="20" rx="9" mask="url(#center)" />
-              <text class="icon-fill" x="50" y="50" font-size="22" text-anchor="middle" dominant-baseline="central">78</text>
-            </svg>
-          </div>
+        <button class="control-btn button-mode control-btn-inv" style="grid-area: 1 / 3 / 2 / 4;" data-mode="center" title="Center marks [alt+]">
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-center" /></svg>
         </button>
-        <button class="control-btn control-btn-inv button-mode" style="grid-area: 1 / 4 / 2 / 5;" data-mode="colors" title="Color Highlights">
-          <div class="icon">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <mask id="center">
-                <rect fill="white" width="100" height="100" />
-                <rect fill="black" width="42" height="42" x="29" y="29" rx="3" />
-              </mask>
-              <rect fill="rgb(254, 82, 93)" width="48" height="48" x="26" y="26" />
-              <polygon fill="rgb(254, 224, 118)" points="31,74 55,26 74,26 74,74" />
-              <polygon fill="rgb(78, 122, 255)" points="45,74 69,26 74,26 74,74" />
-              <rect class="icon-fill" width="60" height="60" x="20" y="20" rx="9" mask="url(#center)" />
-            </svg>
-          </div>
+        <button class="control-btn button-mode control-btn-inv" style="grid-area: 1 / 4 / 2 / 5;" data-mode="colors" title="Color highlights">
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-colors" /></svg>
         </button>
         <!-- Gap. -->
         <!-- Third row. -->
@@ -139,44 +161,29 @@
         <button class="control-btn button-input" style="grid-area: 5 / 4 / 6 / 5;" data-input="9" title="9 [d]">9</button>
         <!-- Delete button. -->
         <button class="control-btn button-input" style="grid-area: 4 / 1 / 6 / 2;" data-input="null" title="Delete [del]">
-          <div class="icon">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <!-- <polygon class="icon-fill" points="100" /> -->
-              <path class="icon-round" fill="none" stroke="white" stroke-width="6" d="M 20,50 L 40,30 L 80,30 L 80,70 L 40,70 Z" />
-              <path class="icon-round" fill="none" stroke="white" stroke-width="6" d="M 50,40 L 70,60" />
-              <path class="icon-round" fill="none" stroke="white" stroke-width="6" d="M 70,40 L 50,60" />
-            </svg>
-          </div>
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-delete" /></svg>
         </button>
         <!-- Gap. -->
         <!-- Seventh row. -->
         <button id="button-undo" class="control-btn" style="grid-area: 7 / 1 / 8 / 2;" title="Undo [ctrl][z]">
-          <div class="icon">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <path fill="none" stroke="white" stroke-width="6" stroke-linecap="round" d="M 73,55 A 25 25 0 0 0 33,55" />
-              <path fill="white" stroke="white" stroke-width="3" stroke-linejoin="round" d="M 25,63 L 41,63 L 25,47 Z" />
-            </svg>
-          </div>
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-undo" /></svg>
         </button>
         <button id="button-redo" class="control-btn" style="grid-area: 7 / 2 / 8 / 3;" title="Redo [ctrl][shift][z]">
-          <div class="icon">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <path class="icon-round" fill="none"  stroke="white" stroke-width="6" d="M 67,55 A 25 25 0 0 0 27,55" />
-              <path class="icon-round" fill="white" stroke="white" stroke-width="3" d="M 75,63 L 59,63 L 75,47 Z" />
-            </svg>
-          </div>
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-redo" /></svg>
         </button>
         <button id="button-check" class="control-btn" style="grid-area: 7 / 4 / 8 / 5;" title="Check">
-          <div class="icon">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <path class="icon-round" fill="none" stroke="white" stroke-width="6" d="M 30,55 L 42,67 L 75,37" />
-            </svg>
-          </div>
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-check" /></svg>
         </button>
       </div>
     </div>
     <div class="layout-timer">
       <span id="timer">0:00</span>
+      <button id="button-timer-pause" class="control-btn button-timer" title="Pause timer">
+        <svg class="icon" viewBox="0 0 100 100"><use href="#icon-pause" /></svg>
+      </button>
+      <button id="button-timer-play" class="control-btn button-timer" title="Restart timer" style="display: none;">
+        <svg class="icon" viewBox="0 0 100 100"><use href="#icon-play" /></svg>
+      </button>
     </div>
   </div>
   

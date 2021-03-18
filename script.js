@@ -85,8 +85,6 @@ const sudokuFilledMask = document.getElementById('sudoku-filled-mask');
 const sudokuCenter = document.getElementById('sudoku-center');
 const sudokuCorner = document.getElementById('sudoku-corner');
 
-const timer = document.getElementById('timer');
-
 
 (() => {
   let gameKey;
@@ -238,20 +236,41 @@ function main(gameKey, cid) {
 
   // Setup timer.
   (() => {
+    const timer = document.getElementById('timer');
+    const timerPause = document.getElementById('button-timer-pause');
+    const timerPlay = document.getElementById('button-timer-play');
+
+    let ticking = true;
+
     const elapsedSeconds = refClient.child('elapsedSeconds');
     elapsedSeconds.once('value', snapshot => {
       let elapsedSeconds = snapshot.val();
       // Update UI every second.
       setInterval(() => {
+        if (!ticking) return;
         elapsedSeconds++;
         timer.textContent = formatSecs(elapsedSeconds);
       }, 1000);
       // Save time every 10 seconds.
       setInterval(() => {
+        if (!ticking) return;
         allClientsData.update({
           [`${cid}/elapsedSeconds`]: elapsedSeconds,
         });
       }, 10000);
+    });
+
+    timerPause.addEventListener('click', e => {
+      console.log('click');
+      ticking = false;
+      timerPause.style.display = 'none';
+      timerPlay.style.display = null;
+    });
+
+    timerPlay.addEventListener('click', e => {
+      ticking = true;
+      timerPlay.style.display = 'none';
+      timerPause.style.display = null;
     });
   })();
 

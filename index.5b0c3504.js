@@ -25989,8 +25989,6 @@
     }
   }
   $c3dc2c70c292881adc144d86adaedde9$export$registerDatabase($b7a74ed9b193a5c616f3a6d2584cd3b1$export$default);
-  // import "firebase/auth";
-  // import "firebase/database";
   function $dfd4302922fcd1d586b6c03ff7fc5926$var$equal(a, b) {
     if (null == a) return null == b;
     const t = typeof a;
@@ -26044,8 +26042,8 @@
     }
     return target;
   }
-  function $dfd4302922fcd1d586b6c03ff7fc5926$var$applyUpdate(readonlyTarget, update) {
-    const out = readonlyTarget && JSON.parse(JSON.stringify(readonlyTarget)) || ({});
+  function $dfd4302922fcd1d586b6c03ff7fc5926$var$applyUpdate(readonlyDataTarget, update) {
+    const out = readonlyDataTarget && JSON.parse(JSON.stringify(readonlyDataTarget)) || ({});
     for (const [key, val] of Object.entries(update)) {
       const path = key.split('/');
       const leaf = path.pop();
@@ -26061,12 +26059,12 @@
     }
     return out;
   }
-  function $dfd4302922fcd1d586b6c03ff7fc5926$var$diffUpdate(dataTarget, update) {
+  function $dfd4302922fcd1d586b6c03ff7fc5926$var$diffUpdate(readonlyDataTarget, update) {
     const forward = {};
     const back = {};
     for (const [key, val] of Object.entries(update)) {
       const path = key.split('/');
-      let oldVal = dataTarget;
+      let oldVal = readonlyDataTarget;
       for (const seg of path) {
         oldVal = oldVal && oldVal[seg];
       }
@@ -26095,32 +26093,32 @@
       back
     };
   }
-  function $dfd4302922fcd1d586b6c03ff7fc5926$var$forEachPattern(pattern, oldData, newData, func, path = []) {
+  function $dfd4302922fcd1d586b6c03ff7fc5926$var$forEachPattern(pattern, oldData, newData, func, _path = []) {
     if ('string' === typeof pattern) {
       pattern = pattern.split('/');
     }
     const root = !pattern || !pattern.length;
     if (root) {
-      func(path, oldData, newData);
+      func(_path, oldData, newData);
     } else if ('*' === pattern[0]) {
       const keys = new Set([...Object.keys(oldData || ({})), ...Object.keys(newData || ({}))]);
       for (const key of keys) {
-        path.push(key);
+        _path.push(key);
         const oldVal = oldData && oldData[key];
         const newVal = newData && newData[key];
         if (root) {
-          func(path, oldVal, newVal);
+          func(_path, oldVal, newVal);
         } else {
-          $dfd4302922fcd1d586b6c03ff7fc5926$var$forEachPattern(pattern.slice(1), oldVal, newVal, func, path);
+          $dfd4302922fcd1d586b6c03ff7fc5926$var$forEachPattern(pattern.slice(1), oldVal, newVal, func, _path);
         }
-        path.pop();
+        _path.pop();
       }
     } else {
       // Note: path is only updated on '*' or root.
       const key = pattern.shift();
       const oldVal = oldData && oldData[key];
       const newVal = newData && newData[key];
-      $dfd4302922fcd1d586b6c03ff7fc5926$var$forEachPattern(pattern, oldVal, newVal, func, path);
+      $dfd4302922fcd1d586b6c03ff7fc5926$var$forEachPattern(pattern, oldVal, newVal, func, _path);
     }
   }
   class $dfd4302922fcd1d586b6c03ff7fc5926$export$DataLayer {
@@ -26211,11 +26209,11 @@
         update && update(el, path, newVal);
         parent.appendChild(el);
       },
-      onRemove: function ({path, oldVal}) {
+      onRemove: function ({path, oldVal: _}) {
         const el = parent.querySelector(`[data-path="${path.join('.')}"]`);
         if (!el) console.warn(`Failed to find element for path ${path.join('.')}.`); else parent.removeChild(el);
       },
-      onChange: function ({path, oldVal, newVal}) {
+      onChange: function ({path, oldVal: _, newVal}) {
         const el = parent.querySelector(`[data-path="${path.join('.')}"]`);
         update && update(el, path, newVal);
       }
@@ -26234,19 +26232,22 @@
   // Initialize Firebase
   $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.initializeApp($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$firebaseConfig);
   const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$NS_SVG = 'http://www.w3.org/2000/svg';
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_GIVENS = 'givens';
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_FILLED = 'filled';
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CORNER = 'corner';
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CENTER = 'center';
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_COLORS = 'colors';
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODES = [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_FILLED, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CORNER, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CENTER, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_COLORS];
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$DELETE_ORDER = [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_FILLED, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CORNER, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CENTER, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_COLORS];
+  var $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode;
+  (function (Mode) {
+    Mode["GIVENS"] = "givens";
+    Mode["FILLED"] = "filled";
+    Mode["CORNER"] = "corner";
+    Mode["CENTER"] = "center";
+    Mode["COLORS"] = "colors";
+  })($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode || ($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode = {}));
+  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODES = [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.FILLED, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.CORNER, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.CENTER, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.COLORS];
+  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$DELETE_ORDER = [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.FILLED, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.CORNER, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.CENTER, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.COLORS];
   const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$BLOCKED_BY_GIVENS = {
-    [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_GIVENS]: false,
-    [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_FILLED]: true,
-    [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CORNER]: true,
-    [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CENTER]: true,
-    [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_COLORS]: false
+    [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.GIVENS]: false,
+    [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.FILLED]: true,
+    [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.CORNER]: true,
+    [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.CENTER]: true,
+    [$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.COLORS]: false
   };
   const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$SIZE = 9;
   const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$CODES = {
@@ -26266,18 +26267,13 @@
     ArrowLeft: [-1, 0],
     ArrowRight: [1, 0]
   };
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_KEYS = {
-    Shift: $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CORNER,
-    Control: $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CENTER,
-    Alt: $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CENTER
-  };
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$COLORS = [[0.07, 0.07, 0.07, 1], [0.4, 0.4, 0.4, 0.6], [0.7, 0.7, 0.7, 0.6], $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([10, 100, 60]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([40, 100, 65]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([70, 100, 90]).concat(0.8), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([120, 100, 80]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([230, 100, 85]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([260, 100, 55]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([300, 100, 70])];
-  $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$COLORS.forEach(row => {
+  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$COLORS = [[0.07, 0.07, 0.07, 1], [0.4, 0.4, 0.4, 0.6], [0.7, 0.7, 0.7, 0.6], $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([10, 100, 60]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([40, 100, 65]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([70, 100, 90]).concat(0.8), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([120, 100, 80]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([230, 100, 85]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([260, 100, 55]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([300, 100, 70])].map(row => {
     for (let i = 0; i < 3; i++) {
       row[i] *= 255;
       row[i] |= 0;
     }
     row.length < 4 && row.push(0.6);
+    return row;
   });
   const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$DIGIT_REGEX = /Digit(\d)/;
   const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku = document.getElementById('sudoku');
@@ -26337,7 +26333,7 @@
     const idxId = 9 * (idx / 3 | 0) + idx % 3;
     return boxId + idxId;
   }
-  function $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$cornerPos(i, len) {
+  function $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$cornerMarkPos(i, len) {
     let dx, dy;
     if (len <= 4) {
       dx = i % 2 * 60 - 30;
@@ -26430,13 +26426,13 @@
           });
         }, 10000);
       });
-      timerPause.addEventListener('click', e => {
+      timerPause.addEventListener('click', _e => {
         console.log('click');
         ticking = false;
         timerPause.style.display = 'none';
         timerPlay.style.display = '';
       });
-      timerPlay.addEventListener('click', e => {
+      timerPlay.addEventListener('click', _e => {
         ticking = true;
         timerPlay.style.display = 'none';
         timerPause.style.display = '';
@@ -26468,7 +26464,7 @@
           el.setAttribute('fill', 'rgb(255, 215, 0)');
           el.setAttribute('href', '#highlight-self');
         }
-        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(id);
+        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(+id);
         el.setAttribute('x', `${100 * x}`);
         el.setAttribute('y', `${100 * y}`);
         return el;
@@ -26482,7 +26478,7 @@
         return el;
       },
       update: function (el, [otherCid], val) {
-        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(val);
+        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(+val);
         let fillColor = '#fa0';
         if (otherCid !== cid) {
           const rgb = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$cidToColor(otherCid);
@@ -26495,34 +26491,34 @@
       }
     }));
     // Given cells.
-    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_GIVENS}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuGivens, {
+    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.GIVENS}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuGivens, {
       create: function () {
         const el = document.createElementNS($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$NS_SVG, 'text');
         el.setAttribute('class', 'givens');
         return el;
       },
       update: function (el, [id], val) {
-        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(id);
+        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(+id);
         el.textContent = '' + val;
         el.setAttribute('x', `${100 * x + 50}`);
         el.setAttribute('y', `${100 * y + 50}`);
       }
     }));
     // Given cells mask, for filled cells and pencil marks.
-    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_GIVENS}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuGivensMask, {
+    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.GIVENS}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuGivensMask, {
       create: function ([id]) {
         const el = document.createElementNS($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$NS_SVG, 'rect');
         el.setAttribute('width', '100');
         el.setAttribute('height', '100');
         el.setAttribute('fill', 'black');
-        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(id);
+        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(+id);
         el.setAttribute('x', `${100 * x}`);
         el.setAttribute('y', `${100 * y}`);
         return el;
       }
     }));
     // Filled cells.
-    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_FILLED}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuFilled, {
+    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.FILLED}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuFilled, {
       create: function () {
         const el = document.createElementNS($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$NS_SVG, 'text');
         el.setAttribute('class', 'filled');
@@ -26530,54 +26526,54 @@
         return el;
       },
       update: function (el, [id], val) {
-        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(id);
+        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(+id);
         el.textContent = '' + val;
         el.setAttribute('x', `${100 * x + 50}`);
         el.setAttribute('y', `${100 * y + 50}`);
       }
     }));
     // Filled cells mask, for pencil marks.
-    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_FILLED}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuFilledMask, {
+    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.FILLED}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuFilledMask, {
       create: function ([id]) {
         const el = document.createElementNS($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$NS_SVG, 'rect');
         el.setAttribute('width', '100');
         el.setAttribute('height', '100');
         el.setAttribute('fill', 'black');
-        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(id);
+        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(+id);
         el.setAttribute('x', `${100 * x}`);
         el.setAttribute('y', `${100 * y}`);
         return el;
       }
     }));
     // Corner pencil marks.
-    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CORNER}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCorner, {
+    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.CORNER}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCorner, {
       create: function () {
         return document.createElementNS($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$NS_SVG, 'g');
       },
       update: function (g, [id], val) {
         while (g.lastChild) g.removeChild(g.lastChild);
-        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(id);
+        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(+id);
         const nums = Object.entries(val).filter(([_, flag]) => flag).map(([num]) => num);
         for (let i = 0; i < nums.length; i++) {
-          const [dx, dy] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$cornerPos(i, nums.length);
+          const [dx, dy] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$cornerMarkPos(i, nums.length);
           const el = document.createElementNS($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$NS_SVG, 'text');
           el.textContent = '' + nums[i];
           el.setAttribute('class', 'corner');
           el.setAttribute('mask', 'url(#sudoku-filled-mask)');
-          el.setAttribute('x', 100 * x + 50 + dx);
-          el.setAttribute('y', 100 * y + 50 + dy);
+          el.setAttribute('x', `${100 * x + 50 + dx}`);
+          el.setAttribute('y', `${100 * y + 50 + dy}`);
           g.appendChild(el);
         }
         $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCorner.appendChild(g);
       }
     }));
     // Center pencil marks.
-    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CENTER}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCenter, {
+    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.CENTER}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCenter, {
       create: function ([id]) {
         const el = document.createElementNS($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$NS_SVG, 'text');
         el.setAttribute('class', 'center');
         el.setAttribute('mask', 'url(#sudoku-filled-mask)');
-        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(id);
+        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(+id);
         el.setAttribute('x', `${100 * x + 50}`);
         el.setAttribute('y', `${100 * y + 50}`);
         return el;
@@ -26595,11 +26591,11 @@
       }
     }));
     // Center pencil marks.
-    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_COLORS}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuColors, {
+    boardData.watch(`${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.COLORS}/*`, $dfd4302922fcd1d586b6c03ff7fc5926$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuColors, {
       create: function ([id]) {
         const el = document.createElementNS($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$NS_SVG, 'use');
         el.setAttribute('href', '#colors');
-        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(id);
+        const [x, y] = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$id2xy(+id);
         el.setAttribute('x', `${100 * x}`);
         el.setAttribute('y', `${100 * y}`);
         return el;
@@ -26637,45 +26633,45 @@
       });
       return true;
     }
-    function fill(num, type) {
-      const madeChange = fillHelper(num, type);
+    function fill(num, mode) {
+      const madeChange = fillHelper(num, mode);
       if (null == num && !madeChange) {
         for (const deleteType of $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$DELETE_ORDER) {
           if (fillHelper(null, deleteType)) break;
         }
       }
     }
-    function fillHelper(num, type) {
+    function fillHelper(num, mode) {
       const update = {};
-      const blockedGivens = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$BLOCKED_BY_GIVENS[type] && boardData.get('givens');
+      const blockedGivens = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$BLOCKED_BY_GIVENS[mode] && boardData.get('givens') || ({});
       const selected = Object.entries(allClientsData.get(cid, 'selected') || ({})).filter(([_, isSet]) => isSet).map(([id, _]) => id).filter(id => !blockedGivens || !blockedGivens[id]);
-      if (!selected.length) return;
-      const markData = boardData.data?.[type] || ({});
-      switch (type) {
-        case $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_GIVENS:
-        case $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_FILLED:
-        case $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_COLORS:
+      if (!selected.length) return false;
+      const markData = boardData.data?.[mode] || ({});
+      switch (mode) {
+        case $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.GIVENS:
+        case $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.FILLED:
+        case $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.COLORS:
           if (null == num && selected.every(id => null == markData[id])) {
             return false;
           }
           for (const id of selected) {
-            update[`${type}/${id}`] = num;
+            update[`${mode}/${id}`] = num;
           }
           break;
-        case $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CORNER:
-        case $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CENTER:
+        case $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.CORNER:
+        case $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.CENTER:
           if (null == num) {
             if (selected.every(id => null == markData[id])) {
               return false;
             }
             for (const id of selected) {
-              update[`${type}/${id}`] = null;
+              update[`${mode}/${id}`] = null;
             }
           } else {
             let allSet = true;
             for (const id of selected) {
-              allSet &&= markData[id] && markData[id][num];
-              update[`${type}/${id}/${num}`] = true;
+              allSet &&= !!markData[id] && markData[id][num];
+              update[`${mode}/${id}/${num}`] = true;
             }
             // If they are all set, unset all.
             if (allSet) {
@@ -26686,7 +26682,7 @@
           }
           break;
         default:
-          throw new Error(`Unknown type: ${type}.`);
+          throw new Error(`Unknown type: ${mode}.`);
       }
       // Update and add update to history.
       const history = boardData.update(update);
@@ -26760,7 +26756,7 @@
           select(...xy, false, 1 === selectingMode ? true : null);
         }
       });
-      window.addEventListener('mouseup', e => {
+      window.addEventListener('mouseup', _e => {
         if (0 !== selectingMode) {
           selectingMode = 0;
         }
@@ -26783,7 +26779,7 @@
       $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku.addEventListener('touchstart', e => handleTouch(e, 1 === e.targetTouches.length));
       $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku.addEventListener('touchmove', e => handleTouch(e));
     }
-    let fillMode = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_FILLED;
+    let fillMode = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.FILLED;
     function setFillMode(arg) {
       let el;
       let mode;
@@ -26794,14 +26790,16 @@
         mode = arg;
         el = document.querySelector(`.button-mode[data-mode="${mode}"]`);
       }
+      if (0 > $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODES.indexOf(mode)) throw new Error(`Unknown mode: ${mode}.`);
+      fillMode = mode;
+      // Update button appearance.
       for (const inputButton of Array.from(document.getElementsByClassName('button-input'))) {
         const num = JSON.parse(inputButton.getAttribute('data-input'));
         if (null != num) {
-          inputButton.style.color = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_COLORS === mode ? `rgb(${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$COLORS[num].slice(0, 3).join(',')})` : '';
-          inputButton.innerText = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_COLORS === mode ? '\u25A8' : num;
+          inputButton.style.color = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.COLORS === mode ? `rgb(${$c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$COLORS[num].slice(0, 3).join(',')})` : '';
+          inputButton.innerText = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.COLORS === mode ? '\u25A8' : num;
         }
       }
-      fillMode = mode;
       for (const button of Array.from(document.getElementsByClassName('button-mode'))) {
         button.classList.add('control-btn-inv');
       }
@@ -26809,15 +26807,15 @@
     }
     window._setFillMode = setFillMode;
     {
-      document.getElementById('button-undo').addEventListener('click', e => updateHistory(false));
-      document.getElementById('button-redo').addEventListener('click', e => updateHistory(true));
-      document.getElementById('button-check').addEventListener('click', e => {
-        const bdObj = boardData.data;
-        const bad = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$checkGrid(Object.assign({}, bdObj?.['filled'], bdObj?.['givens']));
+      document.getElementById('button-undo').addEventListener('click', _e => updateHistory(false));
+      document.getElementById('button-redo').addEventListener('click', _e => updateHistory(true));
+      document.getElementById('button-check').addEventListener('click', _e => {
+        const bdObj = boardData.data || ({});
+        const bad = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$checkGrid(Object.assign({}, bdObj.filled, bdObj.givens));
         if (0 === bad.size) {
           alert('Looks good!');
         } else {
-          let lastId;
+          let lastId = 0;
           const selected = {};
           for (const id of bad) {
             selected[id] = true;
@@ -26833,12 +26831,12 @@
       for (const button of Array.from(document.getElementsByClassName('button-mode'))) {
         button.addEventListener('click', e => setFillMode(e.currentTarget));
       }
-      const onInput = e => {
-        const val = JSON.parse(e.currentTarget.getAttribute('data-input'));
+      function onButtonInput(_e) {
+        const val = JSON.parse(this.getAttribute('data-input'));
         fill(val, fillMode);
-      };
+      }
       for (const button of Array.from(document.getElementsByClassName('button-input'))) {
-        button.addEventListener('click', onInput);
+        button.addEventListener('click', onButtonInput);
       }
     }
     {
@@ -26880,6 +26878,7 @@
             e.preventDefault();
             updateHistory(true);
           }
+          return;
         } else {
           let match = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$DIGIT_REGEX.exec(e.code);
           if (!match) return;
@@ -26887,11 +26886,11 @@
         }
         e.preventDefault();
         if (e.shiftKey) {
-          fill(num, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CORNER);
-          setFillMode($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_FILLED);
+          fill(num, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.CORNER);
+          setFillMode($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.FILLED);
         } else if (e.ctrlKey || e.altKey) {
-          fill(num, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_CENTER);
-          setFillMode($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$MODE_FILLED);
+          fill(num, $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.CENTER);
+          setFillMode($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$Mode.FILLED);
         } else {
           fill(num, fillMode);
         }
@@ -26900,4 +26899,4 @@
   }
 })();
 
-//# sourceMappingURL=index.2aa78de2.js.map
+//# sourceMappingURL=index.5b0c3504.js.map

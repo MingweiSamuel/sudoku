@@ -26363,16 +26363,18 @@
         onDataUpdate(elapsedSeconds);
       }, 10000);
     });
-    $90ccc8d32d617eee95f4c342531bb360$var$timerPause.addEventListener('click', _e => {
-      $90ccc8d32d617eee95f4c342531bb360$var$ticking = false;
-      $90ccc8d32d617eee95f4c342531bb360$var$timerPause.style.display = 'none';
-      $90ccc8d32d617eee95f4c342531bb360$var$timerPlay.style.display = '';
-    });
-    $90ccc8d32d617eee95f4c342531bb360$var$timerPlay.addEventListener('click', _e => {
-      $90ccc8d32d617eee95f4c342531bb360$var$ticking = true;
+    $90ccc8d32d617eee95f4c342531bb360$var$timerPause.addEventListener('click', _e => $90ccc8d32d617eee95f4c342531bb360$export$setTicking(false));
+    $90ccc8d32d617eee95f4c342531bb360$var$timerPlay.addEventListener('click', _e => $90ccc8d32d617eee95f4c342531bb360$export$setTicking(true));
+  }
+  function $90ccc8d32d617eee95f4c342531bb360$export$setTicking(val) {
+    $90ccc8d32d617eee95f4c342531bb360$var$ticking = val;
+    if ($90ccc8d32d617eee95f4c342531bb360$var$ticking) {
       $90ccc8d32d617eee95f4c342531bb360$var$timerPlay.style.display = 'none';
       $90ccc8d32d617eee95f4c342531bb360$var$timerPause.style.display = '';
-    });
+    } else {
+      $90ccc8d32d617eee95f4c342531bb360$var$timerPause.style.display = 'none';
+      $90ccc8d32d617eee95f4c342531bb360$var$timerPlay.style.display = '';
+    }
   }
   function $c8e8b8ac96e97a417a0a608eb61422dd$export$initialize() {
     $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.initializeApp({
@@ -26791,7 +26793,6 @@
         mode = arg;
         el = document.querySelector(`.button-mode[data-mode="${mode}"]`);
       }
-      if (0 > $fbe1664cdf5aadc637490692c444786e$export$MODE_CYCLE.indexOf(mode)) throw new Error(`Unknown mode: ${mode}.`);
       fillMode = mode;
       // Update button appearance.
       for (const inputButton of Array.from(document.getElementsByClassName('button-input'))) {
@@ -26815,6 +26816,7 @@
         const bad = $4618f7dbb2360cfdda8bd96952490c61$export$checkGrid(Object.assign({}, bdObj.filled, bdObj.givens));
         if (0 === bad.size) {
           alert('Looks good!');
+          $90ccc8d32d617eee95f4c342531bb360$export$setTicking(false);
         } else {
           let lastId = 0;
           const selected = {};
@@ -26900,4 +26902,4 @@
   }
 })();
 
-//# sourceMappingURL=index.e14c1ced.js.map
+//# sourceMappingURL=index.af693267.js.map

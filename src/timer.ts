@@ -21,21 +21,21 @@ export function init(ref: firebase.database.Reference, onDataUpdate: (elapsedSec
         setInterval(() => {
             if (!ticking) return;
             onDataUpdate(elapsedSeconds);
-            // allClientsData.update({
-            //     [`${cid}/elapsedSeconds`]: elapsedSeconds,
-            // });
         }, 10000);
     });
 
-    timerPause.addEventListener('click', _e => {
-        ticking = false;
-        timerPause.style.display = 'none';
-        timerPlay.style.display = '';
-    });
+    timerPause.addEventListener('click', _e => setTicking(false));
+    timerPlay.addEventListener('click', _e => setTicking(true));
+}
 
-    timerPlay.addEventListener('click', _e => {
-        ticking = true;
+export function setTicking(val: boolean): void {
+    ticking = val;
+    if (ticking) {
         timerPlay.style.display = 'none';
         timerPause.style.display = '';
-    });
+    }
+    else {
+        timerPause.style.display = 'none';
+        timerPlay.style.display = '';
+    }
 }

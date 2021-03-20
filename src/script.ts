@@ -464,7 +464,6 @@ function main([ gameKey, cid ]: [ string, string ]): void {
       mode = arg;
       el = document.querySelector(`.button-mode[data-mode="${mode}"]`)!;
     }
-    if (0 > consts.MODE_CYCLE.indexOf(mode as any)) throw new Error(`Unknown mode: ${mode}.`);
     fillMode = mode as consts.Mode;
 
     // Update button appearance.
@@ -491,6 +490,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
       const bad = utils.checkGrid(Object.assign({}, bdObj.filled, bdObj.givens));
       if (0 === bad.size) {
         alert('Looks good!');
+        timer.setTicking(false);
       }
       else {
         let lastId: utils.IdCoord = 0;

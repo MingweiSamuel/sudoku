@@ -26344,6 +26344,36 @@
     return bad;
   }
   const $4618f7dbb2360cfdda8bd96952490c61$export$stringifyNums = nums => Object.entries(nums).filter(([_, flag]) => flag).map(([num]) => num).join('');
+  const $90ccc8d32d617eee95f4c342531bb360$var$timer = document.getElementById('timer');
+  const $90ccc8d32d617eee95f4c342531bb360$var$timerPause = document.getElementById('button-timer-pause');
+  const $90ccc8d32d617eee95f4c342531bb360$var$timerPlay = document.getElementById('button-timer-play');
+  let $90ccc8d32d617eee95f4c342531bb360$var$ticking = true;
+  function $90ccc8d32d617eee95f4c342531bb360$export$init(ref, onDataUpdate) {
+    ref.once('value', snapshot => {
+      let elapsedSeconds = snapshot.val();
+      // Update UI every second.
+      setInterval(() => {
+        if (!$90ccc8d32d617eee95f4c342531bb360$var$ticking) return;
+        elapsedSeconds++;
+        $90ccc8d32d617eee95f4c342531bb360$var$timer.textContent = $4618f7dbb2360cfdda8bd96952490c61$export$formatSecs(elapsedSeconds);
+      }, 1000);
+      // Save time every 10 seconds.
+      setInterval(() => {
+        if (!$90ccc8d32d617eee95f4c342531bb360$var$ticking) return;
+        onDataUpdate(elapsedSeconds);
+      }, 10000);
+    });
+    $90ccc8d32d617eee95f4c342531bb360$var$timerPause.addEventListener('click', _e => {
+      $90ccc8d32d617eee95f4c342531bb360$var$ticking = false;
+      $90ccc8d32d617eee95f4c342531bb360$var$timerPause.style.display = 'none';
+      $90ccc8d32d617eee95f4c342531bb360$var$timerPlay.style.display = '';
+    });
+    $90ccc8d32d617eee95f4c342531bb360$var$timerPlay.addEventListener('click', _e => {
+      $90ccc8d32d617eee95f4c342531bb360$var$ticking = true;
+      $90ccc8d32d617eee95f4c342531bb360$var$timerPlay.style.display = 'none';
+      $90ccc8d32d617eee95f4c342531bb360$var$timerPause.style.display = '';
+    });
+  }
   function $c8e8b8ac96e97a417a0a608eb61422dd$export$initialize() {
     $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.initializeApp({
       apiKey: "AIzaSyAmZZULS1wzXF4Sfj6u_eVmigMOL1Ga5NI",
@@ -26406,40 +26436,9 @@
     });
     refClient.child('online').onDisconnect().set(false);
     // Setup timer.
-    (() => {
-      const timer = document.getElementById('timer');
-      const timerPause = document.getElementById('button-timer-pause');
-      const timerPlay = document.getElementById('button-timer-play');
-      let ticking = true;
-      const elapsedSeconds = refClient.child('elapsedSeconds');
-      elapsedSeconds.once('value', snapshot => {
-        let elapsedSeconds = snapshot.val();
-        // Update UI every second.
-        setInterval(() => {
-          if (!ticking) return;
-          elapsedSeconds++;
-          timer.textContent = $4618f7dbb2360cfdda8bd96952490c61$export$formatSecs(elapsedSeconds);
-        }, 1000);
-        // Save time every 10 seconds.
-        setInterval(() => {
-          if (!ticking) return;
-          allClientsData.update({
-            [`${cid}/elapsedSeconds`]: elapsedSeconds
-          });
-        }, 10000);
-      });
-      timerPause.addEventListener('click', _e => {
-        console.log('click');
-        ticking = false;
-        timerPause.style.display = 'none';
-        timerPlay.style.display = '';
-      });
-      timerPlay.addEventListener('click', _e => {
-        ticking = true;
-        timerPlay.style.display = 'none';
-        timerPause.style.display = '';
-      });
-    })();
+    $90ccc8d32d617eee95f4c342531bb360$export$init(refClient.child('elapsedSeconds'), elapsedSeconds => allClientsData.update({
+      [`${cid}/elapsedSeconds`]: elapsedSeconds
+    }));
     // Sticky online (if closed in another tab).
     allClientsData.watch(`${cid}/online`, {
       onChange: function ({newVal}) {
@@ -26901,4 +26900,4 @@
   }
 })();
 
-//# sourceMappingURL=index.cc7c294d.js.map
+//# sourceMappingURL=index.e14c1ced.js.map

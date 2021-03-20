@@ -1,0 +1,215 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Montserrat, Arial, sans-serif;
+  font-weight: 500;
+}
+
+.layout {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(90vw, 135vh);
+  height: min(60vw, 90vh);
+  font-size: min(3.6vw, 5.4vh);
+}
+
+.layout-sudoku {
+  position: absolute;
+  width: 66.6667%;
+  height: 100%;
+  background-color: #111;
+  padding: 0.1em;
+}
+
+.layout-controls {
+  position: absolute;
+  top: 50%;
+  bottom: unset;
+  left: unset;
+  right: 0;
+  transform: translateY(-50%);
+  width: 30%;
+  height: 0;
+  padding-bottom: 40%;
+}
+
+.layout-timer {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  transform: translateX(-100%);
+  white-space: nowrap;
+}
+
+@media (max-aspect-ratio: 9/10) {
+  .layout {
+    width: min(90vw, 54vh);
+    height: min(150vw, 90vh);
+    font-size: min(6vw, 3.6vh);
+  }
+
+  .layout-sudoku {
+    width: 100%;
+    height: 60%;
+  }
+
+  .layout-controls {
+    top: unset;
+    bottom: 0;
+    left: 0;
+    right: unset;
+    transform: none;
+    width: 45%;
+    padding-bottom: 60%;
+  }
+
+  .layout-timer {
+    position: absolute;
+    top: 65%;
+    transform: translateX(-100%);
+  }
+}
+@media print {
+  .layout {
+    top: 0;
+    transform: translateX(-50%);
+    width: min(100vw, 100vh);
+    height: min(100vw, 100vh);
+    font-size: min(4vw, 4vh);
+  }
+
+  .layout-sudoku {
+    width: 100%;
+    height: 100%;
+    background: none;
+  }
+
+  .layout-controls,
+.layout-timer,
+#sudoku-highlights,
+#sudoku-cursor {
+    display: none;
+  }
+
+  .center, .corner {
+    opacity: 0.5;
+  }
+}
+.fullsize {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.controls {
+  display: grid;
+  grid-template-rows: 1fr 1.4% 1fr 1fr 1fr 1.4% 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  row-gap: 1.5%;
+  column-gap: 2%;
+}
+
+.controls > * {
+  position: relative;
+  min-height: 0;
+}
+
+.control-btn {
+  display: block;
+  padding: 0;
+  margin: 0;
+  text-decoration: none;
+  background: #36a;
+  border: 0.01em solid #36a;
+  color: #fff;
+  font-family: inherit;
+  font-weight: inherit;
+  font-size: 100%;
+  line-height: 100%;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.1s ease-in-out;
+  border-radius: 0.2em;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.control-btn:hover {
+  background: #47c;
+}
+
+.control-btn-inv {
+  border: 0.01em solid #888;
+  background: #fff;
+}
+
+.control-btn-inv:hover {
+  background: #def;
+}
+
+svg.icon {
+  display: block;
+  width: 100%;
+  fill: #fff;
+  stroke: #fff;
+}
+
+.control-btn-inv svg.icon {
+  fill: #36a;
+  stroke: #36a;
+}
+
+.icon > svg {
+  display: block;
+}
+
+.icon .icon-fill {
+  fill: #fff;
+}
+
+.control-btn-inv .icon .icon-fill {
+  fill: #36a;
+}
+
+.icon-round {
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+#timer {
+  vertical-align: middle;
+}
+
+.button-timer {
+  display: inline;
+  width: 0.8em;
+  vertical-align: middle;
+}
+
+.givens, .filled, .center, .corner {
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.givens, .filled {
+  font-size: 65px;
+}
+
+.givens {
+  fill: #111;
+}
+
+.center, .corner {
+  font-size: 25px;
+}
+
+.filled, .center, .corner {
+  fill: #36a;
+}
+/*# sourceMappingURL=index.67f1f7d2.css.map */

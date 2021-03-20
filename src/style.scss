@@ -1,8 +1,26 @@
+$color-input: #36a;
+$color-button: #36a;
+$color-button-hover: #47c;
+
+$color-invbutton: #fff;
+$color-invbutton-hover: #def;
+
+$layout-ratio-landscape: 3 / 2;
+$layout-ratio-portrait:  3 / 5;
+
+$font-ratio: 0.04;
+
+@mixin layout-sizing($width, $height, $ratio) {
+    width:  min(#{$width}, #{$height * $ratio});
+    height: min(#{$width / $ratio}, #{$height});
+    font-size: min(#{$width * $font-ratio / min($ratio, 1)}, #{$height * $font-ratio * max($ratio, 1)});
+}
+
 * {
     box-sizing: border-box;
 }
 body {
-    font-family: 'Montserrat', Arial, sans-serif;
+    font-family: Montserrat, Arial, sans-serif;
     font-weight: 500;
 }
 
@@ -12,8 +30,7 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
 
-    width: min(90vw, 135vh);
-    height: min(60vw, 90vh);
+    @include layout-sizing(90vw, 90vh, $layout-ratio-landscape);
 }
 .layout-sudoku {
     position: absolute;
@@ -21,7 +38,7 @@ body {
     height: 100%;
 
     background-color: #111;
-    padding: 0.15em;
+    padding: 0.1em;
 }
 .layout-controls {
     position: absolute;
@@ -35,8 +52,6 @@ body {
     width: 30%;
     height: 0;
     padding-bottom: 40%;
-
-    font-size: min(1.2vw, 1.8vh);
 }
 .layout-timer {
     position: absolute;
@@ -44,15 +59,12 @@ body {
     left: 100%;
     transform: translateX(-100%);
 
-    font-size: min(3.6vw, 5.4vh);
-
     white-space: nowrap;
 }
 
 @media (max-aspect-ratio: 9/10) {
     .layout {
-        width: min(90vw, 54vh);
-        height: min(150vw, 90vh);
+        @include layout-sizing(90vw, 90vh, $layout-ratio-portrait);
     }
     .layout-sudoku {
         width: 100%;
@@ -67,15 +79,11 @@ body {
 
         width: 45%;
         padding-bottom: 60%;
-
-        font-size: min(1.8vw, 1.125vh);
     }
     .layout-timer {
         position: absolute;
         top: 65%;
         transform: translateX(-100%);
-    
-        font-size: min(5.4vw, 3.375vh);
     }
 }
 @media print {
@@ -83,8 +91,7 @@ body {
         top: 0;
         transform: translateX(-50%);
 
-        width: min(100vw, 100vh);
-        height: min(100vw, 100vh);
+        @include layout-sizing(100vw, 100vh, 1);
     }
     .layout-sudoku {
         width: 100%;
@@ -121,8 +128,6 @@ body {
     grid-template-columns: 1fr 1fr 1fr 1fr;
     row-gap: 1.5%;
     column-gap: 2%;
-
-    font-size: 200%;
 }
 .controls > * {
     position: relative;
@@ -138,12 +143,12 @@ body {
     padding: 0;
     margin: 0;
     text-decoration: none;
-    background: #36a;
-    border: 0.01em solid #36a;
-    color: #ffffff;
+    background: $color-button;
+    border: 0.01em solid $color-button;
+    color: #fff;
     font-family: inherit;
     font-weight: inherit;
-    font-size: 150%;
+    font-size: 100%;
     line-height: 100%;
     cursor: pointer;
     text-align: center;
@@ -156,37 +161,15 @@ body {
 }
 
 .control-btn:hover {
-    background: #47C;
+    background: $color-button-hover;
 }
 
 .control-btn-inv {
     border: 0.01em solid #888;
-    background: #fff;
+    background: $color-invbutton;
 }
 .control-btn-inv:hover {
-    background: #def;
-}
-
-.btn-mode-container {
-    position: relative;
-    width: 25%;
-    height: 0;
-    padding-bottom: 22%;
-
-    margin: 1%;
-    float: left;
-}
-
-.btn-numpad-container {
-    font-size: 200%;
-
-    position: relative;
-    width: 22%;
-    height: 0;
-    padding-bottom: 22%;
-
-    margin: 1%;
-    float: left;
+    background: $color-invbutton-hover;
 }
 
 svg.icon {
@@ -196,8 +179,8 @@ svg.icon {
     stroke: #fff;
 }
 .control-btn-inv svg.icon {
-    fill: #36a;
-    stroke: #36a;
+    fill: $color-button;
+    stroke: $color-button;
 }
 
 .icon > svg {
@@ -207,7 +190,7 @@ svg.icon {
     fill: #fff;
 }
 .control-btn-inv .icon .icon-fill {
-    fill: #36a;
+    fill: $color-button;
 }
 
 .icon-round {
@@ -225,9 +208,6 @@ svg.icon {
     vertical-align: middle;
 }
 
-
-
-
 .givens, .filled, .center, .corner {
     text-anchor: middle;
     dominant-baseline: central;
@@ -242,5 +222,5 @@ svg.icon {
     font-size: 25px;
 }
 .filled, .center, .corner {
-    fill: #36a;
+    fill: $color-input;
 }

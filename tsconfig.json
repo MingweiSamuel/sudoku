@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "newLine": "LF",
+        "outDir": "./lib/",
+        "target": "es6",
+        "sourceMap": true,
+        "declaration": true,
+        "jsx": "preserve",
+        "lib": [
+            "es6",
+            "dom"
+        ],
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": false,
+    },
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        ".git",
+        "node_modules"
+    ]
+}

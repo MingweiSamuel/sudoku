@@ -1,3 +1,24 @@
+import * as hsluv from "hsluv";
+
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/database";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAmZZULS1wzXF4Sfj6u_eVmigMOL1Ga5NI",
+  authDomain: "sudoku-0.firebaseapp.com",
+  databaseURL: "https://sudoku-0-default-rtdb.firebaseio.com",
+  projectId: "sudoku-0",
+  storageBucket: "sudoku-0.appspot.com",
+  messagingSenderId: "410365958794",
+  appId: "1:410365958794:web:e8fa3326b8d2735ce8ab73"
+} as const;
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+
+import * as util from "./util";
+
 const NS_SVG = 'http://www.w3.org/2000/svg';
 
 const MODE_GIVENS = 'givens';
@@ -24,7 +45,6 @@ const BLOCKED_BY_GIVENS = {
 };
 
 const SIZE = 9;
-const CELLS = 81;
 
 const CODES = {
   Delete: null,
@@ -74,16 +94,16 @@ COLORS.forEach(row => {
 
 const DIGIT_REGEX = /Digit(\d)/;
 
-const sudoku = document.getElementById('sudoku');
-const sudokuColors = document.getElementById('sudoku-colors');
-const sudokuHighlights = document.getElementById('sudoku-highlights');
-const sudokuCursor = document.getElementById('sudoku-cursor');
-const sudokuGivens = document.getElementById('sudoku-givens');
-const sudokuGivensMask = document.getElementById('sudoku-givens-mask');
-const sudokuFilled = document.getElementById('sudoku-filled');
-const sudokuFilledMask = document.getElementById('sudoku-filled-mask');
-const sudokuCenter = document.getElementById('sudoku-center');
-const sudokuCorner = document.getElementById('sudoku-corner');
+const sudoku = document.getElementById('sudoku')!;
+const sudokuColors = document.getElementById('sudoku-colors')!;
+const sudokuHighlights = document.getElementById('sudoku-highlights')!;
+const sudokuCursor = document.getElementById('sudoku-cursor')!;
+const sudokuGivens = document.getElementById('sudoku-givens')!;
+const sudokuGivensMask = document.getElementById('sudoku-givens-mask')!;
+const sudokuFilled = document.getElementById('sudoku-filled')!;
+const sudokuFilledMask = document.getElementById('sudoku-filled-mask')!;
+const sudokuCenter = document.getElementById('sudoku-center')!;
+const sudokuCorner = document.getElementById('sudoku-corner')!;
 
 
 (() => {
@@ -167,8 +187,8 @@ function cornerPos(i, len) {
   return [ dx, dy ];
 }
 
-function formatSecs(secs) {
-  const nums = [];
+function formatSecs(secs: number) {
+  const nums: number[] = [];
   // Seconds.
   nums.unshift(secs % 60);
   secs = (secs / 60) | 0;
@@ -184,8 +204,8 @@ function formatSecs(secs) {
 }
 
 // TODO: Use this!
-function checkGrid(filled) {
-  const bad = new Set();
+function checkGrid(filled): Set<number> {
+  const bad = new Set<number>();
   const coordFns = [
     xy2id, // Rows.
     (i, j) => xy2id(j, i), // Cols.
@@ -221,7 +241,7 @@ function makeTs() {
 function main(gameKey, cid) {
   const refGame = firebase.database().ref(`game/${gameKey}`);
   const refAllClients = refGame.child('clients');
-  const allClientsData = new DataLayer(refAllClients);
+  const allClientsData = new util.DataLayer(refAllClients);
 
   const refClient = refAllClients.child(cid);
   refClient.update({
@@ -236,9 +256,9 @@ function main(gameKey, cid) {
 
   // Setup timer.
   (() => {
-    const timer = document.getElementById('timer');
-    const timerPause = document.getElementById('button-timer-pause');
-    const timerPlay = document.getElementById('button-timer-play');
+    const timer = document.getElementById('timer')!;
+    const timerPause = document.getElementById('button-timer-pause')!;
+    const timerPlay = document.getElementById('button-timer-play')!;
 
     let ticking = true;
 
@@ -264,13 +284,13 @@ function main(gameKey, cid) {
       console.log('click');
       ticking = false;
       timerPause.style.display = 'none';
-      timerPlay.style.display = null;
+      timerPlay.style.display = '';
     });
 
     timerPlay.addEventListener('click', e => {
       ticking = true;
       timerPlay.style.display = 'none';
-      timerPause.style.display = null;
+      timerPause.style.display = '';
     });
   })();
 
@@ -286,11 +306,11 @@ function main(gameKey, cid) {
   });
 
   const refBoard = refGame.child('board');
-  const boardData = new DataLayer(refBoard);
-  window._boardData = boardData;
+  const boardData = new util.DataLayer(refBoard);
+  (window as any /* TODO */)._boardData = boardData;
 
   // Client selected highlights.
-  allClientsData.watch('*/selected/*', makeBind(sudokuHighlights, {
+  allClientsData.watch('*/selected/*', util.makeBind(sudokuHighlights, {
     create([ otherCid, id ]) {
       const el = document.createElementNS(NS_SVG, 'use');
 
@@ -305,15 +325,15 @@ function main(gameKey, cid) {
       }
 
       const [ x, y ] = id2xy(id);
-      el.setAttribute('x', 100 * x);
-      el.setAttribute('y', 100 * y);
+      el.setAttribute('x', `${100 * x}`);
+      el.setAttribute('y', `${100 * y}`);
 
       return el;
     },
   }));
 
   // Client cursor markers (small triangle in top left).
-  allClientsData.watch('*/cursor', makeBind(sudokuCursor, {
+  allClientsData.watch('*/cursor', util.makeBind(sudokuCursor, {
     create() {
       const el = document.createElementNS(NS_SVG, 'use');
       el.setAttribute('href', '#cursor');
@@ -329,14 +349,14 @@ function main(gameKey, cid) {
       }
       
       el.setAttribute('data-cid', otherCid);
-      el.setAttribute('x', 100 * x);
-      el.setAttribute('y', 100 * y);
+      el.setAttribute('x', `${100 * x}`);
+      el.setAttribute('y', `${100 * y}`);
       el.setAttribute('fill', fillColor);
     },
   }));
 
   // Given cells.
-  boardData.watch(`${MODE_GIVENS}/*`, makeBind(sudokuGivens, {
+  boardData.watch(`${MODE_GIVENS}/*`, util.makeBind(sudokuGivens, {
     create() {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'givens');
@@ -345,12 +365,12 @@ function main(gameKey, cid) {
     update(el, [ id ], val) {
       const [ x, y ] = id2xy(id);
       el.textContent = '' + val;
-      el.setAttribute('x', 100 * x + 50);
-      el.setAttribute('y', 100 * y + 50);
+      el.setAttribute('x', `${100 * x + 50}`);
+      el.setAttribute('y', `${100 * y + 50}`);
     },
   }));
   // Given cells mask, for filled cells and pencil marks.
-  boardData.watch(`${MODE_GIVENS}/*`, makeBind(sudokuGivensMask, {
+  boardData.watch(`${MODE_GIVENS}/*`, util.makeBind(sudokuGivensMask, {
     create([ id ]) {
       const el = document.createElementNS(NS_SVG, 'rect');
       el.setAttribute('width', '100');
@@ -358,15 +378,15 @@ function main(gameKey, cid) {
       el.setAttribute('fill', 'black');
       
       const [ x, y ] = id2xy(id);
-      el.setAttribute('x', 100 * x);
-      el.setAttribute('y', 100 * y);
+      el.setAttribute('x', `${100 * x}`);
+      el.setAttribute('y', `${100 * y}`);
 
       return el;
     },
   }));
 
   // Filled cells.
-  boardData.watch(`${MODE_FILLED}/*`, makeBind(sudokuFilled, {
+  boardData.watch(`${MODE_FILLED}/*`, util.makeBind(sudokuFilled, {
     create() {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'filled');
@@ -376,12 +396,12 @@ function main(gameKey, cid) {
     update(el, [ id ], val) {
       const [ x, y ] = id2xy(id);
       el.textContent = '' + val;
-      el.setAttribute('x', 100 * x + 50);
-      el.setAttribute('y', 100 * y + 50);
+      el.setAttribute('x', `${100 * x + 50}`);
+      el.setAttribute('y', `${100 * y + 50}`);
     },
   }));
   // Filled cells mask, for pencil marks.
-  boardData.watch(`${MODE_FILLED}/*`, makeBind(sudokuFilledMask, {
+  boardData.watch(`${MODE_FILLED}/*`, util.makeBind(sudokuFilledMask, {
     create([ id ]) {
       const el = document.createElementNS(NS_SVG, 'rect');
       el.setAttribute('width', '100');
@@ -389,19 +409,19 @@ function main(gameKey, cid) {
       el.setAttribute('fill', 'black');
       
       const [ x, y ] = id2xy(id);
-      el.setAttribute('x', 100 * x);
-      el.setAttribute('y', 100 * y);
+      el.setAttribute('x', `${100 * x}`);
+      el.setAttribute('y', `${100 * y}`);
 
       return el;
     },
   }));
 
   // Corner pencil marks.
-  boardData.watch(`${MODE_CORNER}/*`, makeBind(sudokuCorner, {
+  boardData.watch(`${MODE_CORNER}/*`, util.makeBind(sudokuCorner, {
     create() {
       return document.createElementNS(NS_SVG, 'g');
     },
-    update(g, [ id ], val) {
+    update(g, [ id ], val: object) {
       while (g.lastChild) g.removeChild(g.lastChild);
 
       const [ x, y ] = id2xy(id);
@@ -428,24 +448,24 @@ function main(gameKey, cid) {
   }));
 
   // Center pencil marks.
-  boardData.watch(`${MODE_CENTER}/*`, makeBind(sudokuCenter, {
+  boardData.watch(`${MODE_CENTER}/*`, util.makeBind(sudokuCenter, {
     create([ id ]) {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'center');
       el.setAttribute('mask', 'url(#sudoku-filled-mask)');
       
       const [ x, y ] = id2xy(id);
-      el.setAttribute('x', 100 * x + 50);
-      el.setAttribute('y', 100 * y + 50);
+      el.setAttribute('x', `${100 * x + 50}`);
+      el.setAttribute('y', `${100 * y + 50}`);
 
       return el;
     },
-    update(el, [ id ], val) {
+    update(el, [ _id ], val) {
       const text = stringifyNums(val);
       el.textContent = text;
 
       if (text.length >= 8) {
-        el.setAttribute('textLength', 95);
+        el.setAttribute('textLength', '95');
         el.setAttribute('lengthAdjust', 'spacingAndGlyphs');
       }
       else {
@@ -456,18 +476,18 @@ function main(gameKey, cid) {
   }));
 
   // Center pencil marks.
-  boardData.watch(`${MODE_COLORS}/*`, makeBind(sudokuColors, {
+  boardData.watch(`${MODE_COLORS}/*`, util.makeBind(sudokuColors, {
     create([ id ]) {
       const el = document.createElementNS(NS_SVG, 'use');
       el.setAttribute('href', '#colors');
 
       const [ x, y ] = id2xy(id);
-      el.setAttribute('x', 100 * x);
-      el.setAttribute('y', 100 * y);
+      el.setAttribute('x', `${100 * x}`);
+      el.setAttribute('y', `${100 * y}`);
 
       return el;
     },
-    update(el, [ id ], val) {
+    update(el, [ _id ], val: number) {
       const color = COLORS[val];
       el.setAttribute('fill', `rgba(${color.join(',')})`);
     },
@@ -476,7 +496,7 @@ function main(gameKey, cid) {
   // Undo if REDO is false.
   // Redo if REDO is true.
   function updateHistory(redo) {
-    const historyEntries = Object.entries(allClientsData.get(cid, redo ? 'historyUndone' : 'history') || {});
+    const historyEntries = Object.entries(allClientsData.get<object>(cid, redo ? 'historyUndone' : 'history') || {});
     if (0 === historyEntries.length) return false;
 
     const [ histKey, histVal ] = historyEntries.reduce((entryA, entryB) => {
@@ -525,7 +545,8 @@ function main(gameKey, cid) {
 
     if (!selected.length) return;
   
-    const markData = (boardData.data || {})[type] || {};
+    const markData = (boardData.data as object | undefined)?.[type] || {};
+
     switch (type) {
       case MODE_GIVENS:
       case MODE_FILLED:
@@ -578,7 +599,7 @@ function main(gameKey, cid) {
     return true;
   }
 
-  function loc2xy(xOff, yOff, limitCircle) {
+  function loc2xy(xOff, yOff, limitCircle): null | [ number, number ] {
     const { width, height } = sudoku.getBoundingClientRect();
     if (xOff < 0 || yOff < 0) return null;
     const xf = SIZE * xOff / width;
@@ -595,7 +616,7 @@ function main(gameKey, cid) {
     return [ xf | 0, yf | 0 ];
   }
 
-  function select(x, y, reset = false, mode = true) {
+  function select(x, y, reset = false, mode: true | null = true) {
     if (x < 0 || SIZE <= x || y < 0 || SIZE <= y) return false;
 
     const id = xy2id(x, y);
@@ -677,38 +698,41 @@ function main(gameKey, cid) {
 
   let fillMode = MODE_FILLED;
 
-  function setFillMode(mode) {
-    let el = null;
-    if ('string' !== typeof mode) {
-      el = mode;
-      mode = el.getAttribute('data-mode');
+  function setFillMode(arg: string | HTMLButtonElement) {
+    let el: HTMLButtonElement;
+    let mode: string;
+    if ('string' !== typeof arg) {
+      el = arg;
+      mode = el.getAttribute('data-mode')!;
     }
     else {
-      el = document.querySelector(`.button-mode[data-mode="${mode}"]`);
+      mode = arg;
+      el = document.querySelector(`.button-mode[data-mode="${mode}"]`)!;
     }
 
-    for (const inputButton of document.getElementsByClassName('button-input')) {
-      const num = JSON.parse(inputButton.getAttribute('data-input'));
+    for (const inputButton of Array.from(document.getElementsByClassName('button-input')) as HTMLButtonElement[]) {
+      const num = JSON.parse(inputButton.getAttribute('data-input')!);
       if (null != num) {
-        inputButton.style.color = MODE_COLORS === mode ? `rgb(${COLORS[num].slice(0, 3).join(',')})` : null;
+        inputButton.style.color = MODE_COLORS === mode ? `rgb(${COLORS[num].slice(0, 3).join(',')})` : '';
         inputButton.innerText = MODE_COLORS === mode ? '\u25A8' : num;
       }
     }
 
     fillMode = mode;
 
-    for (const button of document.getElementsByClassName('button-mode')) {
+    for (const button of Array.from(document.getElementsByClassName('button-mode'))) {
       button.classList.add('control-btn-inv');
     }
     el && el.classList.remove('control-btn-inv');
   }
-  window._setFillMode = setFillMode;
+  (window as any)._setFillMode = setFillMode;
 
   {
-    document.getElementById('button-undo').addEventListener('click', e => updateHistory(false));
-    document.getElementById('button-redo').addEventListener('click', e => updateHistory(true));
-    document.getElementById('button-check').addEventListener('click', e => {
-      const bad = checkGrid(Object.assign({}, _boardData.data.filled, _boardData.data.givens));
+    document.getElementById('button-undo')!.addEventListener('click', e => updateHistory(false));
+    document.getElementById('button-redo')!.addEventListener('click', e => updateHistory(true));
+    document.getElementById('button-check')!.addEventListener('click', e => {
+      const bdObj = boardData.data as object | null;
+      const bad = checkGrid(Object.assign({}, bdObj?.['filled'], bdObj?.['givens']));
       if (0 === bad.size) {
         alert('Looks good!');
       }
@@ -727,8 +751,8 @@ function main(gameKey, cid) {
       }
     });
 
-    for (const button of document.getElementsByClassName('button-mode')) {
-      button.addEventListener('click', e => setFillMode(e.currentTarget));
+    for (const button of Array.from(document.getElementsByClassName('button-mode'))) {
+      button.addEventListener('click', e => setFillMode(e.currentTarget as HTMLButtonElement));
     }
 
 
@@ -736,7 +760,7 @@ function main(gameKey, cid) {
       const val = JSON.parse(e.currentTarget.getAttribute('data-input'));
       fill(val, fillMode);
     };
-    for (const button of document.getElementsByClassName('button-input')) {
+    for (const button of Array.from(document.getElementsByClassName('button-input'))) {
       button.addEventListener('click', onInput);
     }
   }
@@ -748,7 +772,7 @@ function main(gameKey, cid) {
       if ('Space' === e.code || 'Tab' === e.code) {
         e.preventDefault();
 
-        let idx = MODES.indexOf(fillMode) + 1 - (2 * e.shiftKey) + MODES.length;
+        let idx = MODES.indexOf(fillMode) + 1 - (2 * (+e.shiftKey)) + MODES.length;
         idx = idx % MODES.length;
 
         setFillMode(MODES[idx]);

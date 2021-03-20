@@ -1,3 +1,7 @@
+import type firebase from "firebase/app";
+// import "firebase/auth";
+// import "firebase/database";
+
 function equal(a, b) {
     if (null == a) return null == b;
     const t = typeof a;
@@ -26,7 +30,7 @@ function combineUpdates(readonlyTarget, update) {
     outer:
     for (const [ key, val ] of Object.entries(update)) {
         const path = key.split('/');
-        const leaf = path.pop();
+        const leaf = path.pop()!;
         let seg;
         let subpath = '';
 
@@ -62,7 +66,7 @@ function applyUpdate(readonlyTarget, update) {
     const out = readonlyTarget && JSON.parse(JSON.stringify(readonlyTarget)) || {};
     for (const [ key, val ] of Object.entries(update)) {
         const path = key.split('/');
-        const leaf = path.pop();
+        const leaf = path.pop()!;
         let target = out;
         for (const seg of path) {
             target = target[seg] || (target[seg] = {});
@@ -109,7 +113,7 @@ function diffUpdate(dataTarget, update) {
     return { forward, back };
 }
 
-function forEachPattern(pattern, oldData, newData, func, path = []) {
+function forEachPattern(pattern, oldData, newData, func, path: string[] = []) {
     if ('string' === typeof pattern) {
         pattern = pattern.split('/');
     }
@@ -145,8 +149,21 @@ function forEachPattern(pattern, oldData, newData, func, path = []) {
     }
 }
 
-class DataLayer {
-    constructor(ref, delay = 250) {
+export interface Watcher {
+    onAdd?(arg: { path: string[], newVal: unknown });
+    onRemove?(arg: { path: string[], oldVal: unknown });
+    onChange?(arg: { path: string[], oldVal: unknown, newVal: unknown });
+}
+
+export class DataLayer {
+    ref: firebase.database.Reference;
+    data: unknown;
+    private _delay: number;
+    private _watchers: Record<string, Watcher[]>;
+    private _updates: null | object;
+    private _updatesInflight: null | object; 
+
+    constructor(ref: firebase.database.Reference, delay = 250) {
         this.ref = ref;
         this.data = undefined;
         this._delay = delay;
@@ -168,13 +185,13 @@ class DataLayer {
         });
     }
 
-    get(...path) {
-        let target = this.data;
-        while (target && path.length) target = target[path.shift()];
-        return target;
+    get<T>(...path: string[]): T | undefined {
+        let target = this.data as object;
+        while (target && path.length) target = target[path.shift()!];
+        return target as unknown as T;
     }
 
-    watch(pattern, watcher) {
+    watch(pattern, watcher: Watcher) {
         (this._watchers[pattern] || (this._watchers[pattern] = [])).push(watcher);
     }
 
@@ -187,13 +204,14 @@ class DataLayer {
         if (null == this._updates) {
             this._updates = {};
             setTimeout(() => {
-                this._updatesInflight = this._updates;
-                this._updates = null;
-                this.ref.update(this._updatesInflight, e => {
+                if (null == this._updates) return;
+                this.ref.update(this._updates, e => {
                     // TODO?
                     if (e) console.error('Update error!', e);
                     this._updatesInflight = null;
                 });
+                this._updatesInflight = this._updates;
+                this._updates = null;
             }, this._delay);
         }
         this._updates = combineUpdates(this._updates, forward);
@@ -230,7 +248,12 @@ class DataLayer {
     }
 }
 
-function makeBind(parent, { create, update }) {
+interface Bind<T extends Element> {
+    create(path: string[]): T;
+    update?(el: T, path: string[], newVal: unknown);
+}
+
+export function makeBind<T extends Element>(parent: HTMLElement, { create, update = undefined }: Bind<T>): Watcher {
     return {
         onAdd({ path, newVal }) {
             const el = create(path);
@@ -239,12 +262,12 @@ function makeBind(parent, { create, update }) {
             parent.appendChild(el);
         },
         onRemove({ path, oldVal }) {
-            const el = parent.querySelector(`[data-path="${path.join('.')}"]`);
+            const el = parent.querySelector(`[data-path="${path.join('.')}"]`) as T;
             if (!el) console.warn(`Failed to find element for path ${path.join('.')}.`);
             else parent.removeChild(el);
         },
         onChange({ path, oldVal, newVal }) {
-            const el = parent.querySelector(`[data-path="${path.join('.')}"]`);
+            const el = parent.querySelector(`[data-path="${path.join('.')}"]`) as T;
             update && update(el, path, newVal);
         },
     };

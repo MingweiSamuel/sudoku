@@ -5,6 +5,7 @@ import "firebase/database";
 import * as consts from "./consts";
 import * as data from "./data";
 import * as utils from "./utils";
+import * as timer from "./timer";
 
 import { initialize } from "./initialize";
 
@@ -41,44 +42,12 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   refClient.child('online').onDisconnect().set(false);
 
   // Setup timer.
-  (() => {
-    const timer = document.getElementById('timer')!;
-    const timerPause = document.getElementById('button-timer-pause')!;
-    const timerPlay = document.getElementById('button-timer-play')!;
-
-    let ticking = true;
-
-    const elapsedSeconds = refClient.child('elapsedSeconds');
-    elapsedSeconds.once('value', snapshot => {
-      let elapsedSeconds = snapshot.val();
-      // Update UI every second.
-      setInterval(() => {
-        if (!ticking) return;
-        elapsedSeconds++;
-        timer.textContent = utils.formatSecs(elapsedSeconds);
-      }, 1000);
-      // Save time every 10 seconds.
-      setInterval(() => {
-        if (!ticking) return;
-        allClientsData.update({
-          [`${cid}/elapsedSeconds`]: elapsedSeconds,
-        });
-      }, 10000);
-    });
-
-    timerPause.addEventListener('click', _e => {
-      console.log('click');
-      ticking = false;
-      timerPause.style.display = 'none';
-      timerPlay.style.display = '';
-    });
-
-    timerPlay.addEventListener('click', _e => {
-      ticking = true;
-      timerPlay.style.display = 'none';
-      timerPause.style.display = '';
-    });
-  })();
+  timer.init(
+    refClient.child('elapsedSeconds'),
+    elapsedSeconds => allClientsData.update({
+      [`${cid}/elapsedSeconds`]: elapsedSeconds,
+    })
+  );
 
   // Sticky online (if closed in another tab).
   allClientsData.watch(`${cid}/online`, {

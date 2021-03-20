@@ -1,8 +1,10 @@
 import type firebase from "firebase/app";
-// import "firebase/auth";
-// import "firebase/database";
 
-function equal(a, b) {
+export type Data = null | undefined | string | number | boolean | object;
+export type Update = Record<string, Data>;
+export type Diff = { forward: Update, back: Update };
+
+function equal(a: Data, b: Data): boolean {
     if (null == a) return null == b;
     const t = typeof a;
     if (t !== typeof b) return false;
@@ -13,11 +15,11 @@ function equal(a, b) {
             return a === b;
         case 'object':
             const aKeys = new Set(Object.keys(a));
-            const bKeys = Object.keys(b);
+            const bKeys = Object.keys(b as object);
             if (aKeys.size !== bKeys.length) return false;
             for (const key of bKeys) {
                 if (!aKeys.has(key)) return false;
-                if (!equal(a[key], b[key])) return false;
+                if (!equal((a as any)[key], (b as any)[key] as Data)) return false;
             }
             return true;
         default:
@@ -25,13 +27,13 @@ function equal(a, b) {
     }
 }
 
-function combineUpdates(readonlyTarget, update) {
+function combineUpdates(readonlyTarget: Update, update: Update): Update {
     const target = readonlyTarget && JSON.parse(JSON.stringify(readonlyTarget)) || {};
     outer:
     for (const [ key, val ] of Object.entries(update)) {
         const path = key.split('/');
         const leaf = path.pop()!;
-        let seg;
+        let seg: string | undefined;
         let subpath = '';
 
         // Find any existing parent paths.
@@ -62,8 +64,8 @@ function combineUpdates(readonlyTarget, update) {
     return target;
 }
 
-function applyUpdate(readonlyTarget, update) {
-    const out = readonlyTarget && JSON.parse(JSON.stringify(readonlyTarget)) || {};
+function applyUpdate(readonlyDataTarget: Data, update: Update): Data {
+    const out = readonlyDataTarget && JSON.parse(JSON.stringify(readonlyDataTarget)) || {};
     for (const [ key, val ] of Object.entries(update)) {
         const path = key.split('/');
         const leaf = path.pop()!;
@@ -81,14 +83,14 @@ function applyUpdate(readonlyTarget, update) {
     return out;
 }
 
-function diffUpdate(dataTarget, update) {
-    const forward = {};
-    const back = {};
+function diffUpdate(readonlyDataTarget: Data, update: Update): Diff {
+    const forward: Update = {};
+    const back: Update = {};
     for (const [ key, val ] of Object.entries(update)) {
         const path = key.split('/');
-        let oldVal = dataTarget;
+        let oldVal = readonlyDataTarget;
         for (const seg of path) {
-            oldVal = oldVal && oldVal[seg];
+            oldVal = oldVal && (oldVal as any)[seg];
         }
 
         // Pure add.
@@ -113,14 +115,21 @@ function diffUpdate(dataTarget, update) {
     return { forward, back };
 }
 
-function forEachPattern(pattern, oldData, newData, func, path: string[] = []) {
+function forEachPattern(
+    pattern: string | string[],
+    oldData: Data,
+    newData: Data,
+    func: (path: string[], oldVal: Data, newVal: Data) => void,
+    _path: string[] = []
+): void
+{
     if ('string' === typeof pattern) {
         pattern = pattern.split('/');
     }
     
     const root = !pattern || !pattern.length;
     if (root) {
-        func(path, oldData, newData);
+        func(_path, oldData, newData);
     }
     else if ('*' === pattern[0]) {
         const keys = new Set([
@@ -128,40 +137,40 @@ function forEachPattern(pattern, oldData, newData, func, path: string[] = []) {
             ...Object.keys(newData || {}),
         ]);
         for (const key of keys) {
-            path.push(key);
-            const oldVal = oldData && oldData[key];
-            const newVal = newData && newData[key];
+            _path.push(key);
+            const oldVal: Data = oldData && (oldData as any)[key];
+            const newVal: Data = newData && (newData as any)[key];
             if (root) {
-                func(path, oldVal, newVal);
+                func(_path, oldVal, newVal);
             }
             else {
-                forEachPattern(pattern.slice(1), oldVal, newVal, func, path);
+                forEachPattern(pattern.slice(1), oldVal, newVal, func, _path);
             }
-            path.pop();
+            _path.pop();
         }
     }
     else {
         // Note: path is only updated on '*' or root.
-        const key = pattern.shift();
-        const oldVal = oldData && oldData[key];
-        const newVal = newData && newData[key];
-        forEachPattern(pattern, oldVal, newVal, func, path);
+        const key = pattern.shift()!;
+        const oldVal: Data = oldData && (oldData as any)[key];
+        const newVal: Data = newData && (newData as any)[key];
+        forEachPattern(pattern, oldVal, newVal, func, _path);
     }
 }
 
 export interface Watcher {
-    onAdd?(arg: { path: string[], newVal: unknown });
-    onRemove?(arg: { path: string[], oldVal: unknown });
-    onChange?(arg: { path: string[], oldVal: unknown, newVal: unknown });
+    onAdd?(arg: { path: string[], newVal: Data }): void;
+    onRemove?(arg: { path: string[], oldVal: Data }): void;
+    onChange?(arg: { path: string[], oldVal: Data, newVal: Data }): void;
 }
 
 export class DataLayer {
     ref: firebase.database.Reference;
-    data: unknown;
+    data: Data;
     private _delay: number;
     private _watchers: Record<string, Watcher[]>;
-    private _updates: null | object;
-    private _updatesInflight: null | object; 
+    private _updates: null | Update;
+    private _updatesInflight: null | Update; 
 
     constructor(ref: firebase.database.Reference, delay = 250) {
         this.ref = ref;
@@ -186,16 +195,16 @@ export class DataLayer {
     }
 
     get<T>(...path: string[]): T | undefined {
-        let target = this.data as object;
-        while (target && path.length) target = target[path.shift()!];
+        let target = this.data;
+        while (target && path.length) target = (target as any)[path.shift()!];
         return target as unknown as T;
     }
 
-    watch(pattern, watcher: Watcher) {
+    watch(pattern: string, watcher: Watcher): void {
         (this._watchers[pattern] || (this._watchers[pattern] = [])).push(watcher);
     }
 
-    update(update) {
+    update(update: Update): null | Diff {
         const { forward, back } = diffUpdate(this.data, update);
         if (0 === Object.keys(forward).length)
             return null;
@@ -225,7 +234,7 @@ export class DataLayer {
         return { forward, back };
     }
 
-    _onChange(newData) {
+    _onChange(newData: Data) {
         for (const [ pattern, watchers ] of Object.entries(this._watchers)) {
             forEachPattern(pattern, this.data, newData, (path, oldVal, newVal) => {
                 if (null == oldVal) {
@@ -250,7 +259,7 @@ export class DataLayer {
 
 interface Bind<T extends Element> {
     create(path: string[]): T;
-    update?(el: T, path: string[], newVal: unknown);
+    update?(el: T, path: string[], newVal: unknown): void;
 }
 
 export function makeBind<T extends Element>(parent: HTMLElement, { create, update = undefined }: Bind<T>): Watcher {
@@ -261,12 +270,12 @@ export function makeBind<T extends Element>(parent: HTMLElement, { create, updat
             update && update(el, path, newVal);
             parent.appendChild(el);
         },
-        onRemove({ path, oldVal }) {
+        onRemove({ path, oldVal: _ }) {
             const el = parent.querySelector(`[data-path="${path.join('.')}"]`) as T;
             if (!el) console.warn(`Failed to find element for path ${path.join('.')}.`);
             else parent.removeChild(el);
         },
-        onChange({ path, oldVal, newVal }) {
+        onChange({ path, oldVal: _, newVal }) {
             const el = parent.querySelector(`[data-path="${path.join('.')}"]`) as T;
             update && update(el, path, newVal);
         },

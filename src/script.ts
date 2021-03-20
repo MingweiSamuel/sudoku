@@ -4,6 +4,9 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/database";
 
+type XYCoord = number;
+type IdCoord = number;
+
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAmZZULS1wzXF4Sfj6u_eVmigMOL1Ga5NI",
@@ -21,28 +24,32 @@ import * as util from "./util";
 
 const NS_SVG = 'http://www.w3.org/2000/svg';
 
-const MODE_GIVENS = 'givens';
-const MODE_FILLED = 'filled';
-const MODE_CORNER = 'corner';
-const MODE_CENTER = 'center';
-const MODE_COLORS = 'colors';
+enum Mode {
+  GIVENS = 'givens',
+  FILLED = 'filled',
+  CORNER = 'corner',
+  CENTER = 'center',
+  COLORS = 'colors',
+}
 
-const MODES = [ MODE_FILLED, MODE_CORNER, MODE_CENTER, MODE_COLORS ];
+
+
+const MODES = [ Mode.FILLED, Mode.CORNER, Mode.CENTER, Mode.COLORS ];
 
 const DELETE_ORDER = [
-  MODE_FILLED,
-  MODE_CORNER,
-  MODE_CENTER,
-  MODE_COLORS,
-];
+  Mode.FILLED,
+  Mode.CORNER,
+  Mode.CENTER,
+  Mode.COLORS,
+] as const;
 
 const BLOCKED_BY_GIVENS = {
-  [MODE_GIVENS]: false,
-  [MODE_FILLED]: true,
-  [MODE_CORNER]: true,
-  [MODE_CENTER]: true,
-  [MODE_COLORS]: false,
-};
+  [Mode.GIVENS]: false,
+  [Mode.FILLED]: true,
+  [Mode.CORNER]: true,
+  [Mode.CENTER]: true,
+  [Mode.COLORS]: false,
+} as const;
 
 const SIZE = 9;
 
@@ -56,20 +63,14 @@ const CODES = {
   KeyA: 7,
   KeyS: 8,
   KeyD: 9,
-};
+} as const;
 
 const ARROWS = {
   ArrowUp:    [  0, -1 ],
   ArrowDown:  [  0,  1 ],
   ArrowLeft:  [ -1,  0 ],
   ArrowRight: [  1,  0 ],
-};
-
-const MODE_KEYS = {
-  Shift: MODE_CORNER,
-  Control: MODE_CENTER,
-  Alt: MODE_CENTER,
-};
+} as const;
 
 const COLORS = [
   [ 0.07, 0.07, 0.07, 1 ],
@@ -82,14 +83,13 @@ const COLORS = [
   hsluv.hsluvToRgb([ 230, 100, 85 ]),
   hsluv.hsluvToRgb([ 260, 100, 55 ]),
   hsluv.hsluvToRgb([ 300, 100, 70 ]),
-];
-
-COLORS.forEach(row => {
+].map(row => {
   for (let i = 0; i < 3; i++) {
     row[i] *= 255;
     row[i] |= 0;
   }
   row.length < 4 && row.push(0.6);
+  return row as [ number, number, number, number ];
 });
 
 const DIGIT_REGEX = /Digit(\d)/;
@@ -107,12 +107,12 @@ const sudokuCorner = document.getElementById('sudoku-corner')!;
 
 
 (() => {
-  let gameKey;
+  let gameKey: string;
   if (window.location.hash) {
     gameKey = window.location.hash.slice(1);
   }
   else {
-    gameKey = firebase.database().ref('game').push().key;
+    gameKey = firebase.database().ref('game').push().key!;
     window.location.hash = '#' + gameKey;
   }
 
@@ -132,12 +132,12 @@ const sudokuCorner = document.getElementById('sudoku-corner')!;
   firebase.auth().signInAnonymously();
 })();
 
-function wrap(x) {
+function wrap(x: number): XYCoord {
   return ((x % SIZE) + SIZE) % SIZE;
 }
 
 
-function hash(str) {
+function hash(str: string): number {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     hash *= 31;
@@ -147,26 +147,26 @@ function hash(str) {
   return hash;
 }
 
-function cidToColor(cid) {
+function cidToColor(cid: string): [ number, number, number ] {
   const cidHash = hash(cid);
   const rgb = hsluv.hsluvToRgb([ cidHash % 360, 80, 60 ]);
-  return rgb.map(x => 255 * x);
+  return rgb.map(x => 255 * x) as [ number, number, number ];
 }
 
-function xy2id(x, y) {
+function xy2id(x: XYCoord, y: XYCoord): IdCoord {
   return 9 * y + x;
 }
-function id2xy(id) {
+function id2xy(id: IdCoord): [ XYCoord, XYCoord ] {
   return [ id % 9, (id / 9) | 0 ];
 }
-function bx2id(box, idx) {
+function bx2id(box: number, idx: number): number {
   const boxId = 27 * ((box / 3) | 0) + 3 * (box % 3);
   const idxId =  9 * ((idx / 3) | 0) +     (idx % 3);
   return boxId + idxId;
 }
 
-function cornerPos(i, len) {
-  let dx, dy;
+function cornerMarkPos(i: number, len: number): [ number, number ] {
+  let dx: number, dy: number;
   if (len <= 4) {
     dx = (i % 2) * 60 - 30;
     dy = ((i / 2) | 0) * 60 - 30;
@@ -187,7 +187,7 @@ function cornerPos(i, len) {
   return [ dx, dy ];
 }
 
-function formatSecs(secs: number) {
+function formatSecs(secs: number): string {
   const nums: number[] = [];
   // Seconds.
   nums.unshift(secs % 60);
@@ -200,20 +200,21 @@ function formatSecs(secs: number) {
 
   return nums
     .map(n => n.toString())
-    .map((s, i) => i ? s.padStart(2, '0') : s).join(':');
+    .map((s, i) => i ? s.padStart(2, '0') : s)
+    .join(':');
 }
 
 // TODO: Use this!
-function checkGrid(filled): Set<number> {
+function checkGrid(filled: Record<IdCoord, number>): Set<IdCoord> {
   const bad = new Set<number>();
   const coordFns = [
     xy2id, // Rows.
-    (i, j) => xy2id(j, i), // Cols.
+    (i: number, j: number) => xy2id(j, i), // Cols.
     bx2id, // Boxes.
   ];
   for (const coordFn of coordFns) {
     for (let i = 0; i < SIZE; i++) {
-      const valToId = {};
+      const valToId: Record<number, IdCoord> = {};
       for (let j = 0; j < SIZE; j++) {
         const id = coordFn(i, j);
         const val = filled[id];
@@ -229,16 +230,16 @@ function checkGrid(filled): Set<number> {
   return bad;
 }
 
-const stringifyNums = nums => Object.entries(nums)
+const stringifyNums = (nums: Record<number, boolean>) => Object.entries(nums)
   .filter(([ _, flag ]) => flag)
   .map(([ num ]) => num)
   .join('');
 
-function makeTs() {
+function makeTs(): [ typeof firebase.database.ServerValue.TIMESTAMP, number ] {
   return [ firebase.database.ServerValue.TIMESTAMP, Date.now() ];
 }
 
-function main(gameKey, cid) {
+function main(gameKey: string, cid: string): void {
   const refGame = firebase.database().ref(`game/${gameKey}`);
   const refAllClients = refGame.child('clients');
   const allClientsData = new util.DataLayer(refAllClients);
@@ -280,14 +281,14 @@ function main(gameKey, cid) {
       }, 10000);
     });
 
-    timerPause.addEventListener('click', e => {
+    timerPause.addEventListener('click', _e => {
       console.log('click');
       ticking = false;
       timerPause.style.display = 'none';
       timerPlay.style.display = '';
     });
 
-    timerPlay.addEventListener('click', e => {
+    timerPlay.addEventListener('click', _e => {
       ticking = true;
       timerPlay.style.display = 'none';
       timerPause.style.display = '';
@@ -324,7 +325,7 @@ function main(gameKey, cid) {
         el.setAttribute('href', '#highlight-self');
       }
 
-      const [ x, y ] = id2xy(id);
+      const [ x, y ] = id2xy(+id);
       el.setAttribute('x', `${100 * x}`);
       el.setAttribute('y', `${100 * y}`);
 
@@ -339,8 +340,8 @@ function main(gameKey, cid) {
       el.setAttribute('href', '#cursor');
       return el;
     },
-    update(el, [ otherCid ], val) {
-      const [ x, y ] = id2xy(val);
+    update(el, [ otherCid ], val: string) {
+      const [ x, y ] = id2xy(+val);
 
       let fillColor = '#fa0';
       if (otherCid !== cid) {
@@ -356,28 +357,28 @@ function main(gameKey, cid) {
   }));
 
   // Given cells.
-  boardData.watch(`${MODE_GIVENS}/*`, util.makeBind(sudokuGivens, {
+  boardData.watch(`${Mode.GIVENS}/*`, util.makeBind(sudokuGivens, {
     create() {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'givens');
       return el;
     },
-    update(el, [ id ], val) {
-      const [ x, y ] = id2xy(id);
+    update(el, [ id ], val: number) {
+      const [ x, y ] = id2xy(+id);
       el.textContent = '' + val;
       el.setAttribute('x', `${100 * x + 50}`);
       el.setAttribute('y', `${100 * y + 50}`);
     },
   }));
   // Given cells mask, for filled cells and pencil marks.
-  boardData.watch(`${MODE_GIVENS}/*`, util.makeBind(sudokuGivensMask, {
+  boardData.watch(`${Mode.GIVENS}/*`, util.makeBind(sudokuGivensMask, {
     create([ id ]) {
       const el = document.createElementNS(NS_SVG, 'rect');
       el.setAttribute('width', '100');
       el.setAttribute('height', '100');
       el.setAttribute('fill', 'black');
       
-      const [ x, y ] = id2xy(id);
+      const [ x, y ] = id2xy(+id);
       el.setAttribute('x', `${100 * x}`);
       el.setAttribute('y', `${100 * y}`);
 
@@ -386,7 +387,7 @@ function main(gameKey, cid) {
   }));
 
   // Filled cells.
-  boardData.watch(`${MODE_FILLED}/*`, util.makeBind(sudokuFilled, {
+  boardData.watch(`${Mode.FILLED}/*`, util.makeBind(sudokuFilled, {
     create() {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'filled');
@@ -394,21 +395,21 @@ function main(gameKey, cid) {
       return el;
     },
     update(el, [ id ], val) {
-      const [ x, y ] = id2xy(id);
+      const [ x, y ] = id2xy(+id);
       el.textContent = '' + val;
       el.setAttribute('x', `${100 * x + 50}`);
       el.setAttribute('y', `${100 * y + 50}`);
     },
   }));
   // Filled cells mask, for pencil marks.
-  boardData.watch(`${MODE_FILLED}/*`, util.makeBind(sudokuFilledMask, {
+  boardData.watch(`${Mode.FILLED}/*`, util.makeBind(sudokuFilledMask, {
     create([ id ]) {
       const el = document.createElementNS(NS_SVG, 'rect');
       el.setAttribute('width', '100');
       el.setAttribute('height', '100');
       el.setAttribute('fill', 'black');
       
-      const [ x, y ] = id2xy(id);
+      const [ x, y ] = id2xy(+id);
       el.setAttribute('x', `${100 * x}`);
       el.setAttribute('y', `${100 * y}`);
 
@@ -417,28 +418,28 @@ function main(gameKey, cid) {
   }));
 
   // Corner pencil marks.
-  boardData.watch(`${MODE_CORNER}/*`, util.makeBind(sudokuCorner, {
+  boardData.watch(`${Mode.CORNER}/*`, util.makeBind(sudokuCorner, {
     create() {
       return document.createElementNS(NS_SVG, 'g');
     },
-    update(g, [ id ], val: object) {
+    update(g, [ id ], val: Record<number, boolean>) {
       while (g.lastChild) g.removeChild(g.lastChild);
 
-      const [ x, y ] = id2xy(id);
+      const [ x, y ] = id2xy(+id);
 
       const nums = Object.entries(val)
         .filter(([ _, flag ]) => flag)
         .map(([ num ]) => num);
 
       for (let i = 0; i < nums.length; i++) {
-        const [ dx, dy ] = cornerPos(i, nums.length);
+        const [ dx, dy ] = cornerMarkPos(i, nums.length);
 
         const el = document.createElementNS(NS_SVG, 'text');
         el.textContent = '' + nums[i];
         el.setAttribute('class', 'corner');
         el.setAttribute('mask', 'url(#sudoku-filled-mask)');
-        el.setAttribute('x', 100 * x + 50 + dx);
-        el.setAttribute('y', 100 * y + 50 + dy);
+        el.setAttribute('x', `${100 * x + 50 + dx}`);
+        el.setAttribute('y', `${100 * y + 50 + dy}`);
 
         g.appendChild(el);
       }
@@ -448,19 +449,19 @@ function main(gameKey, cid) {
   }));
 
   // Center pencil marks.
-  boardData.watch(`${MODE_CENTER}/*`, util.makeBind(sudokuCenter, {
+  boardData.watch(`${Mode.CENTER}/*`, util.makeBind(sudokuCenter, {
     create([ id ]) {
       const el = document.createElementNS(NS_SVG, 'text');
       el.setAttribute('class', 'center');
       el.setAttribute('mask', 'url(#sudoku-filled-mask)');
       
-      const [ x, y ] = id2xy(id);
+      const [ x, y ] = id2xy(+id);
       el.setAttribute('x', `${100 * x + 50}`);
       el.setAttribute('y', `${100 * y + 50}`);
 
       return el;
     },
-    update(el, [ _id ], val) {
+    update(el, [ _id ], val: Record<number, boolean>) {
       const text = stringifyNums(val);
       el.textContent = text;
 
@@ -476,12 +477,12 @@ function main(gameKey, cid) {
   }));
 
   // Center pencil marks.
-  boardData.watch(`${MODE_COLORS}/*`, util.makeBind(sudokuColors, {
+  boardData.watch(`${Mode.COLORS}/*`, util.makeBind(sudokuColors, {
     create([ id ]) {
       const el = document.createElementNS(NS_SVG, 'use');
       el.setAttribute('href', '#colors');
 
-      const [ x, y ] = id2xy(id);
+      const [ x, y ] = id2xy(+id);
       el.setAttribute('x', `${100 * x}`);
       el.setAttribute('y', `${100 * y}`);
 
@@ -495,7 +496,7 @@ function main(gameKey, cid) {
 
   // Undo if REDO is false.
   // Redo if REDO is true.
-  function updateHistory(redo) {
+  function updateHistory(redo: boolean): boolean {
     const historyEntries = Object.entries(allClientsData.get<object>(cid, redo ? 'historyUndone' : 'history') || {});
     if (0 === historyEntries.length) return false;
 
@@ -525,8 +526,8 @@ function main(gameKey, cid) {
     return true;
   }
 
-  function fill(num, type) {
-    const madeChange = fillHelper(num, type);
+  function fill(num: null | number, mode: Mode): void {
+    const madeChange = fillHelper(num, mode);
     if (null == num && !madeChange) {
       for (const deleteType of DELETE_ORDER) {
         if (fillHelper(null, deleteType)) break;
@@ -534,45 +535,45 @@ function main(gameKey, cid) {
     }
   }
 
-  function fillHelper(num, type) {
-    const update = {};
+  function fillHelper(num: null | number, mode: Mode): boolean {
+    const update: util.Update = {};
 
-    const blockedGivens = BLOCKED_BY_GIVENS[type] && boardData.get('givens');
-    const selected = Object.entries(allClientsData.get(cid, 'selected') || {})
+    const blockedGivens = BLOCKED_BY_GIVENS[mode] && boardData.get<Record<string | IdCoord, number>>('givens') || {};
+    const selected = Object.entries(allClientsData.get<Record<IdCoord, boolean>>(cid, 'selected') || {})
       .filter(([ _, isSet ]) => isSet)
       .map(([ id, _ ]) => id)
-      .filter(id => !blockedGivens || !blockedGivens[id]);
+      .filter(id => !blockedGivens || !blockedGivens[id as any]);
 
-    if (!selected.length) return;
+    if (!selected.length) return false;
   
-    const markData = (boardData.data as object | undefined)?.[type] || {};
+    const markData: Record<string | IdCoord, unknown> = (boardData.data as any)?.[mode] || {};
 
-    switch (type) {
-      case MODE_GIVENS:
-      case MODE_FILLED:
-      case MODE_COLORS:
+    switch (mode) {
+      case Mode.GIVENS:
+      case Mode.FILLED:
+      case Mode.COLORS:
         if (null == num && selected.every(id => null == markData[id])) {
           return false; // Delete nothing.
         }
         for (const id of selected) {
-          update[`${type}/${id}`] = num;
+          update[`${mode}/${id}`] = num;
         }
         break;
-      case MODE_CORNER:
-      case MODE_CENTER:
+      case Mode.CORNER:
+      case Mode.CENTER:
         if (null == num) {
           if (selected.every(id => null == markData[id])) {
             return false; // Delete nothing.
           }
           for (const id of selected) {
-            update[`${type}/${id}`] = null;
+            update[`${mode}/${id}`] = null;
           }
         }
         else {
           let allSet = true;
           for (const id of selected) {
-            allSet &&= markData[id] && markData[id][num];
-            update[`${type}/${id}/${num}`] = true;
+            allSet &&= !!markData[id] && (markData[id] as Record<IdCoord, boolean>)[num];
+            update[`${mode}/${id}/${num}`] = true;
           }
           // If they are all set, unset all.
           if (allSet) {
@@ -583,7 +584,7 @@ function main(gameKey, cid) {
         }
         break;
       default:
-        throw new Error(`Unknown type: ${type}.`);
+        throw new Error(`Unknown type: ${mode}.`);
     }
     // Update and add update to history.
     const history = boardData.update(update);
@@ -599,7 +600,7 @@ function main(gameKey, cid) {
     return true;
   }
 
-  function loc2xy(xOff, yOff, limitCircle): null | [ number, number ] {
+  function loc2xy(xOff: number, yOff: number, limitCircle: boolean): null | [ XYCoord, XYCoord ] {
     const { width, height } = sudoku.getBoundingClientRect();
     if (xOff < 0 || yOff < 0) return null;
     const xf = SIZE * xOff / width;
@@ -616,7 +617,7 @@ function main(gameKey, cid) {
     return [ xf | 0, yf | 0 ];
   }
 
-  function select(x, y, reset = false, mode: true | null = true) {
+  function select(x: XYCoord, y: XYCoord, reset = false, mode: true | null = true): boolean {
     if (x < 0 || SIZE <= x || y < 0 || SIZE <= y) return false;
 
     const id = xy2id(x, y);
@@ -668,7 +669,7 @@ function main(gameKey, cid) {
       }
     });
 
-    window.addEventListener('mouseup', e => {
+    window.addEventListener('mouseup', _e => {
       if (0 !== selectingMode) {
         selectingMode = 0;
       }
@@ -680,13 +681,13 @@ function main(gameKey, cid) {
   }
 
   {
-    function handleTouch(e, reset = false) {
+    function handleTouch(e: TouchEvent, reset = false): void {
       e.preventDefault();
 
       const { top, left } = sudoku.getBoundingClientRect();
 
       for (let i = 0; i < e.targetTouches.length; i++) {
-        const touch = e.targetTouches.item(i);
+        const touch = e.targetTouches.item(i)!;
         const xy = loc2xy(touch.clientX - left, touch.clientY - top, true);
         if (!xy) continue;
         select(...xy, reset);
@@ -696,9 +697,9 @@ function main(gameKey, cid) {
     sudoku.addEventListener('touchmove', e => handleTouch(e));
   }
 
-  let fillMode = MODE_FILLED;
+  let fillMode: Mode = Mode.FILLED;
 
-  function setFillMode(arg: string | HTMLButtonElement) {
+  function setFillMode(arg: string | HTMLButtonElement): void {
     let el: HTMLButtonElement;
     let mode: string;
     if ('string' !== typeof arg) {
@@ -709,16 +710,17 @@ function main(gameKey, cid) {
       mode = arg;
       el = document.querySelector(`.button-mode[data-mode="${mode}"]`)!;
     }
+    if (0 > MODES.indexOf(mode as any)) throw new Error(`Unknown mode: ${mode}.`);
+    fillMode = mode as Mode;
 
+    // Update button appearance.
     for (const inputButton of Array.from(document.getElementsByClassName('button-input')) as HTMLButtonElement[]) {
       const num = JSON.parse(inputButton.getAttribute('data-input')!);
       if (null != num) {
-        inputButton.style.color = MODE_COLORS === mode ? `rgb(${COLORS[num].slice(0, 3).join(',')})` : '';
-        inputButton.innerText = MODE_COLORS === mode ? '\u25A8' : num;
+        inputButton.style.color = Mode.COLORS === mode ? `rgb(${COLORS[num].slice(0, 3).join(',')})` : '';
+        inputButton.innerText = Mode.COLORS === mode ? '\u25A8' : num;
       }
     }
-
-    fillMode = mode;
 
     for (const button of Array.from(document.getElementsByClassName('button-mode'))) {
       button.classList.add('control-btn-inv');
@@ -728,17 +730,17 @@ function main(gameKey, cid) {
   (window as any)._setFillMode = setFillMode;
 
   {
-    document.getElementById('button-undo')!.addEventListener('click', e => updateHistory(false));
-    document.getElementById('button-redo')!.addEventListener('click', e => updateHistory(true));
-    document.getElementById('button-check')!.addEventListener('click', e => {
-      const bdObj = boardData.data as object | null;
-      const bad = checkGrid(Object.assign({}, bdObj?.['filled'], bdObj?.['givens']));
+    document.getElementById('button-undo')!.addEventListener('click', _e => updateHistory(false));
+    document.getElementById('button-redo')!.addEventListener('click', _e => updateHistory(true));
+    document.getElementById('button-check')!.addEventListener('click', _e => {
+      const bdObj: { filled?: Record<IdCoord, number>, givens?: Record<IdCoord, number> } = boardData.data as object || {};
+      const bad = checkGrid(Object.assign({}, bdObj.filled, bdObj.givens));
       if (0 === bad.size) {
         alert('Looks good!');
       }
       else {
-        let lastId;
-        const selected = {};
+        let lastId: IdCoord = 0;
+        const selected: Record<IdCoord, true> = {};
         for (const id of bad) {
           selected[id] = true;
           lastId = id;
@@ -755,19 +757,18 @@ function main(gameKey, cid) {
       button.addEventListener('click', e => setFillMode(e.currentTarget as HTMLButtonElement));
     }
 
-
-    const onInput = e => {
-      const val = JSON.parse(e.currentTarget.getAttribute('data-input'));
+    function onButtonInput(this: Element, _e: Event): void {
+      const val = JSON.parse(this.getAttribute('data-input')!);
       fill(val, fillMode);
-    };
+    }
     for (const button of Array.from(document.getElementsByClassName('button-input'))) {
-      button.addEventListener('click', onInput);
+      button.addEventListener('click', onButtonInput);
     }
   }
 
   {
     window.addEventListener('keydown', e => {
-      let num;
+      let num: null | number;
 
       if ('Space' === e.code || 'Tab' === e.code) {
         e.preventDefault();
@@ -781,7 +782,7 @@ function main(gameKey, cid) {
       }
 
       if (e.code in CODES) {
-        num = CODES[e.code]
+        num = CODES[e.code as keyof typeof CODES];
       }
       else if ('Alt' === e.code || 'AltLeft' === e.code || 'AltRight' === e.code) {
         e.preventDefault();
@@ -791,9 +792,9 @@ function main(gameKey, cid) {
         e.preventDefault();
         let x = 0
         let y = 0;
-        const cursor = allClientsData.get(cid, 'cursor');
+        const cursor = allClientsData.get<null | undefined | number>(cid, 'cursor');
         if (null != cursor) {
-          const [ dx, dy ] = ARROWS[e.code];
+          const [ dx, dy ] = ARROWS[e.code as keyof typeof ARROWS];
           const [ cx, cy ] = id2xy(cursor);
           x = wrap(cx + dx);
           y = wrap(cy + dy);
@@ -813,6 +814,7 @@ function main(gameKey, cid) {
           e.preventDefault();
           updateHistory(true);
         }
+        return;
       }
       else {
         let match = DIGIT_REGEX.exec(e.code);
@@ -823,12 +825,12 @@ function main(gameKey, cid) {
       e.preventDefault();
 
       if (e.shiftKey) {
-        fill(num, MODE_CORNER);
-        setFillMode(MODE_FILLED);
+        fill(num, Mode.CORNER);
+        setFillMode(Mode.FILLED);
       }
       else if (e.ctrlKey || e.altKey) {
-        fill(num, MODE_CENTER);
-        setFillMode(MODE_FILLED);
+        fill(num, Mode.CENTER);
+        setFillMode(Mode.FILLED);
       }
       else {
         fill(num, fillMode);

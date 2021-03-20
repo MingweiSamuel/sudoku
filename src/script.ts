@@ -1,248 +1,33 @@
-import * as hsluv from "hsluv";
-
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/database";
 
-type XYCoord = number;
-type IdCoord = number;
+import * as consts from "./consts";
+import * as data from "./data";
+import * as utils from "./utils";
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyAmZZULS1wzXF4Sfj6u_eVmigMOL1Ga5NI",
-  authDomain: "sudoku-0.firebaseapp.com",
-  databaseURL: "https://sudoku-0-default-rtdb.firebaseio.com",
-  projectId: "sudoku-0",
-  storageBucket: "sudoku-0.appspot.com",
-  messagingSenderId: "410365958794",
-  appId: "1:410365958794:web:e8fa3326b8d2735ce8ab73"
-} as const;
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+import { initialize } from "./initialize";
 
-import * as util from "./util";
-
-const NS_SVG = 'http://www.w3.org/2000/svg';
-
-enum Mode {
-  GIVENS = 'givens',
-  FILLED = 'filled',
-  CORNER = 'corner',
-  CENTER = 'center',
-  COLORS = 'colors',
-}
-
-
-
-const MODES = [ Mode.FILLED, Mode.CORNER, Mode.CENTER, Mode.COLORS ];
-
-const DELETE_ORDER = [
-  Mode.FILLED,
-  Mode.CORNER,
-  Mode.CENTER,
-  Mode.COLORS,
-] as const;
-
-const BLOCKED_BY_GIVENS = {
-  [Mode.GIVENS]: false,
-  [Mode.FILLED]: true,
-  [Mode.CORNER]: true,
-  [Mode.CENTER]: true,
-  [Mode.COLORS]: false,
-} as const;
-
-const SIZE = 9;
-
-const CODES = {
-  Delete: null,
-  Backspace: null,
-  Backquote: 0,
-  KeyQ: 4,
-  KeyW: 5,
-  KeyE: 6,
-  KeyA: 7,
-  KeyS: 8,
-  KeyD: 9,
-} as const;
-
-const ARROWS = {
-  ArrowUp:    [  0, -1 ],
-  ArrowDown:  [  0,  1 ],
-  ArrowLeft:  [ -1,  0 ],
-  ArrowRight: [  1,  0 ],
-} as const;
-
-const COLORS = [
-  [ 0.07, 0.07, 0.07, 1 ],
-  [ 0.4, 0.4, 0.4, 0.6 ],
-  [ 0.7, 0.7, 0.7, 0.6 ],
-  hsluv.hsluvToRgb([  10, 100, 60 ]),
-  hsluv.hsluvToRgb([  40, 100, 65 ]),
-  hsluv.hsluvToRgb([  70, 100, 90 ]).concat(0.8),
-  hsluv.hsluvToRgb([ 120, 100, 80 ]),
-  hsluv.hsluvToRgb([ 230, 100, 85 ]),
-  hsluv.hsluvToRgb([ 260, 100, 55 ]),
-  hsluv.hsluvToRgb([ 300, 100, 70 ]),
-].map(row => {
-  for (let i = 0; i < 3; i++) {
-    row[i] *= 255;
-    row[i] |= 0;
-  }
-  row.length < 4 && row.push(0.6);
-  return row as [ number, number, number, number ];
-});
-
-const DIGIT_REGEX = /Digit(\d)/;
-
-const sudoku = document.getElementById('sudoku')!;
-const sudokuColors = document.getElementById('sudoku-colors')!;
-const sudokuHighlights = document.getElementById('sudoku-highlights')!;
-const sudokuCursor = document.getElementById('sudoku-cursor')!;
-const sudokuGivens = document.getElementById('sudoku-givens')!;
-const sudokuGivensMask = document.getElementById('sudoku-givens-mask')!;
-const sudokuFilled = document.getElementById('sudoku-filled')!;
-const sudokuFilledMask = document.getElementById('sudoku-filled-mask')!;
-const sudokuCenter = document.getElementById('sudoku-center')!;
-const sudokuCorner = document.getElementById('sudoku-corner')!;
-
-
-(() => {
-  let gameKey: string;
-  if (window.location.hash) {
-    gameKey = window.location.hash.slice(1);
-  }
-  else {
-    gameKey = firebase.database().ref('game').push().key!;
-    window.location.hash = '#' + gameKey;
-  }
-
-  // const cid = firebase.database().ref(`game/${gameKey}/clients`).push().key;
-  // main(gameKey, cid);
-
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/firebase.User
-      main(gameKey, user.uid);
-    } else {
-      // User is signed out
-      // ...
-    }
-  });
-  firebase.auth().signInAnonymously();
-})();
-
-function wrap(x: number): XYCoord {
-  return ((x % SIZE) + SIZE) % SIZE;
-}
-
-
-function hash(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash *= 31;
-    hash += str.charCodeAt(i);
-    hash |= 0;
-  }
-  return hash;
-}
-
-function cidToColor(cid: string): [ number, number, number ] {
-  const cidHash = hash(cid);
-  const rgb = hsluv.hsluvToRgb([ cidHash % 360, 80, 60 ]);
-  return rgb.map(x => 255 * x) as [ number, number, number ];
-}
-
-function xy2id(x: XYCoord, y: XYCoord): IdCoord {
-  return 9 * y + x;
-}
-function id2xy(id: IdCoord): [ XYCoord, XYCoord ] {
-  return [ id % 9, (id / 9) | 0 ];
-}
-function bx2id(box: number, idx: number): number {
-  const boxId = 27 * ((box / 3) | 0) + 3 * (box % 3);
-  const idxId =  9 * ((idx / 3) | 0) +     (idx % 3);
-  return boxId + idxId;
-}
-
-function cornerMarkPos(i: number, len: number): [ number, number ] {
-  let dx: number, dy: number;
-  if (len <= 4) {
-    dx = (i % 2) * 60 - 30;
-    dy = ((i / 2) | 0) * 60 - 30;
-  }
-  else {
-    const half = (len / 2) | 0;
-    if (i < half) {
-      const d = 60 / (half - 1);
-      dx = i * d - 30;
-      dy = -30;
-    }
-    else {
-      const d = 60 / (len - half - 1);
-      dx = (i - half) * d - 30;
-      dy = 30;
-    }
-  }
-  return [ dx, dy ];
-}
-
-function formatSecs(secs: number): string {
-  const nums: number[] = [];
-  // Seconds.
-  nums.unshift(secs % 60);
-  secs = (secs / 60) | 0;
-  // Minutes.
-  nums.unshift(secs % 60);
-  secs = (secs / 60) | 0;
-  // Hours.
-  if (secs) nums.unshift(secs);
-
-  return nums
-    .map(n => n.toString())
-    .map((s, i) => i ? s.padStart(2, '0') : s)
-    .join(':');
-}
-
-// TODO: Use this!
-function checkGrid(filled: Record<IdCoord, number>): Set<IdCoord> {
-  const bad = new Set<number>();
-  const coordFns = [
-    xy2id, // Rows.
-    (i: number, j: number) => xy2id(j, i), // Cols.
-    bx2id, // Boxes.
-  ];
-  for (const coordFn of coordFns) {
-    for (let i = 0; i < SIZE; i++) {
-      const valToId: Record<number, IdCoord> = {};
-      for (let j = 0; j < SIZE; j++) {
-        const id = coordFn(i, j);
-        const val = filled[id];
-        if (!val) bad.add(id);
-        else if (val in valToId) {
-          bad.add(valToId[val]);
-          bad.add(id);
-        }
-        else valToId[val] = id;
-      }
-    }
-  }
-  return bad;
-}
-
-const stringifyNums = (nums: Record<number, boolean>) => Object.entries(nums)
-  .filter(([ _, flag ]) => flag)
-  .map(([ num ]) => num)
-  .join('');
+const sudoku = document.getElementById('sudoku')! as unknown as SVGElement;
+const sudokuColors = document.getElementById('sudoku-colors')! as unknown as SVGGElement;
+const sudokuHighlights = document.getElementById('sudoku-highlights')! as unknown as SVGGElement;
+const sudokuCursor = document.getElementById('sudoku-cursor')! as unknown as SVGGElement;
+const sudokuGivens = document.getElementById('sudoku-givens')! as unknown as SVGGElement;
+const sudokuGivensMask = document.getElementById('sudoku-givens-mask')! as unknown as SVGGElement;
+const sudokuFilled = document.getElementById('sudoku-filled')! as unknown as SVGGElement;
+const sudokuFilledMask = document.getElementById('sudoku-filled-mask')! as unknown as SVGGElement;
+const sudokuCenter = document.getElementById('sudoku-center')! as unknown as SVGGElement;
+const sudokuCorner = document.getElementById('sudoku-corner')! as unknown as SVGGElement;
 
 function makeTs(): [ typeof firebase.database.ServerValue.TIMESTAMP, number ] {
   return [ firebase.database.ServerValue.TIMESTAMP, Date.now() ];
 }
 
-function main(gameKey: string, cid: string): void {
+initialize().then(main);
+function main([ gameKey, cid ]: [ string, string ]): void {
   const refGame = firebase.database().ref(`game/${gameKey}`);
   const refAllClients = refGame.child('clients');
-  const allClientsData = new util.DataLayer(refAllClients);
+  const allClientsData = new data.DataLayer(refAllClients);
 
   const refClient = refAllClients.child(cid);
   refClient.update({
@@ -270,7 +55,7 @@ function main(gameKey: string, cid: string): void {
       setInterval(() => {
         if (!ticking) return;
         elapsedSeconds++;
-        timer.textContent = formatSecs(elapsedSeconds);
+        timer.textContent = utils.formatSecs(elapsedSeconds);
       }, 1000);
       // Save time every 10 seconds.
       setInterval(() => {
@@ -307,16 +92,16 @@ function main(gameKey: string, cid: string): void {
   });
 
   const refBoard = refGame.child('board');
-  const boardData = new util.DataLayer(refBoard);
+  const boardData = new data.DataLayer(refBoard);
   (window as any /* TODO */)._boardData = boardData;
 
   // Client selected highlights.
-  allClientsData.watch('*/selected/*', util.makeBind(sudokuHighlights, {
+  allClientsData.watch('*/selected/*', data.makeBind(sudokuHighlights, {
     create([ otherCid, id ]) {
-      const el = document.createElementNS(NS_SVG, 'use');
+      const el = document.createElementNS(consts.NS_SVG, 'use');
 
       if (otherCid !== cid) {
-        const rgb = cidToColor(otherCid);
+        const rgb = utils.cidToColor(otherCid);
         el.setAttribute('fill', `rgb(${rgb.join(',')})`);
         el.setAttribute('href', '#highlight');
       }
@@ -325,7 +110,7 @@ function main(gameKey: string, cid: string): void {
         el.setAttribute('href', '#highlight-self');
       }
 
-      const [ x, y ] = id2xy(+id);
+      const [ x, y ] = utils.id2xy(+id);
       el.setAttribute('x', `${100 * x}`);
       el.setAttribute('y', `${100 * y}`);
 
@@ -334,18 +119,18 @@ function main(gameKey: string, cid: string): void {
   }));
 
   // Client cursor markers (small triangle in top left).
-  allClientsData.watch('*/cursor', util.makeBind(sudokuCursor, {
+  allClientsData.watch('*/cursor', data.makeBind(sudokuCursor, {
     create() {
-      const el = document.createElementNS(NS_SVG, 'use');
+      const el = document.createElementNS(consts.NS_SVG, 'use');
       el.setAttribute('href', '#cursor');
       return el;
     },
     update(el, [ otherCid ], val: string) {
-      const [ x, y ] = id2xy(+val);
+      const [ x, y ] = utils.id2xy(+val);
 
       let fillColor = '#fa0';
       if (otherCid !== cid) {
-        const rgb = cidToColor(otherCid);
+        const rgb = utils.cidToColor(otherCid);
         fillColor = `rgba(${rgb.join(',')}, 0.4)`;
       }
       
@@ -357,28 +142,28 @@ function main(gameKey: string, cid: string): void {
   }));
 
   // Given cells.
-  boardData.watch(`${Mode.GIVENS}/*`, util.makeBind(sudokuGivens, {
+  boardData.watch(`${consts.Mode.GIVENS}/*`, data.makeBind(sudokuGivens, {
     create() {
-      const el = document.createElementNS(NS_SVG, 'text');
+      const el = document.createElementNS(consts.NS_SVG, 'text');
       el.setAttribute('class', 'givens');
       return el;
     },
     update(el, [ id ], val: number) {
-      const [ x, y ] = id2xy(+id);
+      const [ x, y ] = utils.id2xy(+id);
       el.textContent = '' + val;
       el.setAttribute('x', `${100 * x + 50}`);
       el.setAttribute('y', `${100 * y + 50}`);
     },
   }));
   // Given cells mask, for filled cells and pencil marks.
-  boardData.watch(`${Mode.GIVENS}/*`, util.makeBind(sudokuGivensMask, {
+  boardData.watch(`${consts.Mode.GIVENS}/*`, data.makeBind(sudokuGivensMask, {
     create([ id ]) {
-      const el = document.createElementNS(NS_SVG, 'rect');
+      const el = document.createElementNS(consts.NS_SVG, 'rect');
       el.setAttribute('width', '100');
       el.setAttribute('height', '100');
       el.setAttribute('fill', 'black');
       
-      const [ x, y ] = id2xy(+id);
+      const [ x, y ] = utils.id2xy(+id);
       el.setAttribute('x', `${100 * x}`);
       el.setAttribute('y', `${100 * y}`);
 
@@ -387,29 +172,29 @@ function main(gameKey: string, cid: string): void {
   }));
 
   // Filled cells.
-  boardData.watch(`${Mode.FILLED}/*`, util.makeBind(sudokuFilled, {
+  boardData.watch(`${consts.Mode.FILLED}/*`, data.makeBind(sudokuFilled, {
     create() {
-      const el = document.createElementNS(NS_SVG, 'text');
+      const el = document.createElementNS(consts.NS_SVG, 'text');
       el.setAttribute('class', 'filled');
       el.setAttribute('mask', 'url(#sudoku-givens-mask)');
       return el;
     },
     update(el, [ id ], val) {
-      const [ x, y ] = id2xy(+id);
+      const [ x, y ] = utils.id2xy(+id);
       el.textContent = '' + val;
       el.setAttribute('x', `${100 * x + 50}`);
       el.setAttribute('y', `${100 * y + 50}`);
     },
   }));
   // Filled cells mask, for pencil marks.
-  boardData.watch(`${Mode.FILLED}/*`, util.makeBind(sudokuFilledMask, {
+  boardData.watch(`${consts.Mode.FILLED}/*`, data.makeBind(sudokuFilledMask, {
     create([ id ]) {
-      const el = document.createElementNS(NS_SVG, 'rect');
+      const el = document.createElementNS(consts.NS_SVG, 'rect');
       el.setAttribute('width', '100');
       el.setAttribute('height', '100');
       el.setAttribute('fill', 'black');
       
-      const [ x, y ] = id2xy(+id);
+      const [ x, y ] = utils.id2xy(+id);
       el.setAttribute('x', `${100 * x}`);
       el.setAttribute('y', `${100 * y}`);
 
@@ -418,23 +203,23 @@ function main(gameKey: string, cid: string): void {
   }));
 
   // Corner pencil marks.
-  boardData.watch(`${Mode.CORNER}/*`, util.makeBind(sudokuCorner, {
+  boardData.watch(`${consts.Mode.CORNER}/*`, data.makeBind(sudokuCorner, {
     create() {
-      return document.createElementNS(NS_SVG, 'g');
+      return document.createElementNS(consts.NS_SVG, 'g');
     },
     update(g, [ id ], val: Record<number, boolean>) {
       while (g.lastChild) g.removeChild(g.lastChild);
 
-      const [ x, y ] = id2xy(+id);
+      const [ x, y ] = utils.id2xy(+id);
 
       const nums = Object.entries(val)
         .filter(([ _, flag ]) => flag)
         .map(([ num ]) => num);
 
       for (let i = 0; i < nums.length; i++) {
-        const [ dx, dy ] = cornerMarkPos(i, nums.length);
+        const [ dx, dy ] = utils.cornerMarkPos(i, nums.length);
 
-        const el = document.createElementNS(NS_SVG, 'text');
+        const el = document.createElementNS(consts.NS_SVG, 'text');
         el.textContent = '' + nums[i];
         el.setAttribute('class', 'corner');
         el.setAttribute('mask', 'url(#sudoku-filled-mask)');
@@ -449,20 +234,20 @@ function main(gameKey: string, cid: string): void {
   }));
 
   // Center pencil marks.
-  boardData.watch(`${Mode.CENTER}/*`, util.makeBind(sudokuCenter, {
+  boardData.watch(`${consts.Mode.CENTER}/*`, data.makeBind(sudokuCenter, {
     create([ id ]) {
-      const el = document.createElementNS(NS_SVG, 'text');
+      const el = document.createElementNS(consts.NS_SVG, 'text');
       el.setAttribute('class', 'center');
       el.setAttribute('mask', 'url(#sudoku-filled-mask)');
       
-      const [ x, y ] = id2xy(+id);
+      const [ x, y ] = utils.id2xy(+id);
       el.setAttribute('x', `${100 * x + 50}`);
       el.setAttribute('y', `${100 * y + 50}`);
 
       return el;
     },
     update(el, [ _id ], val: Record<number, boolean>) {
-      const text = stringifyNums(val);
+      const text = utils.stringifyNums(val);
       el.textContent = text;
 
       if (text.length >= 8) {
@@ -477,19 +262,19 @@ function main(gameKey: string, cid: string): void {
   }));
 
   // Center pencil marks.
-  boardData.watch(`${Mode.COLORS}/*`, util.makeBind(sudokuColors, {
+  boardData.watch(`${consts.Mode.COLORS}/*`, data.makeBind(sudokuColors, {
     create([ id ]) {
-      const el = document.createElementNS(NS_SVG, 'use');
+      const el = document.createElementNS(consts.NS_SVG, 'use');
       el.setAttribute('href', '#colors');
 
-      const [ x, y ] = id2xy(+id);
+      const [ x, y ] = utils.id2xy(+id);
       el.setAttribute('x', `${100 * x}`);
       el.setAttribute('y', `${100 * y}`);
 
       return el;
     },
     update(el, [ _id ], val: number) {
-      const color = COLORS[val];
+      const color = consts.COLORS[val];
       el.setAttribute('fill', `rgba(${color.join(',')})`);
     },
   }));
@@ -526,32 +311,32 @@ function main(gameKey: string, cid: string): void {
     return true;
   }
 
-  function fill(num: null | number, mode: Mode): void {
+  function fill(num: null | number, mode: consts.Mode): void {
     const madeChange = fillHelper(num, mode);
     if (null == num && !madeChange) {
-      for (const deleteType of DELETE_ORDER) {
+      for (const deleteType of consts.DELETE_ORDER) {
         if (fillHelper(null, deleteType)) break;
       }
     }
   }
 
-  function fillHelper(num: null | number, mode: Mode): boolean {
-    const update: util.Update = {};
+  function fillHelper(num: null | number, mode: consts.Mode): boolean {
+    const update: data.Update = {};
 
-    const blockedGivens = BLOCKED_BY_GIVENS[mode] && boardData.get<Record<string | IdCoord, number>>('givens') || {};
-    const selected = Object.entries(allClientsData.get<Record<IdCoord, boolean>>(cid, 'selected') || {})
+    const blockedGivens = consts.BLOCKED_BY_GIVENS[mode] && boardData.get<Record<string | utils.IdCoord, number>>('givens') || {};
+    const selected = Object.entries(allClientsData.get<Record<utils.IdCoord, boolean>>(cid, 'selected') || {})
       .filter(([ _, isSet ]) => isSet)
       .map(([ id, _ ]) => id)
       .filter(id => !blockedGivens || !blockedGivens[id as any]);
 
     if (!selected.length) return false;
   
-    const markData: Record<string | IdCoord, unknown> = (boardData.data as any)?.[mode] || {};
+    const markData: Record<string | utils.IdCoord, unknown> = (boardData.data as any)?.[mode] || {};
 
     switch (mode) {
-      case Mode.GIVENS:
-      case Mode.FILLED:
-      case Mode.COLORS:
+      case consts.Mode.GIVENS:
+      case consts.Mode.FILLED:
+      case consts.Mode.COLORS:
         if (null == num && selected.every(id => null == markData[id])) {
           return false; // Delete nothing.
         }
@@ -559,8 +344,8 @@ function main(gameKey: string, cid: string): void {
           update[`${mode}/${id}`] = num;
         }
         break;
-      case Mode.CORNER:
-      case Mode.CENTER:
+      case consts.Mode.CORNER:
+      case consts.Mode.CENTER:
         if (null == num) {
           if (selected.every(id => null == markData[id])) {
             return false; // Delete nothing.
@@ -572,7 +357,7 @@ function main(gameKey: string, cid: string): void {
         else {
           let allSet = true;
           for (const id of selected) {
-            allSet &&= !!markData[id] && (markData[id] as Record<IdCoord, boolean>)[num];
+            allSet &&= !!markData[id] && (markData[id] as Record<utils.IdCoord, boolean>)[num];
             update[`${mode}/${id}/${num}`] = true;
           }
           // If they are all set, unset all.
@@ -600,12 +385,12 @@ function main(gameKey: string, cid: string): void {
     return true;
   }
 
-  function loc2xy(xOff: number, yOff: number, limitCircle: boolean): null | [ XYCoord, XYCoord ] {
+  function loc2xy(xOff: number, yOff: number, limitCircle: boolean): null | [ utils.XYCoord, utils.XYCoord ] {
     const { width, height } = sudoku.getBoundingClientRect();
     if (xOff < 0 || yOff < 0) return null;
-    const xf = SIZE * xOff / width;
-    const yf = SIZE * yOff / height;
-    if (SIZE <= xf || SIZE <= yf) return null;
+    const xf = consts.SIZE * xOff / width;
+    const yf = consts.SIZE * yOff / height;
+    if (consts.SIZE <= xf || consts.SIZE <= yf) return null;
 
     if (limitCircle) {
       // Limit to circles.
@@ -617,10 +402,10 @@ function main(gameKey: string, cid: string): void {
     return [ xf | 0, yf | 0 ];
   }
 
-  function select(x: XYCoord, y: XYCoord, reset = false, mode: true | null = true): boolean {
-    if (x < 0 || SIZE <= x || y < 0 || SIZE <= y) return false;
+  function select(x: utils.XYCoord, y: utils.XYCoord, reset = false, mode: true | null = true): boolean {
+    if (x < 0 || consts.SIZE <= x || y < 0 || consts.SIZE <= y) return false;
 
-    const id = xy2id(x, y);
+    const id = utils.xy2id(x, y);
 
     if (reset) {
       allClientsData.update({
@@ -697,7 +482,7 @@ function main(gameKey: string, cid: string): void {
     sudoku.addEventListener('touchmove', e => handleTouch(e));
   }
 
-  let fillMode: Mode = Mode.FILLED;
+  let fillMode: consts.Mode = consts.Mode.FILLED;
 
   function setFillMode(arg: string | HTMLButtonElement): void {
     let el: HTMLButtonElement;
@@ -710,15 +495,15 @@ function main(gameKey: string, cid: string): void {
       mode = arg;
       el = document.querySelector(`.button-mode[data-mode="${mode}"]`)!;
     }
-    if (0 > MODES.indexOf(mode as any)) throw new Error(`Unknown mode: ${mode}.`);
-    fillMode = mode as Mode;
+    if (0 > consts.MODE_CYCLE.indexOf(mode as any)) throw new Error(`Unknown mode: ${mode}.`);
+    fillMode = mode as consts.Mode;
 
     // Update button appearance.
     for (const inputButton of Array.from(document.getElementsByClassName('button-input')) as HTMLButtonElement[]) {
       const num = JSON.parse(inputButton.getAttribute('data-input')!);
       if (null != num) {
-        inputButton.style.color = Mode.COLORS === mode ? `rgb(${COLORS[num].slice(0, 3).join(',')})` : '';
-        inputButton.innerText = Mode.COLORS === mode ? '\u25A8' : num;
+        inputButton.style.color = consts.Mode.COLORS === mode ? `rgb(${consts.COLORS[num].slice(0, 3).join(',')})` : '';
+        inputButton.innerText = consts.Mode.COLORS === mode ? '\u25A8' : num;
       }
     }
 
@@ -733,14 +518,14 @@ function main(gameKey: string, cid: string): void {
     document.getElementById('button-undo')!.addEventListener('click', _e => updateHistory(false));
     document.getElementById('button-redo')!.addEventListener('click', _e => updateHistory(true));
     document.getElementById('button-check')!.addEventListener('click', _e => {
-      const bdObj: { filled?: Record<IdCoord, number>, givens?: Record<IdCoord, number> } = boardData.data as object || {};
-      const bad = checkGrid(Object.assign({}, bdObj.filled, bdObj.givens));
+      const bdObj: { filled?: Record<utils.IdCoord, number>, givens?: Record<utils.IdCoord, number> } = boardData.data as object || {};
+      const bad = utils.checkGrid(Object.assign({}, bdObj.filled, bdObj.givens));
       if (0 === bad.size) {
         alert('Looks good!');
       }
       else {
-        let lastId: IdCoord = 0;
-        const selected: Record<IdCoord, true> = {};
+        let lastId: utils.IdCoord = 0;
+        const selected: Record<utils.IdCoord, true> = {};
         for (const id of bad) {
           selected[id] = true;
           lastId = id;
@@ -773,31 +558,31 @@ function main(gameKey: string, cid: string): void {
       if ('Space' === e.code || 'Tab' === e.code) {
         e.preventDefault();
 
-        let idx = MODES.indexOf(fillMode) + 1 - (2 * (+e.shiftKey)) + MODES.length;
-        idx = idx % MODES.length;
+        let idx = consts.MODE_CYCLE.indexOf(fillMode) + 1 - (2 * (+e.shiftKey)) + consts.MODE_CYCLE.length;
+        idx = idx % consts.MODE_CYCLE.length;
 
-        setFillMode(MODES[idx]);
+        setFillMode(consts.MODE_CYCLE[idx]);
 
         return;
       }
 
-      if (e.code in CODES) {
-        num = CODES[e.code as keyof typeof CODES];
+      if (e.code in consts.CODES) {
+        num = consts.CODES[e.code as keyof typeof consts.CODES];
       }
       else if ('Alt' === e.code || 'AltLeft' === e.code || 'AltRight' === e.code) {
         e.preventDefault();
         return;
       }
-      else if (e.code in ARROWS) {
+      else if (e.code in consts.ARROWS) {
         e.preventDefault();
         let x = 0
         let y = 0;
         const cursor = allClientsData.get<null | undefined | number>(cid, 'cursor');
         if (null != cursor) {
-          const [ dx, dy ] = ARROWS[e.code as keyof typeof ARROWS];
-          const [ cx, cy ] = id2xy(cursor);
-          x = wrap(cx + dx);
-          y = wrap(cy + dy);
+          const [ dx, dy ] = consts.ARROWS[e.code as keyof typeof consts.ARROWS];
+          const [ cx, cy ] = utils.id2xy(cursor);
+          x = utils.wrap(cx + dx);
+          y = utils.wrap(cy + dy);
         }
         select(x, y, !e.shiftKey && !e.ctrlKey && !e.altKey);
         return;
@@ -817,7 +602,7 @@ function main(gameKey: string, cid: string): void {
         return;
       }
       else {
-        let match = DIGIT_REGEX.exec(e.code);
+        let match = consts.DIGIT_REGEX.exec(e.code);
         if (!match) return;
         num = Number(match[1]);
       }
@@ -825,12 +610,12 @@ function main(gameKey: string, cid: string): void {
       e.preventDefault();
 
       if (e.shiftKey) {
-        fill(num, Mode.CORNER);
-        setFillMode(Mode.FILLED);
+        fill(num, consts.Mode.CORNER);
+        setFillMode(consts.Mode.FILLED);
       }
       else if (e.ctrlKey || e.altKey) {
-        fill(num, Mode.CENTER);
-        setFillMode(Mode.FILLED);
+        fill(num, consts.Mode.CENTER);
+        setFillMode(consts.Mode.FILLED);
       }
       else {
         fill(num, fillMode);

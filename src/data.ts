@@ -262,7 +262,7 @@ interface Bind<T extends Element> {
     update?(el: T, path: string[], newVal: unknown): void;
 }
 
-export function makeBind<T extends Element>(parent: HTMLElement, { create, update = undefined }: Bind<T>): Watcher {
+export function makeBind<T extends Element>(parent: Element, { create, update = undefined }: Bind<T>): Watcher {
     return {
         onAdd({ path, newVal }) {
             const el = create(path);

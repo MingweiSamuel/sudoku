@@ -5,8 +5,8 @@
     ],
     "scripts": {
         "start": "parcel serve src/index.html",
-        "build": "cross-env NODE_ENV=production parcel build src/index.html --public-url .",
-        "deploy": "gh-pages -d dist"
+        "build": "cross-env NODE_ENV=production parcel build src/index.html --public-url . --no-optimize",
+        "deploy": "yarn build && gh-pages -d dist"
     },
     "devDependencies": {
         "cross-env": "^7.0.3",

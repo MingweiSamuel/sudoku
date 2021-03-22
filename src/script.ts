@@ -3,34 +3,37 @@ import "firebase/auth";
 import "firebase/database";
 
 import * as consts from "./consts";
+
+import * as init from "./initialize";
+
 import * as dataLayer from "./dataLayer";
 import * as utils from "./utils";
 import * as timer from "./timer";
 
-import { initialize } from "./initialize";
-
-const sudoku = document.getElementById('sudoku')! as unknown as SVGElement;
-const sudokuColors = document.getElementById('sudoku-colors')! as unknown as SVGGElement;
-const sudokuHighlights = document.getElementById('sudoku-highlights')! as unknown as SVGGElement;
-const sudokuCursor = document.getElementById('sudoku-cursor')! as unknown as SVGGElement;
-const sudokuGivens = document.getElementById('sudoku-givens')! as unknown as SVGGElement;
+const sudoku           = document.getElementById('sudoku')!             as unknown as SVGElement;
+const sudokuColors     = document.getElementById('sudoku-colors')!      as unknown as SVGGElement;
+const sudokuHighlights = document.getElementById('sudoku-highlights')!  as unknown as SVGGElement;
+const sudokuCursor     = document.getElementById('sudoku-cursor')!      as unknown as SVGGElement;
+const sudokuGivens     = document.getElementById('sudoku-givens')!      as unknown as SVGGElement;
 const sudokuGivensMask = document.getElementById('sudoku-givens-mask')! as unknown as SVGGElement;
-const sudokuFilled = document.getElementById('sudoku-filled')! as unknown as SVGGElement;
+const sudokuFilled     = document.getElementById('sudoku-filled')!      as unknown as SVGGElement;
 const sudokuFilledMask = document.getElementById('sudoku-filled-mask')! as unknown as SVGGElement;
-const sudokuCenter = document.getElementById('sudoku-center')! as unknown as SVGGElement;
-const sudokuCorner = document.getElementById('sudoku-corner')! as unknown as SVGGElement;
+const sudokuCenter     = document.getElementById('sudoku-center')!      as unknown as SVGGElement;
+const sudokuCorner     = document.getElementById('sudoku-corner')!      as unknown as SVGGElement;
 
 function makeTs(): [ typeof firebase.database.ServerValue.TIMESTAMP, number ] {
   return [ firebase.database.ServerValue.TIMESTAMP, Date.now() ];
 }
 
-initialize().then(main);
-function main([ gameKey, cid ]: [ string, string ]): void {
-  const refGame = firebase.database().ref(`game/${gameKey}`);
-  const refAllClients = refGame.child('clients');
-  const allClientsData = new dataLayer.DataLayer(refAllClients);
+init.authPromise.then(main);
 
-  const refClient = refAllClients.child(cid);
+function main(user: firebase.User): void {
+  const userId = user.uid;
+
+  (window as any /* TODO */)._allClientsData = init.allClientsData;
+  (window as any /* TODO */)._boardData = init.boardData;
+
+  const refClient = init.allClientsData.ref.child(userId);
   refClient.update({
     // cursor: null,
     // selected: null,
@@ -44,32 +47,28 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   // Setup timer.
   timer.init(
     refClient.child('elapsedSeconds'),
-    elapsedSeconds => allClientsData.update({
-      [`${cid}/elapsedSeconds`]: elapsedSeconds,
+    elapsedSeconds => init.allClientsData.update({
+      [`${userId}/elapsedSeconds`]: elapsedSeconds,
     })
   );
 
   // Sticky online (if closed in another tab).
-  allClientsData.watch(`${cid}/online`, {
+  init.allClientsData.watch(`${userId}/online`, {
     onChange({ newVal }) {
       if (!newVal) {
-        allClientsData.update({
-          [`${cid}/online`]: true,
+        init.allClientsData.update({
+          [`${userId}/online`]: true,
         });
       }
     }
   });
 
-  const refBoard = refGame.child('board');
-  const boardData = new dataLayer.DataLayer(refBoard);
-  (window as any /* TODO */)._boardData = boardData;
-
   // Client selected highlights.
-  allClientsData.watch('*/selected/*', dataLayer.makeBind(sudokuHighlights, {
+  init.allClientsData.watch('*/selected/*', dataLayer.makeBind(sudokuHighlights, {
     create([ otherCid, id ]) {
       const el = document.createElementNS(consts.NS_SVG, 'use');
 
-      if (otherCid !== cid) {
+      if (otherCid !== userId) {
         const rgb = utils.cidToColor(otherCid);
         el.setAttribute('fill', `rgb(${rgb.join(',')})`);
         el.setAttribute('href', '#highlight');
@@ -88,7 +87,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }));
 
   // Client cursor markers (small triangle in top left).
-  allClientsData.watch('*/cursor', dataLayer.makeBind(sudokuCursor, {
+  init.allClientsData.watch('*/cursor', dataLayer.makeBind(sudokuCursor, {
     create() {
       const el = document.createElementNS(consts.NS_SVG, 'use');
       el.setAttribute('href', '#cursor');
@@ -98,7 +97,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
       const [ x, y ] = utils.id2xy(+val);
 
       let fillColor = '#fa0';
-      if (otherCid !== cid) {
+      if (otherCid !== userId) {
         const rgb = utils.cidToColor(otherCid);
         fillColor = `rgba(${rgb.join(',')}, 0.4)`;
       }
@@ -111,7 +110,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }));
 
   // Given cells.
-  boardData.watch(`${consts.Mode.GIVENS}/*`, dataLayer.makeBind(sudokuGivens, {
+  init.boardData.watch(`${consts.Mode.GIVENS}/*`, dataLayer.makeBind(sudokuGivens, {
     create() {
       const el = document.createElementNS(consts.NS_SVG, 'text');
       el.setAttribute('class', 'givens');
@@ -125,7 +124,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
     },
   }));
   // Given cells mask, for filled cells and pencil marks.
-  boardData.watch(`${consts.Mode.GIVENS}/*`, dataLayer.makeBind(sudokuGivensMask, {
+  init.boardData.watch(`${consts.Mode.GIVENS}/*`, dataLayer.makeBind(sudokuGivensMask, {
     create([ id ]) {
       const el = document.createElementNS(consts.NS_SVG, 'rect');
       el.setAttribute('width', '100');
@@ -141,7 +140,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }));
 
   // Filled cells.
-  boardData.watch(`${consts.Mode.FILLED}/*`, dataLayer.makeBind(sudokuFilled, {
+  init.boardData.watch(`${consts.Mode.FILLED}/*`, dataLayer.makeBind(sudokuFilled, {
     create() {
       const el = document.createElementNS(consts.NS_SVG, 'text');
       el.setAttribute('class', 'filled');
@@ -156,7 +155,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
     },
   }));
   // Filled cells mask, for pencil marks.
-  boardData.watch(`${consts.Mode.FILLED}/*`, dataLayer.makeBind(sudokuFilledMask, {
+  init.boardData.watch(`${consts.Mode.FILLED}/*`, dataLayer.makeBind(sudokuFilledMask, {
     create([ id ]) {
       const el = document.createElementNS(consts.NS_SVG, 'rect');
       el.setAttribute('width', '100');
@@ -172,7 +171,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }));
 
   // Corner pencil marks.
-  boardData.watch(`${consts.Mode.CORNER}/*`, dataLayer.makeBind(sudokuCorner, {
+  init.boardData.watch(`${consts.Mode.CORNER}/*`, dataLayer.makeBind(sudokuCorner, {
     create() {
       return document.createElementNS(consts.NS_SVG, 'g');
     },
@@ -203,7 +202,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }));
 
   // Center pencil marks.
-  boardData.watch(`${consts.Mode.CENTER}/*`, dataLayer.makeBind(sudokuCenter, {
+  init.boardData.watch(`${consts.Mode.CENTER}/*`, dataLayer.makeBind(sudokuCenter, {
     create([ id ]) {
       const el = document.createElementNS(consts.NS_SVG, 'text');
       el.setAttribute('class', 'center');
@@ -231,7 +230,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }));
 
   // Center pencil marks.
-  boardData.watch(`${consts.Mode.COLORS}/*`, dataLayer.makeBind(sudokuColors, {
+  init.boardData.watch(`${consts.Mode.COLORS}/*`, dataLayer.makeBind(sudokuColors, {
     create([ id ]) {
       const el = document.createElementNS(consts.NS_SVG, 'use');
       el.setAttribute('href', '#colors');
@@ -251,7 +250,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   // Undo if REDO is false.
   // Redo if REDO is true.
   function updateHistory(redo: boolean): boolean {
-    const historyEntries = Object.entries(allClientsData.get<object>(cid, redo ? 'historyUndone' : 'history') || {});
+    const historyEntries = Object.entries(init.allClientsData.get<object>(userId, redo ? 'historyUndone' : 'history') || {});
     if (0 === historyEntries.length) return false;
 
     const [ histKey, histVal ] = historyEntries.reduce((entryA, entryB) => {
@@ -261,8 +260,8 @@ function main([ gameKey, cid ]: [ string, string ]): void {
 
     // Ignore empty entries (bug).
     if (!histVal.data) {
-      allClientsData.update({
-        [`${cid}/${redo ? 'historyUndone' : 'history'}/${histKey}`]: null,
+      init.allClientsData.update({
+        [`${userId}/${redo ? 'historyUndone' : 'history'}/${histKey}`]: null,
       });
       updateHistory(redo);
     }
@@ -270,12 +269,12 @@ function main([ gameKey, cid ]: [ string, string ]): void {
     const diffData = JSON.parse(histVal.data);
     // Update board changes.
     // TODO: USE OTHER TO RESOLVE CONFLICTS.
-    boardData.update(redo ? diffData.forward : diffData.back);
+    init.boardData.update(redo ? diffData.forward : diffData.back);
     // Remove entry from historyUndone.
     // Add entry to history.
-    allClientsData.update({
-      [`${cid}/history/${histKey}`]: redo ? histVal : null,
-      [`${cid}/historyUndone/${histKey}`]: redo ? null : histVal,
+    init.allClientsData.update({
+      [`${userId}/history/${histKey}`]: redo ? histVal : null,
+      [`${userId}/historyUndone/${histKey}`]: redo ? null : histVal,
     });
     return true;
   }
@@ -292,15 +291,15 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   function fillHelper(num: null | number, mode: consts.Mode): boolean {
     const update: dataLayer.Update = {};
 
-    const blockedGivens = consts.BLOCKED_BY_GIVENS[mode] && boardData.get<Record<string | utils.IdCoord, number>>('givens') || {};
-    const selected = Object.entries(allClientsData.get<Record<utils.IdCoord, boolean>>(cid, 'selected') || {})
+    const blockedGivens = consts.BLOCKED_BY_GIVENS[mode] && init.boardData.get<Record<string | utils.IdCoord, number>>('givens') || {};
+    const selected = Object.entries(init.allClientsData.get<Record<utils.IdCoord, boolean>>(userId, 'selected') || {})
       .filter(([ _, isSet ]) => isSet)
       .map(([ id, _ ]) => id)
       .filter(id => !blockedGivens || !blockedGivens[id as any]);
 
     if (!selected.length) return false;
   
-    const markData: Record<string | utils.IdCoord, unknown> = (boardData.data as any)?.[mode] || {};
+    const markData = init.boardData.get<Record<string | utils.IdCoord, unknown>>(mode) || {};
 
     switch (mode) {
       case consts.Mode.GIVENS:
@@ -341,15 +340,15 @@ function main([ gameKey, cid ]: [ string, string ]): void {
         throw new Error(`Unknown type: ${mode}.`);
     }
     // Update and add update to history.
-    const history = boardData.update(update);
+    const history = init.boardData.update(update);
     if (!history) return false;
-    const key = allClientsData.ref.child(`${cid}/history`).push().key;
-    allClientsData.update({
-      [`${cid}/history/${key}`]: {
+    const key = init.allClientsData.ref.child(`${userId}/history`).push().key;
+    init.allClientsData.update({
+      [`${userId}/history/${key}`]: {
         data: JSON.stringify(history),
         ts: makeTs(),
       },
-      [`${cid}/historyUndone`]: null,
+      [`${userId}/historyUndone`]: null,
     });
     return true;
   }
@@ -377,21 +376,21 @@ function main([ gameKey, cid ]: [ string, string ]): void {
     const id = utils.xy2id(x, y);
 
     if (reset) {
-      allClientsData.update({
-        [`${cid}/selected`]: { [id]: mode },
-        [`${cid}/cursor`]: id,
+      init.allClientsData.update({
+        [`${userId}/selected`]: { [id]: mode },
+        [`${userId}/cursor`]: id,
       });
       return true;
     }
 
     // // Short circuit if not reseting and already selected.
-    // if (allClientsData.get(cid, 'selected', 'id')) {
+    // if (init.allClientsData.get(cid, 'selected', 'id')) {
     //   return false;
     // }
 
-    allClientsData.update({
-      [`${cid}/selected/${id}`]: mode,
-      [`${cid}/cursor`]: id,
+    init.allClientsData.update({
+      [`${userId}/selected/${id}`]: mode,
+      [`${userId}/cursor`]: id,
     });
     return true;
   }
@@ -486,8 +485,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
     document.getElementById('button-undo')!.addEventListener('click', _e => updateHistory(false));
     document.getElementById('button-redo')!.addEventListener('click', _e => updateHistory(true));
     document.getElementById('button-check')!.addEventListener('click', _e => {
-      const bdObj: { filled?: Record<utils.IdCoord, number>, givens?: Record<utils.IdCoord, number> } = boardData.data as object || {};
-      const bad = utils.checkGrid(Object.assign({}, bdObj.filled, bdObj.givens));
+      const bad = utils.checkGrid(Object.assign({}, init.boardData.get('filled'), init.boardData.get('givens')));
       if (0 === bad.size) {
         alert('Looks good!');
         timer.setTicking(false);
@@ -499,9 +497,9 @@ function main([ gameKey, cid ]: [ string, string ]): void {
           selected[id] = true;
           lastId = id;
         }
-        allClientsData.update({
-          [`${cid}/selected`]: selected,
-          [`${cid}/cursor`]: lastId,
+        init.allClientsData.update({
+          [`${userId}/selected`]: selected,
+          [`${userId}/cursor`]: lastId,
         });
         alert("Something's wrong!");
       }
@@ -548,7 +546,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
         e.preventDefault();
         let x = 0
         let y = 0;
-        const cursor = allClientsData.get<null | undefined | number>(cid, 'cursor');
+        const cursor = init.allClientsData.get<null | undefined | number>(userId, 'cursor');
         if (null != cursor) {
           const [ dx, dy ] = consts.ARROWS[e.code as keyof typeof consts.ARROWS];
           const [ cx, cy ] = utils.id2xy(cursor);

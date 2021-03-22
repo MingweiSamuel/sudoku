@@ -165,8 +165,8 @@ export interface Watcher {
 }
 
 export class DataLayer {
-    ref: firebase.database.Reference;
-    data: Data;
+    readonly ref: firebase.database.Reference;
+    private _data: Data;
     private _delay: number;
     private _watchers: Record<string, Watcher[]>;
     private _updates: null | Update;
@@ -174,7 +174,7 @@ export class DataLayer {
 
     constructor(ref: firebase.database.Reference, delay = 250) {
         this.ref = ref;
-        this.data = undefined;
+        this._data = undefined;
         this._delay = delay;
         this._watchers = {};
         this._updates = null;
@@ -195,17 +195,13 @@ export class DataLayer {
     }
 
     get<T>(...path: string[]): T | undefined {
-        let target = this.data;
+        let target = this._data;
         while (target && path.length) target = (target as any)[path.shift()!];
         return target as unknown as T;
     }
 
-    watch(pattern: string, watcher: Watcher): void {
-        (this._watchers[pattern] || (this._watchers[pattern] = [])).push(watcher);
-    }
-
     update(update: Update): null | Diff {
-        const { forward, back } = diffUpdate(this.data, update);
+        const { forward, back } = diffUpdate(this._data, update);
         if (0 === Object.keys(forward).length)
             return null;
 
@@ -226,7 +222,7 @@ export class DataLayer {
         this._updates = combineUpdates(this._updates, forward);
 
         // Update local model.
-        const newData = applyUpdate(this.data, forward);
+        const newData = applyUpdate(this._data, forward);
 
 
         this._onChange(newData);
@@ -234,26 +230,37 @@ export class DataLayer {
         return { forward, back };
     }
 
-    _onChange(newData: Data) {
+    watch(pattern: string, watcher: Watcher): void {
+        (this._watchers[pattern] || (this._watchers[pattern] = [])).push(watcher);
+        forEachPattern(
+            pattern, null, this._data,
+            (path, oldVal, newVal) => this._runWatchers([ watcher ], path, oldVal, newVal));
+    }
+
+    private _onChange(newData: Data): void {
         for (const [ pattern, watchers ] of Object.entries(this._watchers)) {
-            forEachPattern(pattern, this.data, newData, (path, oldVal, newVal) => {
-                if (null == oldVal) {
-                    if (null != newVal) {
-                        watchers.forEach(({ onAdd }) =>
-                            onAdd && onAdd({ path, newVal }));
-                    }
-                }
-                else if (null == newVal) {
-                    watchers.forEach(({ onRemove }) =>
-                        onRemove && onRemove({ path, oldVal }));
-                }
-                else if (!equal(oldVal, newVal)) {
-                    watchers.forEach(({ onChange }) =>
-                        onChange && onChange({ path, oldVal, newVal }));
-                }
-            });
+            forEachPattern(
+                pattern, this._data, newData,
+                (path, oldVal, newVal) => this._runWatchers(watchers, path, oldVal, newVal));
         }
-        this.data = newData;
+        this._data = newData;
+    }
+
+    private _runWatchers(watchers: Watcher[], path: string[], oldVal: Data, newVal: Data): void {
+        if (null == oldVal) {
+            if (null != newVal) {
+                watchers.forEach(({ onAdd }) =>
+                    onAdd && onAdd({ path, newVal }));
+            }
+        }
+        else if (null == newVal) {
+            watchers.forEach(({ onRemove }) =>
+                onRemove && onRemove({ path, oldVal }));
+        }
+        else if (!equal(oldVal, newVal)) {
+            watchers.forEach(({ onChange }) =>
+                onChange && onChange({ path, oldVal, newVal }));
+        }
     }
 }
 

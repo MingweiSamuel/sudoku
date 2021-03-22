@@ -26693,10 +26693,11 @@
       return true;
     }
     function loc2xy(xOff, yOff, limitCircle) {
-      const {width, height} = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku.getBoundingClientRect();
+      const {width: elWidth, height: elHeight} = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku.getBoundingClientRect();
+      const {x, y, width, height} = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku.viewBox.baseVal;
       if (xOff < 0 || yOff < 0) return null;
-      const xf = $fbe1664cdf5aadc637490692c444786e$export$SIZE * xOff / width;
-      const yf = $fbe1664cdf5aadc637490692c444786e$export$SIZE * yOff / height;
+      const xf = (width * xOff / elWidth + x) / 100;
+      const yf = (height * yOff / elHeight + y) / 100;
       if ($fbe1664cdf5aadc637490692c444786e$export$SIZE <= xf || $fbe1664cdf5aadc637490692c444786e$export$SIZE <= yf) return null;
       if (limitCircle) {
         // Limit to circles.
@@ -26894,4 +26895,4 @@
   }
 })();
 
-//# sourceMappingURL=index.fa892242.js.map
+//# sourceMappingURL=index.58c80b53.js.map

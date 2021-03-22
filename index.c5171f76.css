@@ -1,3 +1,24 @@
+.givens, .filled, .center, .corner {
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.givens, .filled {
+  font-size: 65px;
+}
+
+.givens {
+  fill: #111;
+}
+
+.center, .corner {
+  font-size: 25px;
+}
+
+.filled, .center, .corner {
+  fill: #36a;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -19,10 +40,8 @@ body {
 
 .layout-sudoku {
   position: absolute;
-  width: 66.6667%;
+  width: 66.6666666667%;
   height: 100%;
-  background-color: #111;
-  padding: 0.1em;
 }
 
 .layout-controls {
@@ -85,7 +104,6 @@ body {
   .layout-sudoku {
     width: 100%;
     height: 100%;
-    background: none;
   }
 
   .layout-controls,
@@ -191,25 +209,4 @@ svg.icon {
   width: 0.8em;
   vertical-align: middle;
 }
-
-.givens, .filled, .center, .corner {
-  text-anchor: middle;
-  dominant-baseline: central;
-}
-
-.givens, .filled {
-  font-size: 65px;
-}
-
-.givens {
-  fill: #111;
-}
-
-.center, .corner {
-  font-size: 25px;
-}
-
-.filled, .center, .corner {
-  fill: #36a;
-}
-/*# sourceMappingURL=index.67f1f7d2.css.map */
+/*# sourceMappingURL=index.c5171f76.css.map */

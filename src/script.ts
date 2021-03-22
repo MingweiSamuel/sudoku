@@ -521,6 +521,8 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }
 
   {
+    const DIGIT_REGEX = /Digit(\d)/;
+
     window.addEventListener('keydown', e => {
       let num: null | number;
 
@@ -571,7 +573,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
         return;
       }
       else {
-        let match = consts.DIGIT_REGEX.exec(e.code);
+        let match = DIGIT_REGEX.exec(e.code);
         if (!match) return;
         num = Number(match[1]);
       }

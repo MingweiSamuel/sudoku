@@ -67,5 +67,3 @@ export const COLORS = [
   row.length < 4 && row.push(0.6);
   return row as [ number, number, number, number ];
 });
-
-export const DIGIT_REGEX = /Digit(\d)/;

@@ -3,7 +3,7 @@ import "firebase/auth";
 import "firebase/database";
 
 import * as consts from "./consts";
-import * as data from "./data";
+import * as dataLayer from "./dataLayer";
 import * as utils from "./utils";
 import * as timer from "./timer";
 
@@ -28,7 +28,7 @@ initialize().then(main);
 function main([ gameKey, cid ]: [ string, string ]): void {
   const refGame = firebase.database().ref(`game/${gameKey}`);
   const refAllClients = refGame.child('clients');
-  const allClientsData = new data.DataLayer(refAllClients);
+  const allClientsData = new dataLayer.DataLayer(refAllClients);
 
   const refClient = refAllClients.child(cid);
   refClient.update({
@@ -61,11 +61,11 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   });
 
   const refBoard = refGame.child('board');
-  const boardData = new data.DataLayer(refBoard);
+  const boardData = new dataLayer.DataLayer(refBoard);
   (window as any /* TODO */)._boardData = boardData;
 
   // Client selected highlights.
-  allClientsData.watch('*/selected/*', data.makeBind(sudokuHighlights, {
+  allClientsData.watch('*/selected/*', dataLayer.makeBind(sudokuHighlights, {
     create([ otherCid, id ]) {
       const el = document.createElementNS(consts.NS_SVG, 'use');
 
@@ -88,7 +88,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }));
 
   // Client cursor markers (small triangle in top left).
-  allClientsData.watch('*/cursor', data.makeBind(sudokuCursor, {
+  allClientsData.watch('*/cursor', dataLayer.makeBind(sudokuCursor, {
     create() {
       const el = document.createElementNS(consts.NS_SVG, 'use');
       el.setAttribute('href', '#cursor');
@@ -111,7 +111,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }));
 
   // Given cells.
-  boardData.watch(`${consts.Mode.GIVENS}/*`, data.makeBind(sudokuGivens, {
+  boardData.watch(`${consts.Mode.GIVENS}/*`, dataLayer.makeBind(sudokuGivens, {
     create() {
       const el = document.createElementNS(consts.NS_SVG, 'text');
       el.setAttribute('class', 'givens');
@@ -125,7 +125,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
     },
   }));
   // Given cells mask, for filled cells and pencil marks.
-  boardData.watch(`${consts.Mode.GIVENS}/*`, data.makeBind(sudokuGivensMask, {
+  boardData.watch(`${consts.Mode.GIVENS}/*`, dataLayer.makeBind(sudokuGivensMask, {
     create([ id ]) {
       const el = document.createElementNS(consts.NS_SVG, 'rect');
       el.setAttribute('width', '100');
@@ -141,7 +141,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }));
 
   // Filled cells.
-  boardData.watch(`${consts.Mode.FILLED}/*`, data.makeBind(sudokuFilled, {
+  boardData.watch(`${consts.Mode.FILLED}/*`, dataLayer.makeBind(sudokuFilled, {
     create() {
       const el = document.createElementNS(consts.NS_SVG, 'text');
       el.setAttribute('class', 'filled');
@@ -156,7 +156,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
     },
   }));
   // Filled cells mask, for pencil marks.
-  boardData.watch(`${consts.Mode.FILLED}/*`, data.makeBind(sudokuFilledMask, {
+  boardData.watch(`${consts.Mode.FILLED}/*`, dataLayer.makeBind(sudokuFilledMask, {
     create([ id ]) {
       const el = document.createElementNS(consts.NS_SVG, 'rect');
       el.setAttribute('width', '100');
@@ -172,7 +172,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }));
 
   // Corner pencil marks.
-  boardData.watch(`${consts.Mode.CORNER}/*`, data.makeBind(sudokuCorner, {
+  boardData.watch(`${consts.Mode.CORNER}/*`, dataLayer.makeBind(sudokuCorner, {
     create() {
       return document.createElementNS(consts.NS_SVG, 'g');
     },
@@ -203,7 +203,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }));
 
   // Center pencil marks.
-  boardData.watch(`${consts.Mode.CENTER}/*`, data.makeBind(sudokuCenter, {
+  boardData.watch(`${consts.Mode.CENTER}/*`, dataLayer.makeBind(sudokuCenter, {
     create([ id ]) {
       const el = document.createElementNS(consts.NS_SVG, 'text');
       el.setAttribute('class', 'center');
@@ -231,7 +231,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }));
 
   // Center pencil marks.
-  boardData.watch(`${consts.Mode.COLORS}/*`, data.makeBind(sudokuColors, {
+  boardData.watch(`${consts.Mode.COLORS}/*`, dataLayer.makeBind(sudokuColors, {
     create([ id ]) {
       const el = document.createElementNS(consts.NS_SVG, 'use');
       el.setAttribute('href', '#colors');
@@ -290,7 +290,7 @@ function main([ gameKey, cid ]: [ string, string ]): void {
   }
 
   function fillHelper(num: null | number, mode: consts.Mode): boolean {
-    const update: data.Update = {};
+    const update: dataLayer.Update = {};
 
     const blockedGivens = consts.BLOCKED_BY_GIVENS[mode] && boardData.get<Record<string | utils.IdCoord, number>>('givens') || {};
     const selected = Object.entries(allClientsData.get<Record<utils.IdCoord, boolean>>(cid, 'selected') || {})

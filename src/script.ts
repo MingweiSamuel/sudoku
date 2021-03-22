@@ -10,7 +10,7 @@ import * as dataLayer from "./dataLayer";
 import * as utils from "./utils";
 import * as timer from "./timer";
 
-const sudoku           = document.getElementById('sudoku')!             as unknown as SVGElement;
+const sudoku           = document.getElementById('sudoku')!             as unknown as SVGSVGElement;
 const sudokuColors     = document.getElementById('sudoku-colors')!      as unknown as SVGGElement;
 const sudokuHighlights = document.getElementById('sudoku-highlights')!  as unknown as SVGGElement;
 const sudokuCursor     = document.getElementById('sudoku-cursor')!      as unknown as SVGGElement;
@@ -354,10 +354,11 @@ function main(user: firebase.User): void {
   }
 
   function loc2xy(xOff: number, yOff: number, limitCircle: boolean): null | [ utils.XYCoord, utils.XYCoord ] {
-    const { width, height } = sudoku.getBoundingClientRect();
+    const { width: elWidth, height: elHeight } = sudoku.getBoundingClientRect();
+    const { x, y, width, height } = sudoku.viewBox.baseVal;
     if (xOff < 0 || yOff < 0) return null;
-    const xf = consts.SIZE * xOff / width;
-    const yf = consts.SIZE * yOff / height;
+    const xf = (width  * xOff / elWidth  + x) / 100;
+    const yf = (height * yOff / elHeight + y) / 100;
     if (consts.SIZE <= xf || consts.SIZE <= yf) return null;
 
     if (limitCircle) {

@@ -10,6 +10,8 @@ $layout-ratio-portrait:  3 / 5;
 
 $font-ratio: 0.04;
 
+@import "sudoku";
+
 @mixin layout-sizing($width, $height, $ratio) {
     width:  min(#{$width}, #{$height * $ratio});
     height: min(#{$width / $ratio}, #{$height});
@@ -34,11 +36,8 @@ body {
 }
 .layout-sudoku {
     position: absolute;
-    width: 66.6667%;
+    width: 100% * 2 / 3;
     height: 100%;
-
-    background-color: #111;
-    padding: 0.1em;
 }
 .layout-controls {
     position: absolute;
@@ -96,8 +95,6 @@ body {
     .layout-sudoku {
         width: 100%;
         height: 100%;
-
-        background: none;
     }
     .layout-controls,
     .layout-timer,
@@ -206,21 +203,4 @@ svg.icon {
     display: inline;
     width: 0.8em;
     vertical-align: middle;
-}
-
-.givens, .filled, .center, .corner {
-    text-anchor: middle;
-    dominant-baseline: central;
-}
-.givens, .filled {
-    font-size: 65px;
-}
-.givens {
-    fill: #111;
-}
-.center, .corner {
-    font-size: 25px;
-}
-.filled, .center, .corner {
-    fill: $color-input;
 }

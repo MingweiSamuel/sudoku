@@ -1,0 +1,16 @@
+.givens, .filled, .center, .corner {
+    text-anchor: middle;
+    dominant-baseline: central;
+}
+.givens, .filled {
+    font-size: 65px;
+}
+.givens {
+    fill: #111;
+}
+.center, .corner {
+    font-size: 25px;
+}
+.filled, .center, .corner {
+    fill: $color-input;
+}

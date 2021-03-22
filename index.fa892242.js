@@ -26033,8 +26033,7 @@
     row.length < 4 && row.push(0.6);
     return row;
   });
-  const $fbe1664cdf5aadc637490692c444786e$export$DIGIT_REGEX = /Digit(\d)/;
-  function $3fa94a9d0eed2b01dbbd79ab687ce888$var$equal(a, b) {
+  function $082cb8d5543562678ea4e5422c4229e8$var$equal(a, b) {
     if (null == a) return null == b;
     const t = typeof a;
     if (t !== typeof b) return false;
@@ -26049,14 +26048,14 @@
         if (aKeys.size !== bKeys.length) return false;
         for (const key of bKeys) {
           if (!aKeys.has(key)) return false;
-          if (!$3fa94a9d0eed2b01dbbd79ab687ce888$var$equal(a[key], b[key])) return false;
+          if (!$082cb8d5543562678ea4e5422c4229e8$var$equal(a[key], b[key])) return false;
         }
         return true;
       default:
         throw Error(`Unknown type for equality check: ${t}.`);
     }
   }
-  function $3fa94a9d0eed2b01dbbd79ab687ce888$var$combineUpdates(readonlyTarget, update) {
+  function $082cb8d5543562678ea4e5422c4229e8$var$combineUpdates(readonlyTarget, update) {
     const target = readonlyTarget && JSON.parse(JSON.stringify(readonlyTarget)) || ({});
     outer: for (const [key, val] of Object.entries(update)) {
       const path = key.split('/');
@@ -26087,7 +26086,7 @@
     }
     return target;
   }
-  function $3fa94a9d0eed2b01dbbd79ab687ce888$var$applyUpdate(readonlyDataTarget, update) {
+  function $082cb8d5543562678ea4e5422c4229e8$var$applyUpdate(readonlyDataTarget, update) {
     const out = readonlyDataTarget && JSON.parse(JSON.stringify(readonlyDataTarget)) || ({});
     for (const [key, val] of Object.entries(update)) {
       const path = key.split('/');
@@ -26104,7 +26103,7 @@
     }
     return out;
   }
-  function $3fa94a9d0eed2b01dbbd79ab687ce888$var$diffUpdate(readonlyDataTarget, update) {
+  function $082cb8d5543562678ea4e5422c4229e8$var$diffUpdate(readonlyDataTarget, update) {
     const forward = {};
     const back = {};
     for (const [key, val] of Object.entries(update)) {
@@ -26128,7 +26127,7 @@
         back[key] = oldVal;
               // Change.
 } else // Change.
-      if (!$3fa94a9d0eed2b01dbbd79ab687ce888$var$equal(oldVal, val)) {
+      if (!$082cb8d5543562678ea4e5422c4229e8$var$equal(oldVal, val)) {
         forward[key] = val;
         back[key] = oldVal;
       }
@@ -26138,7 +26137,7 @@
       back
     };
   }
-  function $3fa94a9d0eed2b01dbbd79ab687ce888$var$forEachPattern(pattern, oldData, newData, func, _path = []) {
+  function $082cb8d5543562678ea4e5422c4229e8$var$forEachPattern(pattern, oldData, newData, func, _path = []) {
     if ('string' === typeof pattern) {
       pattern = pattern.split('/');
     }
@@ -26154,7 +26153,7 @@
         if (root) {
           func(_path, oldVal, newVal);
         } else {
-          $3fa94a9d0eed2b01dbbd79ab687ce888$var$forEachPattern(pattern.slice(1), oldVal, newVal, func, _path);
+          $082cb8d5543562678ea4e5422c4229e8$var$forEachPattern(pattern.slice(1), oldVal, newVal, func, _path);
         }
         _path.pop();
       }
@@ -26163,13 +26162,13 @@
       const key = pattern.shift();
       const oldVal = oldData && oldData[key];
       const newVal = newData && newData[key];
-      $3fa94a9d0eed2b01dbbd79ab687ce888$var$forEachPattern(pattern, oldVal, newVal, func, _path);
+      $082cb8d5543562678ea4e5422c4229e8$var$forEachPattern(pattern, oldVal, newVal, func, _path);
     }
   }
-  class $3fa94a9d0eed2b01dbbd79ab687ce888$export$DataLayer {
+  class $082cb8d5543562678ea4e5422c4229e8$export$DataLayer {
     constructor(ref, delay = 250) {
       this.ref = ref;
-      this.data = undefined;
+      this._data = undefined;
       this._delay = delay;
       this._watchers = {};
       this._updates = null;
@@ -26177,24 +26176,21 @@
       this.ref.on('value', snapshot => {
         let newData = snapshot.val();
         if (this._updatesInflight) {
-          newData = $3fa94a9d0eed2b01dbbd79ab687ce888$var$applyUpdate(newData, this._updatesInflight);
+          newData = $082cb8d5543562678ea4e5422c4229e8$var$applyUpdate(newData, this._updatesInflight);
         }
         if (this._updates) {
-          newData = $3fa94a9d0eed2b01dbbd79ab687ce888$var$applyUpdate(newData, this._updates);
+          newData = $082cb8d5543562678ea4e5422c4229e8$var$applyUpdate(newData, this._updates);
         }
         this._onChange(newData);
       });
     }
     get(...path) {
-      let target = this.data;
+      let target = this._data;
       while (target && path.length) target = target[path.shift()];
       return target;
     }
-    watch(pattern, watcher) {
-      (this._watchers[pattern] || (this._watchers[pattern] = [])).push(watcher);
-    }
     update(update) {
-      const {forward, back} = $3fa94a9d0eed2b01dbbd79ab687ce888$var$diffUpdate(this.data, update);
+      const {forward, back} = $082cb8d5543562678ea4e5422c4229e8$var$diffUpdate(this._data, update);
       if (0 === Object.keys(forward).length) return null;
       // Enqueue updates.
       if (null == this._updates) {
@@ -26210,43 +26206,48 @@
           this._updates = null;
         }, this._delay);
       }
-      this._updates = $3fa94a9d0eed2b01dbbd79ab687ce888$var$combineUpdates(this._updates, forward);
+      this._updates = $082cb8d5543562678ea4e5422c4229e8$var$combineUpdates(this._updates, forward);
       // Update local model.
-      const newData = $3fa94a9d0eed2b01dbbd79ab687ce888$var$applyUpdate(this.data, forward);
+      const newData = $082cb8d5543562678ea4e5422c4229e8$var$applyUpdate(this._data, forward);
       this._onChange(newData);
       return {
         forward,
         back
       };
     }
+    watch(pattern, watcher) {
+      (this._watchers[pattern] || (this._watchers[pattern] = [])).push(watcher);
+      $082cb8d5543562678ea4e5422c4229e8$var$forEachPattern(pattern, null, this._data, (path, oldVal, newVal) => this._runWatchers([watcher], path, oldVal, newVal));
+    }
     _onChange(newData) {
       for (const [pattern, watchers] of Object.entries(this._watchers)) {
-        $3fa94a9d0eed2b01dbbd79ab687ce888$var$forEachPattern(pattern, this.data, newData, (path, oldVal, newVal) => {
-          if (null == oldVal) {
-            if (null != newVal) {
-              watchers.forEach(({onAdd}) => onAdd && onAdd({
-                path,
-                newVal
-              }));
-            }
-          } else if (null == newVal) {
-            watchers.forEach(({onRemove}) => onRemove && onRemove({
-              path,
-              oldVal
-            }));
-          } else if (!$3fa94a9d0eed2b01dbbd79ab687ce888$var$equal(oldVal, newVal)) {
-            watchers.forEach(({onChange}) => onChange && onChange({
-              path,
-              oldVal,
-              newVal
-            }));
-          }
-        });
+        $082cb8d5543562678ea4e5422c4229e8$var$forEachPattern(pattern, this._data, newData, (path, oldVal, newVal) => this._runWatchers(watchers, path, oldVal, newVal));
       }
-      this.data = newData;
+      this._data = newData;
+    }
+    _runWatchers(watchers, path, oldVal, newVal) {
+      if (null == oldVal) {
+        if (null != newVal) {
+          watchers.forEach(({onAdd}) => onAdd && onAdd({
+            path,
+            newVal
+          }));
+        }
+      } else if (null == newVal) {
+        watchers.forEach(({onRemove}) => onRemove && onRemove({
+          path,
+          oldVal
+        }));
+      } else if (!$082cb8d5543562678ea4e5422c4229e8$var$equal(oldVal, newVal)) {
+        watchers.forEach(({onChange}) => onChange && onChange({
+          path,
+          oldVal,
+          newVal
+        }));
+      }
     }
   }
-  function $3fa94a9d0eed2b01dbbd79ab687ce888$export$makeBind(parent, {create, update = undefined}) {
+  function $082cb8d5543562678ea4e5422c4229e8$export$makeBind(parent, {create, update = undefined}) {
     return {
       onAdd: function ({path, newVal}) {
         const el = create(path);
@@ -26264,6 +26265,32 @@
       }
     };
   }
+  $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.initializeApp({
+    apiKey: "AIzaSyAmZZULS1wzXF4Sfj6u_eVmigMOL1Ga5NI",
+    authDomain: "sudoku-0.firebaseapp.com",
+    databaseURL: "https://sudoku-0-default-rtdb.firebaseio.com",
+    projectId: "sudoku-0",
+    storageBucket: "sudoku-0.appspot.com",
+    messagingSenderId: "410365958794",
+    appId: "1:410365958794:web:e8fa3326b8d2735ce8ab73"
+  });
+  const $c8e8b8ac96e97a417a0a608eb61422dd$export$gameKey = (() => {
+    if (window.location.hash) {
+      return window.location.hash.slice(1);
+    }
+    let gameKey = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database().ref('game').push().key;
+    window.location.hash = '#' + gameKey;
+    return gameKey;
+  })();
+  const $c8e8b8ac96e97a417a0a608eb61422dd$export$authPromise = new Promise((resolve, reject) => {
+    $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().onAuthStateChanged(user => {
+      user ? resolve(user) : reject(null);
+    });
+    $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().signInAnonymously();
+  });
+  const $c8e8b8ac96e97a417a0a608eb61422dd$var$refGame = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database().ref(`game/${$c8e8b8ac96e97a417a0a608eb61422dd$export$gameKey}`);
+  const $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData = new $082cb8d5543562678ea4e5422c4229e8$export$DataLayer($c8e8b8ac96e97a417a0a608eb61422dd$var$refGame.child('clients'));
+  const $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData = new $082cb8d5543562678ea4e5422c4229e8$export$DataLayer($c8e8b8ac96e97a417a0a608eb61422dd$var$refGame.child('board'));
   function $4618f7dbb2360cfdda8bd96952490c61$export$wrap(x) {
     return (x % $fbe1664cdf5aadc637490692c444786e$export$SIZE + $fbe1664cdf5aadc637490692c444786e$export$SIZE) % $fbe1664cdf5aadc637490692c444786e$export$SIZE;
   }
@@ -26376,39 +26403,6 @@
       $90ccc8d32d617eee95f4c342531bb360$var$timerPlay.style.display = '';
     }
   }
-  function $c8e8b8ac96e97a417a0a608eb61422dd$export$initialize() {
-    $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.initializeApp({
-      apiKey: "AIzaSyAmZZULS1wzXF4Sfj6u_eVmigMOL1Ga5NI",
-      authDomain: "sudoku-0.firebaseapp.com",
-      databaseURL: "https://sudoku-0-default-rtdb.firebaseio.com",
-      projectId: "sudoku-0",
-      storageBucket: "sudoku-0.appspot.com",
-      messagingSenderId: "410365958794",
-      appId: "1:410365958794:web:e8fa3326b8d2735ce8ab73"
-    });
-    let gameKey;
-    if (window.location.hash) {
-      gameKey = window.location.hash.slice(1);
-    } else {
-      gameKey = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database().ref('game').push().key;
-      window.location.hash = '#' + gameKey;
-    }
-    // const cid = firebase.database().ref(`game/${gameKey}/clients`).push().key;
-    // main(gameKey, cid);
-    return new Promise((resolve, reject) => {
-      $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().onAuthStateChanged(user => {
-        if (user) {
-          // User is signed in, see docs for a list of available properties
-          // https://firebase.google.com/docs/reference/js/firebase.User
-          resolve([gameKey, user.uid]);
-        } else {
-          // User is signed out
-          reject(null);
-        }
-      });
-      $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().signInAnonymously();
-    });
-  }
   const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku = document.getElementById('sudoku');
   const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuColors = document.getElementById('sudoku-colors');
   const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuHighlights = document.getElementById('sudoku-highlights');
@@ -26422,12 +26416,14 @@
   function $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$makeTs() {
     return [$b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database.ServerValue.TIMESTAMP, Date.now()];
   }
-  $c8e8b8ac96e97a417a0a608eb61422dd$export$initialize().then($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$main);
-  function $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$main([gameKey, cid]) {
-    const refGame = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database().ref(`game/${gameKey}`);
-    const refAllClients = refGame.child('clients');
-    const allClientsData = new $3fa94a9d0eed2b01dbbd79ab687ce888$export$DataLayer(refAllClients);
-    const refClient = refAllClients.child(cid);
+  $c8e8b8ac96e97a417a0a608eb61422dd$export$authPromise.then($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$main);
+  function $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$main(user) {
+    const userId = user.uid;
+    window./*TODO*/
+    _allClientsData = $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData;
+    window./*TODO*/
+    _boardData = $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData;
+    const refClient = $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.ref.child(userId);
     refClient.update({
       // cursor: null,
       // selected: null,
@@ -26438,28 +26434,24 @@
     });
     refClient.child('online').onDisconnect().set(false);
     // Setup timer.
-    $90ccc8d32d617eee95f4c342531bb360$export$init(refClient.child('elapsedSeconds'), elapsedSeconds => allClientsData.update({
-      [`${cid}/elapsedSeconds`]: elapsedSeconds
+    $90ccc8d32d617eee95f4c342531bb360$export$init(refClient.child('elapsedSeconds'), elapsedSeconds => $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+      [`${userId}/elapsedSeconds`]: elapsedSeconds
     }));
     // Sticky online (if closed in another tab).
-    allClientsData.watch(`${cid}/online`, {
+    $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.watch(`${userId}/online`, {
       onChange: function ({newVal}) {
         if (!newVal) {
-          allClientsData.update({
-            [`${cid}/online`]: true
+          $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+            [`${userId}/online`]: true
           });
         }
       }
     });
-    const refBoard = refGame.child('board');
-    const boardData = new $3fa94a9d0eed2b01dbbd79ab687ce888$export$DataLayer(refBoard);
-    window./*TODO*/
-    _boardData = boardData;
     // Client selected highlights.
-    allClientsData.watch('*/selected/*', $3fa94a9d0eed2b01dbbd79ab687ce888$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuHighlights, {
+    $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.watch('*/selected/*', $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuHighlights, {
       create: function ([otherCid, id]) {
         const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'use');
-        if (otherCid !== cid) {
+        if (otherCid !== userId) {
           const rgb = $4618f7dbb2360cfdda8bd96952490c61$export$cidToColor(otherCid);
           el.setAttribute('fill', `rgb(${rgb.join(',')})`);
           el.setAttribute('href', '#highlight');
@@ -26474,7 +26466,7 @@
       }
     }));
     // Client cursor markers (small triangle in top left).
-    allClientsData.watch('*/cursor', $3fa94a9d0eed2b01dbbd79ab687ce888$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCursor, {
+    $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.watch('*/cursor', $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCursor, {
       create: function () {
         const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'use');
         el.setAttribute('href', '#cursor');
@@ -26483,7 +26475,7 @@
       update: function (el, [otherCid], val) {
         const [x, y] = $4618f7dbb2360cfdda8bd96952490c61$export$id2xy(+val);
         let fillColor = '#fa0';
-        if (otherCid !== cid) {
+        if (otherCid !== userId) {
           const rgb = $4618f7dbb2360cfdda8bd96952490c61$export$cidToColor(otherCid);
           fillColor = `rgba(${rgb.join(',')}, 0.4)`;
         }
@@ -26494,7 +26486,7 @@
       }
     }));
     // Given cells.
-    boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.GIVENS}/*`, $3fa94a9d0eed2b01dbbd79ab687ce888$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuGivens, {
+    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.GIVENS}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuGivens, {
       create: function () {
         const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'text');
         el.setAttribute('class', 'givens');
@@ -26508,7 +26500,7 @@
       }
     }));
     // Given cells mask, for filled cells and pencil marks.
-    boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.GIVENS}/*`, $3fa94a9d0eed2b01dbbd79ab687ce888$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuGivensMask, {
+    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.GIVENS}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuGivensMask, {
       create: function ([id]) {
         const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'rect');
         el.setAttribute('width', '100');
@@ -26521,7 +26513,7 @@
       }
     }));
     // Filled cells.
-    boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED}/*`, $3fa94a9d0eed2b01dbbd79ab687ce888$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuFilled, {
+    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuFilled, {
       create: function () {
         const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'text');
         el.setAttribute('class', 'filled');
@@ -26536,7 +26528,7 @@
       }
     }));
     // Filled cells mask, for pencil marks.
-    boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED}/*`, $3fa94a9d0eed2b01dbbd79ab687ce888$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuFilledMask, {
+    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuFilledMask, {
       create: function ([id]) {
         const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'rect');
         el.setAttribute('width', '100');
@@ -26549,7 +26541,7 @@
       }
     }));
     // Corner pencil marks.
-    boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.CORNER}/*`, $3fa94a9d0eed2b01dbbd79ab687ce888$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCorner, {
+    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.CORNER}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCorner, {
       create: function () {
         return document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'g');
       },
@@ -26571,7 +26563,7 @@
       }
     }));
     // Center pencil marks.
-    boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.CENTER}/*`, $3fa94a9d0eed2b01dbbd79ab687ce888$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCenter, {
+    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.CENTER}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCenter, {
       create: function ([id]) {
         const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'text');
         el.setAttribute('class', 'center');
@@ -26594,7 +26586,7 @@
       }
     }));
     // Center pencil marks.
-    boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.COLORS}/*`, $3fa94a9d0eed2b01dbbd79ab687ce888$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuColors, {
+    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.COLORS}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuColors, {
       create: function ([id]) {
         const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'use');
         el.setAttribute('href', '#colors');
@@ -26611,7 +26603,7 @@
     // Undo if REDO is false.
     // Redo if REDO is true.
     function updateHistory(redo) {
-      const historyEntries = Object.entries(allClientsData.get(cid, redo ? 'historyUndone' : 'history') || ({}));
+      const historyEntries = Object.entries($c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.get(userId, redo ? 'historyUndone' : 'history') || ({}));
       if (0 === historyEntries.length) return false;
       const [histKey, histVal] = historyEntries.reduce((entryA, entryB) => {
         const order = entryA[1].ts[0] - entryB[1].ts[0] || entryA[1].ts[1] - entryB[1].ts[1];
@@ -26619,20 +26611,20 @@
       });
       // Ignore empty entries (bug).
       if (!histVal.data) {
-        allClientsData.update({
-          [`${cid}/${redo ? 'historyUndone' : 'history'}/${histKey}`]: null
+        $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+          [`${userId}/${redo ? 'historyUndone' : 'history'}/${histKey}`]: null
         });
         updateHistory(redo);
       }
       const diffData = JSON.parse(histVal.data);
       // Update board changes.
       // TODO: USE OTHER TO RESOLVE CONFLICTS.
-      boardData.update(redo ? diffData.forward : diffData.back);
+      $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.update(redo ? diffData.forward : diffData.back);
       // Remove entry from historyUndone.
       // Add entry to history.
-      allClientsData.update({
-        [`${cid}/history/${histKey}`]: redo ? histVal : null,
-        [`${cid}/historyUndone/${histKey}`]: redo ? null : histVal
+      $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+        [`${userId}/history/${histKey}`]: redo ? histVal : null,
+        [`${userId}/historyUndone/${histKey}`]: redo ? null : histVal
       });
       return true;
     }
@@ -26646,10 +26638,10 @@
     }
     function fillHelper(num, mode) {
       const update = {};
-      const blockedGivens = $fbe1664cdf5aadc637490692c444786e$export$BLOCKED_BY_GIVENS[mode] && boardData.get('givens') || ({});
-      const selected = Object.entries(allClientsData.get(cid, 'selected') || ({})).filter(([_, isSet]) => isSet).map(([id, _]) => id).filter(id => !blockedGivens || !blockedGivens[id]);
+      const blockedGivens = $fbe1664cdf5aadc637490692c444786e$export$BLOCKED_BY_GIVENS[mode] && $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.get('givens') || ({});
+      const selected = Object.entries($c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.get(userId, 'selected') || ({})).filter(([_, isSet]) => isSet).map(([id, _]) => id).filter(id => !blockedGivens || !blockedGivens[id]);
       if (!selected.length) return false;
-      const markData = boardData.data?.[mode] || ({});
+      const markData = $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.get(mode) || ({});
       switch (mode) {
         case $fbe1664cdf5aadc637490692c444786e$export$Mode.GIVENS:
         case $fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED:
@@ -26688,15 +26680,15 @@
           throw new Error(`Unknown type: ${mode}.`);
       }
       // Update and add update to history.
-      const history = boardData.update(update);
+      const history = $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.update(update);
       if (!history) return false;
-      const key = allClientsData.ref.child(`${cid}/history`).push().key;
-      allClientsData.update({
-        [`${cid}/history/${key}`]: {
+      const key = $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.ref.child(`${userId}/history`).push().key;
+      $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+        [`${userId}/history/${key}`]: {
           data: JSON.stringify(history),
           ts: $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$makeTs()
         },
-        [`${cid}/historyUndone`]: null
+        [`${userId}/historyUndone`]: null
       });
       return true;
     }
@@ -26718,21 +26710,21 @@
       if (x < 0 || $fbe1664cdf5aadc637490692c444786e$export$SIZE <= x || y < 0 || $fbe1664cdf5aadc637490692c444786e$export$SIZE <= y) return false;
       const id = $4618f7dbb2360cfdda8bd96952490c61$export$xy2id(x, y);
       if (reset) {
-        allClientsData.update({
-          [`${cid}/selected`]: {
+        $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+          [`${userId}/selected`]: {
             [id]: mode
           },
-          [`${cid}/cursor`]: id
+          [`${userId}/cursor`]: id
         });
         return true;
       }
       // // Short circuit if not reseting and already selected.
-      // if (allClientsData.get(cid, 'selected', 'id')) {
+      // if (init.allClientsData.get(cid, 'selected', 'id')) {
       // return false;
       // }
-      allClientsData.update({
-        [`${cid}/selected/${id}`]: mode,
-        [`${cid}/cursor`]: id
+      $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+        [`${userId}/selected/${id}`]: mode,
+        [`${userId}/cursor`]: id
       });
       return true;
     }
@@ -26812,8 +26804,7 @@
       document.getElementById('button-undo').addEventListener('click', _e => updateHistory(false));
       document.getElementById('button-redo').addEventListener('click', _e => updateHistory(true));
       document.getElementById('button-check').addEventListener('click', _e => {
-        const bdObj = boardData.data || ({});
-        const bad = $4618f7dbb2360cfdda8bd96952490c61$export$checkGrid(Object.assign({}, bdObj.filled, bdObj.givens));
+        const bad = $4618f7dbb2360cfdda8bd96952490c61$export$checkGrid(Object.assign({}, $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.get('filled'), $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.get('givens')));
         if (0 === bad.size) {
           alert('Looks good!');
           $90ccc8d32d617eee95f4c342531bb360$export$setTicking(false);
@@ -26824,9 +26815,9 @@
             selected[id] = true;
             lastId = id;
           }
-          allClientsData.update({
-            [`${cid}/selected`]: selected,
-            [`${cid}/cursor`]: lastId
+          $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+            [`${userId}/selected`]: selected,
+            [`${userId}/cursor`]: lastId
           });
           alert("Something's wrong!");
         }
@@ -26843,6 +26834,7 @@
       }
     }
     {
+      const DIGIT_REGEX = /Digit(\d)/;
       window.addEventListener('keydown', e => {
         let num;
         if ('Space' === e.code || 'Tab' === e.code) {
@@ -26861,7 +26853,7 @@
           e.preventDefault();
           let x = 0;
           let y = 0;
-          const cursor = allClientsData.get(cid, 'cursor');
+          const cursor = $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.get(userId, 'cursor');
           if (null != cursor) {
             const [dx, dy] = $fbe1664cdf5aadc637490692c444786e$export$ARROWS[e.code];
             const [cx, cy] = $4618f7dbb2360cfdda8bd96952490c61$export$id2xy(cursor);
@@ -26883,7 +26875,7 @@
           }
           return;
         } else {
-          let match = $fbe1664cdf5aadc637490692c444786e$export$DIGIT_REGEX.exec(e.code);
+          let match = DIGIT_REGEX.exec(e.code);
           if (!match) return;
           num = Number(match[1]);
         }
@@ -26902,4 +26894,4 @@
   }
 })();
 
-//# sourceMappingURL=index.af693267.js.map
+//# sourceMappingURL=index.fa892242.js.map

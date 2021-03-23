@@ -25989,26 +25989,26 @@
     "rgbToLch": $058dbb8bb91205cf99a0b8fd3e3c20d9$var$hsluv.Hsluv.rgbToLch
   };
   $058dbb8bb91205cf99a0b8fd3e3c20d9$exports = $058dbb8bb91205cf99a0b8fd3e3c20d9$var$root;
-  const $fbe1664cdf5aadc637490692c444786e$export$NS_SVG = 'http://www.w3.org/2000/svg';
-  let $fbe1664cdf5aadc637490692c444786e$export$Mode;
+  const $abe68232cbb7f72af82010f1f56d44cd$export$NS_SVG = 'http://www.w3.org/2000/svg';
+  let $abe68232cbb7f72af82010f1f56d44cd$export$Mode;
   (function (Mode) {
     Mode["GIVENS"] = "givens";
     Mode["FILLED"] = "filled";
     Mode["CORNER"] = "corner";
     Mode["CENTER"] = "center";
     Mode["COLORS"] = "colors";
-  })($fbe1664cdf5aadc637490692c444786e$export$Mode || ($fbe1664cdf5aadc637490692c444786e$export$Mode = {}));
-  const $fbe1664cdf5aadc637490692c444786e$export$MODE_CYCLE = [$fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED, $fbe1664cdf5aadc637490692c444786e$export$Mode.CORNER, $fbe1664cdf5aadc637490692c444786e$export$Mode.CENTER, $fbe1664cdf5aadc637490692c444786e$export$Mode.COLORS];
-  const $fbe1664cdf5aadc637490692c444786e$export$DELETE_ORDER = [$fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED, $fbe1664cdf5aadc637490692c444786e$export$Mode.CORNER, $fbe1664cdf5aadc637490692c444786e$export$Mode.CENTER, $fbe1664cdf5aadc637490692c444786e$export$Mode.COLORS];
-  const $fbe1664cdf5aadc637490692c444786e$export$BLOCKED_BY_GIVENS = {
-    [$fbe1664cdf5aadc637490692c444786e$export$Mode.GIVENS]: false,
-    [$fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED]: true,
-    [$fbe1664cdf5aadc637490692c444786e$export$Mode.CORNER]: true,
-    [$fbe1664cdf5aadc637490692c444786e$export$Mode.CENTER]: true,
-    [$fbe1664cdf5aadc637490692c444786e$export$Mode.COLORS]: false
+  })($abe68232cbb7f72af82010f1f56d44cd$export$Mode || ($abe68232cbb7f72af82010f1f56d44cd$export$Mode = {}));
+  const $abe68232cbb7f72af82010f1f56d44cd$export$MODE_CYCLE = [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS];
+  const $abe68232cbb7f72af82010f1f56d44cd$export$DELETE_ORDER = [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS];
+  const $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_GIVENS = {
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.GIVENS]: false,
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED]: true,
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER]: true,
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER]: true,
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS]: false
   };
-  const $fbe1664cdf5aadc637490692c444786e$export$SIZE = 9;
-  const $fbe1664cdf5aadc637490692c444786e$export$CODES = {
+  const $abe68232cbb7f72af82010f1f56d44cd$export$SIZE = 9;
+  const $abe68232cbb7f72af82010f1f56d44cd$export$CODES = {
     Delete: null,
     Backspace: null,
     Backquote: 0,
@@ -26019,13 +26019,13 @@
     KeyS: 8,
     KeyD: 9
   };
-  const $fbe1664cdf5aadc637490692c444786e$export$ARROWS = {
+  const $abe68232cbb7f72af82010f1f56d44cd$export$ARROWS = {
     ArrowUp: [0, -1],
     ArrowDown: [0, 1],
     ArrowLeft: [-1, 0],
     ArrowRight: [1, 0]
   };
-  const $fbe1664cdf5aadc637490692c444786e$export$COLORS = [[0.07, 0.07, 0.07, 1], [0.4, 0.4, 0.4, 0.6], [0.7, 0.7, 0.7, 0.6], $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([10, 100, 60]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([40, 100, 65]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([70, 100, 90]).concat(0.8), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([120, 100, 80]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([230, 100, 85]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([260, 100, 55]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([300, 100, 70])].map(row => {
+  const $abe68232cbb7f72af82010f1f56d44cd$export$COLORS = [[0.07, 0.07, 0.07, 1], [0.4, 0.4, 0.4, 0.6], [0.7, 0.7, 0.7, 0.6], $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([10, 100, 60]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([40, 100, 65]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([70, 100, 90]).concat(0.8), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([120, 100, 80]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([230, 100, 85]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([260, 100, 55]), $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([300, 100, 70])].map(row => {
     for (let i = 0; i < 3; i++) {
       row[i] *= 255;
       row[i] |= 0;
@@ -26033,7 +26033,7 @@
     row.length < 4 && row.push(0.6);
     return row;
   });
-  function $082cb8d5543562678ea4e5422c4229e8$var$equal(a, b) {
+  function $29821818cda24958b32cfc86ab7af955$var$equal(a, b) {
     if (null == a) return null == b;
     const t = typeof a;
     if (t !== typeof b) return false;
@@ -26048,14 +26048,14 @@
         if (aKeys.size !== bKeys.length) return false;
         for (const key of bKeys) {
           if (!aKeys.has(key)) return false;
-          if (!$082cb8d5543562678ea4e5422c4229e8$var$equal(a[key], b[key])) return false;
+          if (!$29821818cda24958b32cfc86ab7af955$var$equal(a[key], b[key])) return false;
         }
         return true;
       default:
         throw Error(`Unknown type for equality check: ${t}.`);
     }
   }
-  function $082cb8d5543562678ea4e5422c4229e8$var$combineUpdates(readonlyTarget, update) {
+  function $29821818cda24958b32cfc86ab7af955$var$combineUpdates(readonlyTarget, update) {
     const target = readonlyTarget && JSON.parse(JSON.stringify(readonlyTarget)) || ({});
     outer: for (const [key, val] of Object.entries(update)) {
       const path = key.split('/');
@@ -26086,7 +26086,7 @@
     }
     return target;
   }
-  function $082cb8d5543562678ea4e5422c4229e8$var$applyUpdate(readonlyDataTarget, update) {
+  function $29821818cda24958b32cfc86ab7af955$var$applyUpdate(readonlyDataTarget, update) {
     const out = readonlyDataTarget && JSON.parse(JSON.stringify(readonlyDataTarget)) || ({});
     for (const [key, val] of Object.entries(update)) {
       const path = key.split('/');
@@ -26103,7 +26103,7 @@
     }
     return out;
   }
-  function $082cb8d5543562678ea4e5422c4229e8$var$diffUpdate(readonlyDataTarget, update) {
+  function $29821818cda24958b32cfc86ab7af955$var$diffUpdate(readonlyDataTarget, update) {
     const forward = {};
     const back = {};
     for (const [key, val] of Object.entries(update)) {
@@ -26127,7 +26127,7 @@
         back[key] = oldVal;
               // Change.
 } else // Change.
-      if (!$082cb8d5543562678ea4e5422c4229e8$var$equal(oldVal, val)) {
+      if (!$29821818cda24958b32cfc86ab7af955$var$equal(oldVal, val)) {
         forward[key] = val;
         back[key] = oldVal;
       }
@@ -26137,7 +26137,7 @@
       back
     };
   }
-  function $082cb8d5543562678ea4e5422c4229e8$var$forEachPattern(pattern, oldData, newData, func, _path = []) {
+  function $29821818cda24958b32cfc86ab7af955$var$forEachPattern(pattern, oldData, newData, func, _path = []) {
     if ('string' === typeof pattern) {
       pattern = pattern.split('/');
     }
@@ -26153,7 +26153,7 @@
         if (root) {
           func(_path, oldVal, newVal);
         } else {
-          $082cb8d5543562678ea4e5422c4229e8$var$forEachPattern(pattern.slice(1), oldVal, newVal, func, _path);
+          $29821818cda24958b32cfc86ab7af955$var$forEachPattern(pattern.slice(1), oldVal, newVal, func, _path);
         }
         _path.pop();
       }
@@ -26162,10 +26162,10 @@
       const key = pattern.shift();
       const oldVal = oldData && oldData[key];
       const newVal = newData && newData[key];
-      $082cb8d5543562678ea4e5422c4229e8$var$forEachPattern(pattern, oldVal, newVal, func, _path);
+      $29821818cda24958b32cfc86ab7af955$var$forEachPattern(pattern, oldVal, newVal, func, _path);
     }
   }
-  class $082cb8d5543562678ea4e5422c4229e8$export$DataLayer {
+  class $29821818cda24958b32cfc86ab7af955$export$DataLayer {
     constructor(ref, delay = 250) {
       this.ref = ref;
       this._data = undefined;
@@ -26176,10 +26176,10 @@
       this.ref.on('value', snapshot => {
         let newData = snapshot.val();
         if (this._updatesInflight) {
-          newData = $082cb8d5543562678ea4e5422c4229e8$var$applyUpdate(newData, this._updatesInflight);
+          newData = $29821818cda24958b32cfc86ab7af955$var$applyUpdate(newData, this._updatesInflight);
         }
         if (this._updates) {
-          newData = $082cb8d5543562678ea4e5422c4229e8$var$applyUpdate(newData, this._updates);
+          newData = $29821818cda24958b32cfc86ab7af955$var$applyUpdate(newData, this._updates);
         }
         this._onChange(newData);
       });
@@ -26190,7 +26190,7 @@
       return target;
     }
     update(update) {
-      const {forward, back} = $082cb8d5543562678ea4e5422c4229e8$var$diffUpdate(this._data, update);
+      const {forward, back} = $29821818cda24958b32cfc86ab7af955$var$diffUpdate(this._data, update);
       if (0 === Object.keys(forward).length) return null;
       // Enqueue updates.
       if (null == this._updates) {
@@ -26206,9 +26206,9 @@
           this._updates = null;
         }, this._delay);
       }
-      this._updates = $082cb8d5543562678ea4e5422c4229e8$var$combineUpdates(this._updates, forward);
+      this._updates = $29821818cda24958b32cfc86ab7af955$var$combineUpdates(this._updates, forward);
       // Update local model.
-      const newData = $082cb8d5543562678ea4e5422c4229e8$var$applyUpdate(this._data, forward);
+      const newData = $29821818cda24958b32cfc86ab7af955$var$applyUpdate(this._data, forward);
       this._onChange(newData);
       return {
         forward,
@@ -26217,11 +26217,11 @@
     }
     watch(pattern, watcher) {
       (this._watchers[pattern] || (this._watchers[pattern] = [])).push(watcher);
-      $082cb8d5543562678ea4e5422c4229e8$var$forEachPattern(pattern, null, this._data, (path, oldVal, newVal) => this._runWatchers([watcher], path, oldVal, newVal));
+      $29821818cda24958b32cfc86ab7af955$var$forEachPattern(pattern, null, this._data, (path, oldVal, newVal) => this._runWatchers([watcher], path, oldVal, newVal));
     }
     _onChange(newData) {
       for (const [pattern, watchers] of Object.entries(this._watchers)) {
-        $082cb8d5543562678ea4e5422c4229e8$var$forEachPattern(pattern, this._data, newData, (path, oldVal, newVal) => this._runWatchers(watchers, path, oldVal, newVal));
+        $29821818cda24958b32cfc86ab7af955$var$forEachPattern(pattern, this._data, newData, (path, oldVal, newVal) => this._runWatchers(watchers, path, oldVal, newVal));
       }
       this._data = newData;
     }
@@ -26238,7 +26238,7 @@
           path,
           oldVal
         }));
-      } else if (!$082cb8d5543562678ea4e5422c4229e8$var$equal(oldVal, newVal)) {
+      } else if (!$29821818cda24958b32cfc86ab7af955$var$equal(oldVal, newVal)) {
         watchers.forEach(({onChange}) => onChange && onChange({
           path,
           oldVal,
@@ -26247,7 +26247,7 @@
       }
     }
   }
-  function $082cb8d5543562678ea4e5422c4229e8$export$makeBind(parent, {create, update = undefined}) {
+  function $29821818cda24958b32cfc86ab7af955$export$makeBind(parent, {create, update = undefined}) {
     return {
       onAdd: function ({path, newVal}) {
         const el = create(path);
@@ -26274,7 +26274,7 @@
     messagingSenderId: "410365958794",
     appId: "1:410365958794:web:e8fa3326b8d2735ce8ab73"
   });
-  const $c8e8b8ac96e97a417a0a608eb61422dd$export$gameKey = (() => {
+  const $3bfc4decb8494f8f341894cb417de4cd$export$gameKey = (() => {
     if (window.location.hash) {
       return window.location.hash.slice(1);
     }
@@ -26282,19 +26282,19 @@
     window.location.hash = '#' + gameKey;
     return gameKey;
   })();
-  const $c8e8b8ac96e97a417a0a608eb61422dd$export$authPromise = new Promise((resolve, reject) => {
+  const $3bfc4decb8494f8f341894cb417de4cd$export$authPromise = new Promise((resolve, reject) => {
     $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().onAuthStateChanged(user => {
       user ? resolve(user) : reject(null);
     });
     $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().signInAnonymously();
   });
-  const $c8e8b8ac96e97a417a0a608eb61422dd$var$refGame = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database().ref(`game/${$c8e8b8ac96e97a417a0a608eb61422dd$export$gameKey}`);
-  const $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData = new $082cb8d5543562678ea4e5422c4229e8$export$DataLayer($c8e8b8ac96e97a417a0a608eb61422dd$var$refGame.child('clients'));
-  const $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData = new $082cb8d5543562678ea4e5422c4229e8$export$DataLayer($c8e8b8ac96e97a417a0a608eb61422dd$var$refGame.child('board'));
-  function $4618f7dbb2360cfdda8bd96952490c61$export$wrap(x) {
-    return (x % $fbe1664cdf5aadc637490692c444786e$export$SIZE + $fbe1664cdf5aadc637490692c444786e$export$SIZE) % $fbe1664cdf5aadc637490692c444786e$export$SIZE;
+  const $3bfc4decb8494f8f341894cb417de4cd$var$refGame = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database().ref(`game/${$3bfc4decb8494f8f341894cb417de4cd$export$gameKey}`);
+  const $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData = new $29821818cda24958b32cfc86ab7af955$export$DataLayer($3bfc4decb8494f8f341894cb417de4cd$var$refGame.child('clients'));
+  const $3bfc4decb8494f8f341894cb417de4cd$export$boardData = new $29821818cda24958b32cfc86ab7af955$export$DataLayer($3bfc4decb8494f8f341894cb417de4cd$var$refGame.child('board'));
+  function $a7fdc277ac0520c64854bc7b63570dc1$export$wrap(x) {
+    return (x % $abe68232cbb7f72af82010f1f56d44cd$export$SIZE + $abe68232cbb7f72af82010f1f56d44cd$export$SIZE) % $abe68232cbb7f72af82010f1f56d44cd$export$SIZE;
   }
-  function $4618f7dbb2360cfdda8bd96952490c61$export$hash(str) {
+  function $a7fdc277ac0520c64854bc7b63570dc1$export$hash(str) {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       hash *= 31;
@@ -26303,23 +26303,23 @@
     }
     return hash;
   }
-  function $4618f7dbb2360cfdda8bd96952490c61$export$cidToColor(cid) {
-    const cidHash = $4618f7dbb2360cfdda8bd96952490c61$export$hash(cid);
+  function $a7fdc277ac0520c64854bc7b63570dc1$export$cidToColor(cid) {
+    const cidHash = $a7fdc277ac0520c64854bc7b63570dc1$export$hash(cid);
     const rgb = $058dbb8bb91205cf99a0b8fd3e3c20d9$exports.hsluvToRgb([cidHash % 360, 80, 60]);
     return rgb.map(x => 255 * x);
   }
-  function $4618f7dbb2360cfdda8bd96952490c61$export$xy2id(x, y) {
+  function $a7fdc277ac0520c64854bc7b63570dc1$export$xy2id(x, y) {
     return 9 * y + x;
   }
-  function $4618f7dbb2360cfdda8bd96952490c61$export$id2xy(id) {
+  function $a7fdc277ac0520c64854bc7b63570dc1$export$id2xy(id) {
     return [id % 9, id / 9 | 0];
   }
-  function $4618f7dbb2360cfdda8bd96952490c61$export$bx2id(box, idx) {
+  function $a7fdc277ac0520c64854bc7b63570dc1$export$bx2id(box, idx) {
     const boxId = 27 * (box / 3 | 0) + 3 * (box % 3);
     const idxId = 9 * (idx / 3 | 0) + idx % 3;
     return boxId + idxId;
   }
-  function $4618f7dbb2360cfdda8bd96952490c61$export$cornerMarkPos(i, len) {
+  function $a7fdc277ac0520c64854bc7b63570dc1$export$cornerMarkPos(i, len) {
     let dx, dy;
     if (len <= 4) {
       dx = i % 2 * 60 - 30;
@@ -26338,7 +26338,7 @@
     }
     return [dx, dy];
   }
-  function $4618f7dbb2360cfdda8bd96952490c61$export$formatSecs(secs) {
+  function $a7fdc277ac0520c64854bc7b63570dc1$export$formatSecs(secs) {
     const nums = [];
     // Seconds.
     nums.unshift(secs % 60);
@@ -26350,15 +26350,15 @@
     if (secs) nums.unshift(secs);
     return nums.map(n => n.toString()).map((s, i) => i ? s.padStart(2, '0') : s).join(':');
   }
-  function $4618f7dbb2360cfdda8bd96952490c61$export$checkGrid(filled) {
+  function $a7fdc277ac0520c64854bc7b63570dc1$export$checkGrid(filled) {
     const bad = new Set();
-    const coordFns = [$4618f7dbb2360cfdda8bd96952490c61$export$xy2id, // Rows.
-    (i, j) => $4618f7dbb2360cfdda8bd96952490c61$export$xy2id(j, i), // Cols.
-    $4618f7dbb2360cfdda8bd96952490c61$export$bx2id];
+    const coordFns = [$a7fdc277ac0520c64854bc7b63570dc1$export$xy2id, // Rows.
+    (i, j) => $a7fdc277ac0520c64854bc7b63570dc1$export$xy2id(j, i), // Cols.
+    $a7fdc277ac0520c64854bc7b63570dc1$export$bx2id];
     for (const coordFn of coordFns) {
-      for (let i = 0; i < $fbe1664cdf5aadc637490692c444786e$export$SIZE; i++) {
+      for (let i = 0; i < $abe68232cbb7f72af82010f1f56d44cd$export$SIZE; i++) {
         const valToId = {};
-        for (let j = 0; j < $fbe1664cdf5aadc637490692c444786e$export$SIZE; j++) {
+        for (let j = 0; j < $abe68232cbb7f72af82010f1f56d44cd$export$SIZE; j++) {
           const id = coordFn(i, j);
           const val = filled[id];
           if (!val) bad.add(id); else if ((val in valToId)) {
@@ -26370,113 +26370,113 @@
     }
     return bad;
   }
-  const $4618f7dbb2360cfdda8bd96952490c61$export$stringifyNums = nums => Object.entries(nums).filter(([_, flag]) => flag).map(([num]) => num).join('');
-  const $90ccc8d32d617eee95f4c342531bb360$var$timer = document.getElementById('timer');
-  const $90ccc8d32d617eee95f4c342531bb360$var$timerPause = document.getElementById('button-timer-pause');
-  const $90ccc8d32d617eee95f4c342531bb360$var$timerPlay = document.getElementById('button-timer-play');
-  let $90ccc8d32d617eee95f4c342531bb360$var$ticking = true;
-  function $90ccc8d32d617eee95f4c342531bb360$export$init(ref, onDataUpdate) {
+  const $a7fdc277ac0520c64854bc7b63570dc1$export$stringifyNums = nums => Object.entries(nums).filter(([_, flag]) => flag).map(([num]) => num).join('');
+  const $c226919c184f4d25757b9cccfdb43fbb$var$timer = document.getElementById('timer');
+  const $c226919c184f4d25757b9cccfdb43fbb$var$timerPause = document.getElementById('button-timer-pause');
+  const $c226919c184f4d25757b9cccfdb43fbb$var$timerPlay = document.getElementById('button-timer-play');
+  let $c226919c184f4d25757b9cccfdb43fbb$var$ticking = true;
+  function $c226919c184f4d25757b9cccfdb43fbb$export$init(ref, onDataUpdate) {
     ref.once('value', snapshot => {
       let elapsedSeconds = snapshot.val();
       // Update UI every second.
       setInterval(() => {
-        if (!$90ccc8d32d617eee95f4c342531bb360$var$ticking) return;
+        if (!$c226919c184f4d25757b9cccfdb43fbb$var$ticking) return;
         elapsedSeconds++;
-        $90ccc8d32d617eee95f4c342531bb360$var$timer.textContent = $4618f7dbb2360cfdda8bd96952490c61$export$formatSecs(elapsedSeconds);
+        $c226919c184f4d25757b9cccfdb43fbb$var$timer.textContent = $a7fdc277ac0520c64854bc7b63570dc1$export$formatSecs(elapsedSeconds);
       }, 1000);
       // Save time every 10 seconds.
       setInterval(() => {
-        if (!$90ccc8d32d617eee95f4c342531bb360$var$ticking) return;
+        if (!$c226919c184f4d25757b9cccfdb43fbb$var$ticking) return;
         onDataUpdate(elapsedSeconds);
       }, 10000);
     });
-    $90ccc8d32d617eee95f4c342531bb360$var$timerPause.addEventListener('click', _e => $90ccc8d32d617eee95f4c342531bb360$export$setTicking(false));
-    $90ccc8d32d617eee95f4c342531bb360$var$timerPlay.addEventListener('click', _e => $90ccc8d32d617eee95f4c342531bb360$export$setTicking(true));
+    $c226919c184f4d25757b9cccfdb43fbb$var$timerPause.addEventListener('click', _e => $c226919c184f4d25757b9cccfdb43fbb$export$setTicking(false));
+    $c226919c184f4d25757b9cccfdb43fbb$var$timerPlay.addEventListener('click', _e => $c226919c184f4d25757b9cccfdb43fbb$export$setTicking(true));
   }
-  function $90ccc8d32d617eee95f4c342531bb360$export$setTicking(val) {
-    $90ccc8d32d617eee95f4c342531bb360$var$ticking = val;
-    if ($90ccc8d32d617eee95f4c342531bb360$var$ticking) {
-      $90ccc8d32d617eee95f4c342531bb360$var$timerPlay.style.display = 'none';
-      $90ccc8d32d617eee95f4c342531bb360$var$timerPause.style.display = '';
+  function $c226919c184f4d25757b9cccfdb43fbb$export$setTicking(val) {
+    $c226919c184f4d25757b9cccfdb43fbb$var$ticking = val;
+    if ($c226919c184f4d25757b9cccfdb43fbb$var$ticking) {
+      $c226919c184f4d25757b9cccfdb43fbb$var$timerPlay.style.display = 'none';
+      $c226919c184f4d25757b9cccfdb43fbb$var$timerPause.style.display = '';
     } else {
-      $90ccc8d32d617eee95f4c342531bb360$var$timerPause.style.display = 'none';
-      $90ccc8d32d617eee95f4c342531bb360$var$timerPlay.style.display = '';
+      $c226919c184f4d25757b9cccfdb43fbb$var$timerPause.style.display = 'none';
+      $c226919c184f4d25757b9cccfdb43fbb$var$timerPlay.style.display = '';
     }
   }
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku = document.getElementById('sudoku');
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuColors = document.getElementById('sudoku-colors');
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuHighlights = document.getElementById('sudoku-highlights');
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCursor = document.getElementById('sudoku-cursor');
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuGivens = document.getElementById('sudoku-givens');
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuGivensMask = document.getElementById('sudoku-givens-mask');
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuFilled = document.getElementById('sudoku-filled');
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuFilledMask = document.getElementById('sudoku-filled-mask');
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCenter = document.getElementById('sudoku-center');
-  const $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCorner = document.getElementById('sudoku-corner');
-  function $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$makeTs() {
+  const $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku = document.getElementById('sudoku');
+  const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuColors = document.getElementById('sudoku-colors');
+  const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuHighlights = document.getElementById('sudoku-highlights');
+  const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuCursor = document.getElementById('sudoku-cursor');
+  const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuGivens = document.getElementById('sudoku-givens');
+  const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuGivensMask = document.getElementById('sudoku-givens-mask');
+  const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuFilled = document.getElementById('sudoku-filled');
+  const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuFilledMask = document.getElementById('sudoku-filled-mask');
+  const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuCenter = document.getElementById('sudoku-center');
+  const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuCorner = document.getElementById('sudoku-corner');
+  function $aa27b46fdea9a4f013efbd74ec72870e$var$makeTs() {
     return [$b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database.ServerValue.TIMESTAMP, Date.now()];
   }
-  $c8e8b8ac96e97a417a0a608eb61422dd$export$authPromise.then($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$main);
-  function $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$main(user) {
+  $3bfc4decb8494f8f341894cb417de4cd$export$authPromise.then($aa27b46fdea9a4f013efbd74ec72870e$var$main);
+  function $aa27b46fdea9a4f013efbd74ec72870e$var$main(user) {
     const userId = user.uid;
     window./*TODO*/
-    _allClientsData = $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData;
+    _allClientsData = $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData;
     window./*TODO*/
-    _boardData = $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData;
-    const refClient = $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.ref.child(userId);
+    _boardData = $3bfc4decb8494f8f341894cb417de4cd$export$boardData;
+    const refClient = $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.ref.child(userId);
     refClient.update({
       // cursor: null,
       // selected: null,
       // history: null,
       // historyUndone: null,
       online: true,
-      ts: $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$makeTs()
+      ts: $aa27b46fdea9a4f013efbd74ec72870e$var$makeTs()
     });
     refClient.child('online').onDisconnect().set(false);
     // Setup timer.
-    $90ccc8d32d617eee95f4c342531bb360$export$init(refClient.child('elapsedSeconds'), elapsedSeconds => $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+    $c226919c184f4d25757b9cccfdb43fbb$export$init(refClient.child('elapsedSeconds'), elapsedSeconds => $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.update({
       [`${userId}/elapsedSeconds`]: elapsedSeconds
     }));
     // Sticky online (if closed in another tab).
-    $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.watch(`${userId}/online`, {
+    $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.watch(`${userId}/online`, {
       onChange: function ({newVal}) {
         if (!newVal) {
-          $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+          $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.update({
             [`${userId}/online`]: true
           });
         }
       }
     });
     // Client selected highlights.
-    $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.watch('*/selected/*', $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuHighlights, {
+    $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.watch('*/selected/*', $29821818cda24958b32cfc86ab7af955$export$makeBind($aa27b46fdea9a4f013efbd74ec72870e$var$sudokuHighlights, {
       create: function ([otherCid, id]) {
-        const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'use');
+        const el = document.createElementNS($abe68232cbb7f72af82010f1f56d44cd$export$NS_SVG, 'use');
         if (otherCid !== userId) {
-          const rgb = $4618f7dbb2360cfdda8bd96952490c61$export$cidToColor(otherCid);
+          const rgb = $a7fdc277ac0520c64854bc7b63570dc1$export$cidToColor(otherCid);
           el.setAttribute('fill', `rgb(${rgb.join(',')})`);
           el.setAttribute('href', '#highlight');
         } else {
           el.setAttribute('fill', 'rgb(255, 215, 0)');
           el.setAttribute('href', '#highlight-self');
         }
-        const [x, y] = $4618f7dbb2360cfdda8bd96952490c61$export$id2xy(+id);
+        const [x, y] = $a7fdc277ac0520c64854bc7b63570dc1$export$id2xy(+id);
         el.setAttribute('x', `${100 * x}`);
         el.setAttribute('y', `${100 * y}`);
         return el;
       }
     }));
     // Client cursor markers (small triangle in top left).
-    $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.watch('*/cursor', $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCursor, {
+    $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.watch('*/cursor', $29821818cda24958b32cfc86ab7af955$export$makeBind($aa27b46fdea9a4f013efbd74ec72870e$var$sudokuCursor, {
       create: function () {
-        const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'use');
+        const el = document.createElementNS($abe68232cbb7f72af82010f1f56d44cd$export$NS_SVG, 'use');
         el.setAttribute('href', '#cursor');
         return el;
       },
       update: function (el, [otherCid], val) {
-        const [x, y] = $4618f7dbb2360cfdda8bd96952490c61$export$id2xy(+val);
+        const [x, y] = $a7fdc277ac0520c64854bc7b63570dc1$export$id2xy(+val);
         let fillColor = '#fa0';
         if (otherCid !== userId) {
-          const rgb = $4618f7dbb2360cfdda8bd96952490c61$export$cidToColor(otherCid);
+          const rgb = $a7fdc277ac0520c64854bc7b63570dc1$export$cidToColor(otherCid);
           fillColor = `rgba(${rgb.join(',')}, 0.4)`;
         }
         el.setAttribute('data-cid', otherCid);
@@ -26486,72 +26486,72 @@
       }
     }));
     // Given cells.
-    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.GIVENS}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuGivens, {
+    $3bfc4decb8494f8f341894cb417de4cd$export$boardData.watch(`${$abe68232cbb7f72af82010f1f56d44cd$export$Mode.GIVENS}/*`, $29821818cda24958b32cfc86ab7af955$export$makeBind($aa27b46fdea9a4f013efbd74ec72870e$var$sudokuGivens, {
       create: function () {
-        const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'text');
+        const el = document.createElementNS($abe68232cbb7f72af82010f1f56d44cd$export$NS_SVG, 'text');
         el.setAttribute('class', 'givens');
         return el;
       },
       update: function (el, [id], val) {
-        const [x, y] = $4618f7dbb2360cfdda8bd96952490c61$export$id2xy(+id);
+        const [x, y] = $a7fdc277ac0520c64854bc7b63570dc1$export$id2xy(+id);
         el.textContent = '' + val;
         el.setAttribute('x', `${100 * x + 50}`);
         el.setAttribute('y', `${100 * y + 50}`);
       }
     }));
     // Given cells mask, for filled cells and pencil marks.
-    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.GIVENS}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuGivensMask, {
+    $3bfc4decb8494f8f341894cb417de4cd$export$boardData.watch(`${$abe68232cbb7f72af82010f1f56d44cd$export$Mode.GIVENS}/*`, $29821818cda24958b32cfc86ab7af955$export$makeBind($aa27b46fdea9a4f013efbd74ec72870e$var$sudokuGivensMask, {
       create: function ([id]) {
-        const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'rect');
+        const el = document.createElementNS($abe68232cbb7f72af82010f1f56d44cd$export$NS_SVG, 'rect');
         el.setAttribute('width', '100');
         el.setAttribute('height', '100');
         el.setAttribute('fill', 'black');
-        const [x, y] = $4618f7dbb2360cfdda8bd96952490c61$export$id2xy(+id);
+        const [x, y] = $a7fdc277ac0520c64854bc7b63570dc1$export$id2xy(+id);
         el.setAttribute('x', `${100 * x}`);
         el.setAttribute('y', `${100 * y}`);
         return el;
       }
     }));
     // Filled cells.
-    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuFilled, {
+    $3bfc4decb8494f8f341894cb417de4cd$export$boardData.watch(`${$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED}/*`, $29821818cda24958b32cfc86ab7af955$export$makeBind($aa27b46fdea9a4f013efbd74ec72870e$var$sudokuFilled, {
       create: function () {
-        const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'text');
+        const el = document.createElementNS($abe68232cbb7f72af82010f1f56d44cd$export$NS_SVG, 'text');
         el.setAttribute('class', 'filled');
         el.setAttribute('mask', 'url(#sudoku-givens-mask)');
         return el;
       },
       update: function (el, [id], val) {
-        const [x, y] = $4618f7dbb2360cfdda8bd96952490c61$export$id2xy(+id);
+        const [x, y] = $a7fdc277ac0520c64854bc7b63570dc1$export$id2xy(+id);
         el.textContent = '' + val;
         el.setAttribute('x', `${100 * x + 50}`);
         el.setAttribute('y', `${100 * y + 50}`);
       }
     }));
     // Filled cells mask, for pencil marks.
-    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuFilledMask, {
+    $3bfc4decb8494f8f341894cb417de4cd$export$boardData.watch(`${$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED}/*`, $29821818cda24958b32cfc86ab7af955$export$makeBind($aa27b46fdea9a4f013efbd74ec72870e$var$sudokuFilledMask, {
       create: function ([id]) {
-        const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'rect');
+        const el = document.createElementNS($abe68232cbb7f72af82010f1f56d44cd$export$NS_SVG, 'rect');
         el.setAttribute('width', '100');
         el.setAttribute('height', '100');
         el.setAttribute('fill', 'black');
-        const [x, y] = $4618f7dbb2360cfdda8bd96952490c61$export$id2xy(+id);
+        const [x, y] = $a7fdc277ac0520c64854bc7b63570dc1$export$id2xy(+id);
         el.setAttribute('x', `${100 * x}`);
         el.setAttribute('y', `${100 * y}`);
         return el;
       }
     }));
     // Corner pencil marks.
-    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.CORNER}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCorner, {
+    $3bfc4decb8494f8f341894cb417de4cd$export$boardData.watch(`${$abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER}/*`, $29821818cda24958b32cfc86ab7af955$export$makeBind($aa27b46fdea9a4f013efbd74ec72870e$var$sudokuCorner, {
       create: function () {
-        return document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'g');
+        return document.createElementNS($abe68232cbb7f72af82010f1f56d44cd$export$NS_SVG, 'g');
       },
       update: function (g, [id], val) {
         while (g.lastChild) g.removeChild(g.lastChild);
-        const [x, y] = $4618f7dbb2360cfdda8bd96952490c61$export$id2xy(+id);
+        const [x, y] = $a7fdc277ac0520c64854bc7b63570dc1$export$id2xy(+id);
         const nums = Object.entries(val).filter(([_, flag]) => flag).map(([num]) => num);
         for (let i = 0; i < nums.length; i++) {
-          const [dx, dy] = $4618f7dbb2360cfdda8bd96952490c61$export$cornerMarkPos(i, nums.length);
-          const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'text');
+          const [dx, dy] = $a7fdc277ac0520c64854bc7b63570dc1$export$cornerMarkPos(i, nums.length);
+          const el = document.createElementNS($abe68232cbb7f72af82010f1f56d44cd$export$NS_SVG, 'text');
           el.textContent = '' + nums[i];
           el.setAttribute('class', 'corner');
           el.setAttribute('mask', 'url(#sudoku-filled-mask)');
@@ -26559,22 +26559,22 @@
           el.setAttribute('y', `${100 * y + 50 + dy}`);
           g.appendChild(el);
         }
-        $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCorner.appendChild(g);
+        $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuCorner.appendChild(g);
       }
     }));
     // Center pencil marks.
-    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.CENTER}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuCenter, {
+    $3bfc4decb8494f8f341894cb417de4cd$export$boardData.watch(`${$abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER}/*`, $29821818cda24958b32cfc86ab7af955$export$makeBind($aa27b46fdea9a4f013efbd74ec72870e$var$sudokuCenter, {
       create: function ([id]) {
-        const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'text');
+        const el = document.createElementNS($abe68232cbb7f72af82010f1f56d44cd$export$NS_SVG, 'text');
         el.setAttribute('class', 'center');
         el.setAttribute('mask', 'url(#sudoku-filled-mask)');
-        const [x, y] = $4618f7dbb2360cfdda8bd96952490c61$export$id2xy(+id);
+        const [x, y] = $a7fdc277ac0520c64854bc7b63570dc1$export$id2xy(+id);
         el.setAttribute('x', `${100 * x + 50}`);
         el.setAttribute('y', `${100 * y + 50}`);
         return el;
       },
       update: function (el, [_id], val) {
-        const text = $4618f7dbb2360cfdda8bd96952490c61$export$stringifyNums(val);
+        const text = $a7fdc277ac0520c64854bc7b63570dc1$export$stringifyNums(val);
         el.textContent = text;
         if (text.length >= 8) {
           el.setAttribute('textLength', '95');
@@ -26586,24 +26586,24 @@
       }
     }));
     // Center pencil marks.
-    $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.watch(`${$fbe1664cdf5aadc637490692c444786e$export$Mode.COLORS}/*`, $082cb8d5543562678ea4e5422c4229e8$export$makeBind($c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudokuColors, {
+    $3bfc4decb8494f8f341894cb417de4cd$export$boardData.watch(`${$abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS}/*`, $29821818cda24958b32cfc86ab7af955$export$makeBind($aa27b46fdea9a4f013efbd74ec72870e$var$sudokuColors, {
       create: function ([id]) {
-        const el = document.createElementNS($fbe1664cdf5aadc637490692c444786e$export$NS_SVG, 'use');
+        const el = document.createElementNS($abe68232cbb7f72af82010f1f56d44cd$export$NS_SVG, 'use');
         el.setAttribute('href', '#colors');
-        const [x, y] = $4618f7dbb2360cfdda8bd96952490c61$export$id2xy(+id);
+        const [x, y] = $a7fdc277ac0520c64854bc7b63570dc1$export$id2xy(+id);
         el.setAttribute('x', `${100 * x}`);
         el.setAttribute('y', `${100 * y}`);
         return el;
       },
       update: function (el, [_id], val) {
-        const color = $fbe1664cdf5aadc637490692c444786e$export$COLORS[val];
+        const color = $abe68232cbb7f72af82010f1f56d44cd$export$COLORS[val];
         el.setAttribute('fill', `rgba(${color.join(',')})`);
       }
     }));
     // Undo if REDO is false.
     // Redo if REDO is true.
     function updateHistory(redo) {
-      const historyEntries = Object.entries($c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.get(userId, redo ? 'historyUndone' : 'history') || ({}));
+      const historyEntries = Object.entries($3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.get(userId, redo ? 'historyUndone' : 'history') || ({}));
       if (0 === historyEntries.length) return false;
       const [histKey, histVal] = historyEntries.reduce((entryA, entryB) => {
         const order = entryA[1].ts[0] - entryB[1].ts[0] || entryA[1].ts[1] - entryB[1].ts[1];
@@ -26611,7 +26611,7 @@
       });
       // Ignore empty entries (bug).
       if (!histVal.data) {
-        $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+        $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.update({
           [`${userId}/${redo ? 'historyUndone' : 'history'}/${histKey}`]: null
         });
         updateHistory(redo);
@@ -26619,10 +26619,10 @@
       const diffData = JSON.parse(histVal.data);
       // Update board changes.
       // TODO: USE OTHER TO RESOLVE CONFLICTS.
-      $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.update(redo ? diffData.forward : diffData.back);
+      $3bfc4decb8494f8f341894cb417de4cd$export$boardData.update(redo ? diffData.forward : diffData.back);
       // Remove entry from historyUndone.
       // Add entry to history.
-      $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+      $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.update({
         [`${userId}/history/${histKey}`]: redo ? histVal : null,
         [`${userId}/historyUndone/${histKey}`]: redo ? null : histVal
       });
@@ -26631,21 +26631,21 @@
     function fill(num, mode) {
       const madeChange = fillHelper(num, mode);
       if (null == num && !madeChange) {
-        for (const deleteType of $fbe1664cdf5aadc637490692c444786e$export$DELETE_ORDER) {
+        for (const deleteType of $abe68232cbb7f72af82010f1f56d44cd$export$DELETE_ORDER) {
           if (fillHelper(null, deleteType)) break;
         }
       }
     }
     function fillHelper(num, mode) {
       const update = {};
-      const blockedGivens = $fbe1664cdf5aadc637490692c444786e$export$BLOCKED_BY_GIVENS[mode] && $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.get('givens') || ({});
-      const selected = Object.entries($c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.get(userId, 'selected') || ({})).filter(([_, isSet]) => isSet).map(([id, _]) => id).filter(id => !blockedGivens || !blockedGivens[id]);
+      const blockedGivens = $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_GIVENS[mode] && $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('givens') || ({});
+      const selected = Object.entries($3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.get(userId, 'selected') || ({})).filter(([_, isSet]) => isSet).map(([id, _]) => id).filter(id => !blockedGivens || !blockedGivens[id]);
       if (!selected.length) return false;
-      const markData = $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.get(mode) || ({});
+      const markData = $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get(mode) || ({});
       switch (mode) {
-        case $fbe1664cdf5aadc637490692c444786e$export$Mode.GIVENS:
-        case $fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED:
-        case $fbe1664cdf5aadc637490692c444786e$export$Mode.COLORS:
+        case $abe68232cbb7f72af82010f1f56d44cd$export$Mode.GIVENS:
+        case $abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED:
+        case $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS:
           if (null == num && selected.every(id => null == markData[id])) {
             return false;
           }
@@ -26653,8 +26653,8 @@
             update[`${mode}/${id}`] = num;
           }
           break;
-        case $fbe1664cdf5aadc637490692c444786e$export$Mode.CORNER:
-        case $fbe1664cdf5aadc637490692c444786e$export$Mode.CENTER:
+        case $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER:
+        case $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER:
           if (null == num) {
             if (selected.every(id => null == markData[id])) {
               return false;
@@ -26680,25 +26680,25 @@
           throw new Error(`Unknown type: ${mode}.`);
       }
       // Update and add update to history.
-      const history = $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.update(update);
+      const history = $3bfc4decb8494f8f341894cb417de4cd$export$boardData.update(update);
       if (!history) return false;
-      const key = $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.ref.child(`${userId}/history`).push().key;
-      $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+      const key = $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.ref.child(`${userId}/history`).push().key;
+      $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.update({
         [`${userId}/history/${key}`]: {
           data: JSON.stringify(history),
-          ts: $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$makeTs()
+          ts: $aa27b46fdea9a4f013efbd74ec72870e$var$makeTs()
         },
         [`${userId}/historyUndone`]: null
       });
       return true;
     }
     function loc2xy(xOff, yOff, limitCircle) {
-      const {width: elWidth, height: elHeight} = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku.getBoundingClientRect();
-      const {x, y, width, height} = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku.viewBox.baseVal;
+      const {width: elWidth, height: elHeight} = $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.getBoundingClientRect();
+      const {x, y, width, height} = $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.viewBox.baseVal;
       if (xOff < 0 || yOff < 0) return null;
       const xf = (width * xOff / elWidth + x) / 100;
       const yf = (height * yOff / elHeight + y) / 100;
-      if ($fbe1664cdf5aadc637490692c444786e$export$SIZE <= xf || $fbe1664cdf5aadc637490692c444786e$export$SIZE <= yf) return null;
+      if ($abe68232cbb7f72af82010f1f56d44cd$export$SIZE <= xf || $abe68232cbb7f72af82010f1f56d44cd$export$SIZE <= yf) return null;
       if (limitCircle) {
         // Limit to circles.
         const xr = xf % 1 - 0.5;
@@ -26708,10 +26708,10 @@
       return [xf | 0, yf | 0];
     }
     function select(x, y, reset = false, mode = true) {
-      if (x < 0 || $fbe1664cdf5aadc637490692c444786e$export$SIZE <= x || y < 0 || $fbe1664cdf5aadc637490692c444786e$export$SIZE <= y) return false;
-      const id = $4618f7dbb2360cfdda8bd96952490c61$export$xy2id(x, y);
+      if (x < 0 || $abe68232cbb7f72af82010f1f56d44cd$export$SIZE <= x || y < 0 || $abe68232cbb7f72af82010f1f56d44cd$export$SIZE <= y) return false;
+      const id = $a7fdc277ac0520c64854bc7b63570dc1$export$xy2id(x, y);
       if (reset) {
-        $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+        $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.update({
           [`${userId}/selected`]: {
             [id]: mode
           },
@@ -26723,7 +26723,7 @@
       // if (init.allClientsData.get(cid, 'selected', 'id')) {
       // return false;
       // }
-      $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+      $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.update({
         [`${userId}/selected/${id}`]: mode,
         [`${userId}/cursor`]: id
       });
@@ -26732,7 +26732,7 @@
     {
       let selectingMode = 0;
       // 0 for none, 1 for selecting, 2 for deselecting.
-      $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku.addEventListener('mousedown', e => {
+      $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.addEventListener('mousedown', e => {
         if (0 === selectingMode) {
           const xy = loc2xy(e.offsetX, e.offsetY, false);
           if (!xy) return;
@@ -26745,7 +26745,7 @@
           }
         }
       });
-      $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku.addEventListener('mousemove', e => {
+      $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.addEventListener('mousemove', e => {
         if (0 !== selectingMode) {
           const xy = loc2xy(e.offsetX, e.offsetY, true);
           if (!xy) return;
@@ -26757,14 +26757,14 @@
           selectingMode = 0;
         }
       });
-      $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku.addEventListener('contextmenu', e => {
+      $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.addEventListener('contextmenu', e => {
         e.preventDefault();
       });
     }
     {
       function handleTouch(e, reset = false) {
         e.preventDefault();
-        const {top, left} = $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku.getBoundingClientRect();
+        const {top, left} = $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.getBoundingClientRect();
         for (let i = 0; i < e.targetTouches.length; i++) {
           const touch = e.targetTouches.item(i);
           const xy = loc2xy(touch.clientX - left, touch.clientY - top, true);
@@ -26772,10 +26772,10 @@
           select(...xy, reset);
         }
       }
-      $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku.addEventListener('touchstart', e => handleTouch(e, 1 === e.targetTouches.length));
-      $c0bd8b3b9f1b36db6b538b6d7b8d4b5b$var$sudoku.addEventListener('touchmove', e => handleTouch(e));
+      $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.addEventListener('touchstart', e => handleTouch(e, 1 === e.targetTouches.length));
+      $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.addEventListener('touchmove', e => handleTouch(e));
     }
-    let fillMode = $fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED;
+    let fillMode = $abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED;
     function setFillMode(arg) {
       let el;
       let mode;
@@ -26791,8 +26791,8 @@
       for (const inputButton of Array.from(document.getElementsByClassName('button-input'))) {
         const num = JSON.parse(inputButton.getAttribute('data-input'));
         if (null != num) {
-          inputButton.style.color = $fbe1664cdf5aadc637490692c444786e$export$Mode.COLORS === mode ? `rgb(${$fbe1664cdf5aadc637490692c444786e$export$COLORS[num].slice(0, 3).join(',')})` : '';
-          inputButton.innerText = $fbe1664cdf5aadc637490692c444786e$export$Mode.COLORS === mode ? '\u25A8' : num;
+          inputButton.style.color = $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS === mode ? `rgb(${$abe68232cbb7f72af82010f1f56d44cd$export$COLORS[num].slice(0, 3).join(',')})` : '';
+          inputButton.innerText = $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS === mode ? '\u25A8' : num;
         }
       }
       for (const button of Array.from(document.getElementsByClassName('button-mode'))) {
@@ -26805,10 +26805,10 @@
       document.getElementById('button-undo').addEventListener('click', _e => updateHistory(false));
       document.getElementById('button-redo').addEventListener('click', _e => updateHistory(true));
       document.getElementById('button-check').addEventListener('click', _e => {
-        const bad = $4618f7dbb2360cfdda8bd96952490c61$export$checkGrid(Object.assign({}, $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.get('filled'), $c8e8b8ac96e97a417a0a608eb61422dd$export$boardData.get('givens')));
+        const bad = $a7fdc277ac0520c64854bc7b63570dc1$export$checkGrid(Object.assign({}, $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('filled'), $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('givens')));
         if (0 === bad.size) {
           alert('Looks good!');
-          $90ccc8d32d617eee95f4c342531bb360$export$setTicking(false);
+          $c226919c184f4d25757b9cccfdb43fbb$export$setTicking(false);
         } else {
           let lastId = 0;
           const selected = {};
@@ -26816,7 +26816,7 @@
             selected[id] = true;
             lastId = id;
           }
-          $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.update({
+          $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.update({
             [`${userId}/selected`]: selected,
             [`${userId}/cursor`]: lastId
           });
@@ -26840,26 +26840,26 @@
         let num;
         if ('Space' === e.code || 'Tab' === e.code) {
           e.preventDefault();
-          let idx = $fbe1664cdf5aadc637490692c444786e$export$MODE_CYCLE.indexOf(fillMode) + 1 - 2 * +e.shiftKey + $fbe1664cdf5aadc637490692c444786e$export$MODE_CYCLE.length;
-          idx = idx % $fbe1664cdf5aadc637490692c444786e$export$MODE_CYCLE.length;
-          setFillMode($fbe1664cdf5aadc637490692c444786e$export$MODE_CYCLE[idx]);
+          let idx = $abe68232cbb7f72af82010f1f56d44cd$export$MODE_CYCLE.indexOf(fillMode) + 1 - 2 * +e.shiftKey + $abe68232cbb7f72af82010f1f56d44cd$export$MODE_CYCLE.length;
+          idx = idx % $abe68232cbb7f72af82010f1f56d44cd$export$MODE_CYCLE.length;
+          setFillMode($abe68232cbb7f72af82010f1f56d44cd$export$MODE_CYCLE[idx]);
           return;
         }
-        if ((e.code in $fbe1664cdf5aadc637490692c444786e$export$CODES)) {
-          num = $fbe1664cdf5aadc637490692c444786e$export$CODES[e.code];
+        if ((e.code in $abe68232cbb7f72af82010f1f56d44cd$export$CODES)) {
+          num = $abe68232cbb7f72af82010f1f56d44cd$export$CODES[e.code];
         } else if ('Alt' === e.code || 'AltLeft' === e.code || 'AltRight' === e.code) {
           e.preventDefault();
           return;
-        } else if ((e.code in $fbe1664cdf5aadc637490692c444786e$export$ARROWS)) {
+        } else if ((e.code in $abe68232cbb7f72af82010f1f56d44cd$export$ARROWS)) {
           e.preventDefault();
           let x = 0;
           let y = 0;
-          const cursor = $c8e8b8ac96e97a417a0a608eb61422dd$export$allClientsData.get(userId, 'cursor');
+          const cursor = $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.get(userId, 'cursor');
           if (null != cursor) {
-            const [dx, dy] = $fbe1664cdf5aadc637490692c444786e$export$ARROWS[e.code];
-            const [cx, cy] = $4618f7dbb2360cfdda8bd96952490c61$export$id2xy(cursor);
-            x = $4618f7dbb2360cfdda8bd96952490c61$export$wrap(cx + dx);
-            y = $4618f7dbb2360cfdda8bd96952490c61$export$wrap(cy + dy);
+            const [dx, dy] = $abe68232cbb7f72af82010f1f56d44cd$export$ARROWS[e.code];
+            const [cx, cy] = $a7fdc277ac0520c64854bc7b63570dc1$export$id2xy(cursor);
+            x = $a7fdc277ac0520c64854bc7b63570dc1$export$wrap(cx + dx);
+            y = $a7fdc277ac0520c64854bc7b63570dc1$export$wrap(cy + dy);
           }
           select(x, y, !e.shiftKey && !e.ctrlKey && !e.altKey);
           return;
@@ -26882,11 +26882,11 @@
         }
         e.preventDefault();
         if (e.shiftKey) {
-          fill(num, $fbe1664cdf5aadc637490692c444786e$export$Mode.CORNER);
-          setFillMode($fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED);
+          fill(num, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER);
+          setFillMode($abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED);
         } else if (e.ctrlKey || e.altKey) {
-          fill(num, $fbe1664cdf5aadc637490692c444786e$export$Mode.CENTER);
-          setFillMode($fbe1664cdf5aadc637490692c444786e$export$Mode.FILLED);
+          fill(num, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER);
+          setFillMode($abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED);
         } else {
           fill(num, fillMode);
         }
@@ -26895,4 +26895,4 @@
   }
 })();
 
-//# sourceMappingURL=index.58c80b53.js.map
+//# sourceMappingURL=index.1458e286.js.map

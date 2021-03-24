@@ -26278,19 +26278,27 @@
     if (window.location.hash) {
       return window.location.hash.slice(1);
     }
-    let gameKey = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database().ref('game').push().key;
+    const gameKey = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database().ref('game').push().key;
     window.location.hash = '#' + gameKey;
     return gameKey;
   })();
-  const $3bfc4decb8494f8f341894cb417de4cd$export$authPromise = new Promise((resolve, reject) => {
-    $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().onAuthStateChanged(user => {
-      user ? resolve(user) : reject(null);
-    });
+  const $3bfc4decb8494f8f341894cb417de4cd$export$database = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database();
+  const $3bfc4decb8494f8f341894cb417de4cd$export$refGame = $3bfc4decb8494f8f341894cb417de4cd$export$database.ref(`game/${$3bfc4decb8494f8f341894cb417de4cd$export$gameKey}`);
+  const $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData = new $29821818cda24958b32cfc86ab7af955$export$DataLayer($3bfc4decb8494f8f341894cb417de4cd$export$refGame.child('clients'));
+  const $3bfc4decb8494f8f341894cb417de4cd$export$boardData = new $29821818cda24958b32cfc86ab7af955$export$DataLayer($3bfc4decb8494f8f341894cb417de4cd$export$refGame.child('board'));
+  const $3bfc4decb8494f8f341894cb417de4cd$export$isFrozenPromise = new Promise(resolve => $3bfc4decb8494f8f341894cb417de4cd$export$refGame.child('frozen').once('value', snapshot => {
+    const layout = document.getElementById('layout');
+    if (snapshot.val()) {
+      layout.classList.add('game-frozen');
+    } else {
+      layout.classList.add('game-playing');
+    }
+    resolve(snapshot.val());
+  }));
+  const $3bfc4decb8494f8f341894cb417de4cd$export$authPromise = new Promise(resolve => {
+    $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().onAuthStateChanged(user => user && resolve(user));
     $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().signInAnonymously();
   });
-  const $3bfc4decb8494f8f341894cb417de4cd$var$refGame = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database().ref(`game/${$3bfc4decb8494f8f341894cb417de4cd$export$gameKey}`);
-  const $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData = new $29821818cda24958b32cfc86ab7af955$export$DataLayer($3bfc4decb8494f8f341894cb417de4cd$var$refGame.child('clients'));
-  const $3bfc4decb8494f8f341894cb417de4cd$export$boardData = new $29821818cda24958b32cfc86ab7af955$export$DataLayer($3bfc4decb8494f8f341894cb417de4cd$var$refGame.child('board'));
   function $a7fdc277ac0520c64854bc7b63570dc1$export$wrap(x) {
     return (x % $abe68232cbb7f72af82010f1f56d44cd$export$SIZE + $abe68232cbb7f72af82010f1f56d44cd$export$SIZE) % $abe68232cbb7f72af82010f1f56d44cd$export$SIZE;
   }
@@ -26406,15 +26414,38 @@
   const $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSetter = document.getElementById('button-modes-setter');
   const $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSolver = document.getElementById('button-modes-solver');
   const $7fad4442d5945cd1f39d3594599d2b9f$var$controls = document.getElementById('controls');
-  $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSetter.addEventListener('click', _e => {
-    $7fad4442d5945cd1f39d3594599d2b9f$var$controls.classList.add('show-setter');
-    $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSetter.style.setProperty('display', 'none');
-    $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSolver.style.setProperty('display', '');
+  function $7fad4442d5945cd1f39d3594599d2b9f$export$setMode(setterMode) {
+    $7fad4442d5945cd1f39d3594599d2b9f$var$controls.classList.toggle('show-setter', setterMode);
+    $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSetter.style.setProperty('display', setterMode ? 'none' : '');
+    $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSolver.style.setProperty('display', setterMode ? '' : 'none');
+  }
+  $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSetter.addEventListener('click', _e => $7fad4442d5945cd1f39d3594599d2b9f$export$setMode(true));
+  $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSolver.addEventListener('click', _e => $7fad4442d5945cd1f39d3594599d2b9f$export$setMode(false));
+  const $6bd03f53ceca4c0bf3939f051c446a60$var$buttonShare = document.getElementById('button-share');
+  $3bfc4decb8494f8f341894cb417de4cd$export$authPromise.then(_user => {
+    $6bd03f53ceca4c0bf3939f051c446a60$var$buttonShare.addEventListener('click', _e => {
+      const targetGame = $3bfc4decb8494f8f341894cb417de4cd$export$database.ref('game').push();
+      targetGame.set({
+        frozen: true,
+        board: $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get()
+      });
+      const win = window.open('#' + targetGame.key, '_blank');
+      if (null == win) {
+        alert('Failed to open window.');
+        throw Error('Failed to open window,');
+      }
+      win.focus();
+    });
   });
-  $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSolver.addEventListener('click', _e => {
-    $7fad4442d5945cd1f39d3594599d2b9f$var$controls.classList.remove('show-setter');
-    $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSolver.style.setProperty('display', 'none');
-    $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSetter.style.setProperty('display', '');
+  // TODO: Note there is a bit of a race condition here, on when game data arrives....
+  const $6bd03f53ceca4c0bf3939f051c446a60$var$buttonPlay = document.getElementById('button-play');
+  $6bd03f53ceca4c0bf3939f051c446a60$var$buttonPlay.addEventListener('click', _e => {
+    const targetGame = $3bfc4decb8494f8f341894cb417de4cd$export$database.ref('game').push();
+    targetGame.set({
+      board: $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get()
+    });
+    window.location.hash = '#' + targetGame.key;
+    window.location.reload();
   });
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku = document.getElementById('sudoku');
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuColors = document.getElementById('sudoku-colors');
@@ -26613,6 +26644,9 @@
         el.setAttribute('fill', `rgba(${color.join(',')})`);
       }
     }));
+    $3bfc4decb8494f8f341894cb417de4cd$export$isFrozenPromise.then(isFrozen => isFrozen || $aa27b46fdea9a4f013efbd74ec72870e$var$startSolverMode(userId));
+  }
+  function $aa27b46fdea9a4f013efbd74ec72870e$var$startSolverMode(userId) {
     // Undo if REDO is false.
     // Redo if REDO is true.
     function updateHistory(redo) {
@@ -26908,4 +26942,4 @@
   }
 })();
 
-//# sourceMappingURL=index.4ed46d66.js.map
+//# sourceMappingURL=index.641cdd59.js.map

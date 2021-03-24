@@ -38,6 +38,14 @@ body {
   font-size: min(3.6vw, 5.4vh);
 }
 
+.layout:not(.game-playing) .layout-controls, .layout:not(.game-playing) .layout-timer {
+  display: none;
+}
+
+.layout:not(.game-frozen) .layout-frozen {
+  display: none;
+}
+
 .layout-sudoku {
   position: absolute;
   width: 66.6666666667%;
@@ -66,6 +74,16 @@ body {
   white-space: nowrap;
   display: flex;
   justify-content: space-between;
+}
+
+.layout-frozen {
+  position: absolute;
+  top: 50%;
+  bottom: unset;
+  left: unset;
+  right: 0;
+  transform: translateY(-50%);
+  width: 30%;
 }
 
 @media (max-aspect-ratio: 9/10) {
@@ -98,6 +116,15 @@ body {
     width: 45%;
     transform: translateX(-100%);
   }
+
+  .layout-frozen {
+    top: 64%;
+    bottom: unset;
+    left: 50%;
+    right: unset;
+    transform: translateX(-50%);
+    width: 45%;
+  }
 }
 @media print {
   .layout {
@@ -115,6 +142,7 @@ body {
 
   .layout-controls,
 .layout-timer,
+.layout-frozen,
 #sudoku-highlights,
 #sudoku-cursor {
     display: none;
@@ -235,4 +263,10 @@ svg.icon {
   width: 0.8em;
   vertical-align: middle;
 }
-/*# sourceMappingURL=index.e4235f73.css.map */
+
+#button-play {
+  text-transform: uppercase;
+  padding: 0.5em;
+  width: 100%;
+}
+/*# sourceMappingURL=index.33c4d173.css.map */

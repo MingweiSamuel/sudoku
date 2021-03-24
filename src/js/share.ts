@@ -22,6 +22,7 @@ const buttonPlay = document.getElementById('button-play')! as HTMLButtonElement;
 buttonPlay.addEventListener('click', _e => {
     const targetGame = init.database.ref('game').push();
     targetGame.set({
+        parent: init.gameKey,
         board: init.boardData.get(),
     });
     window.location.hash = '#' + targetGame.key;

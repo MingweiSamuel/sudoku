@@ -6,6 +6,8 @@
         ".write": "null != auth.uid && !data.exists()",
         "frozen": {
         },
+        "parent": {
+        },
         "clients": {
           "$userId": {
             ".write": "$userId === auth.uid",

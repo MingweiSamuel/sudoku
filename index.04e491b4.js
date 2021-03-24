@@ -26442,6 +26442,7 @@
   $6bd03f53ceca4c0bf3939f051c446a60$var$buttonPlay.addEventListener('click', _e => {
     const targetGame = $3bfc4decb8494f8f341894cb417de4cd$export$database.ref('game').push();
     targetGame.set({
+      parent: $3bfc4decb8494f8f341894cb417de4cd$export$gameKey,
       board: $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get()
     });
     window.location.hash = '#' + targetGame.key;
@@ -26942,4 +26943,4 @@
   }
 })();
 
-//# sourceMappingURL=index.641cdd59.js.map
+//# sourceMappingURL=index.04e491b4.js.map

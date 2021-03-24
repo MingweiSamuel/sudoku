@@ -53,13 +53,30 @@
       <polygon fill="rgb(78, 122, 255)" points="45,74 69,26 74,26 74,74" />
       <rect width="60" height="60" x="20" y="20" rx="9" mask="url(#center-mask)" />
     </symbol>
+    <symbol id="icon-gcolor" viewBox="0 0 100 100">
+      <rect fill="rgb(254, 82, 93)" width="48" height="41" x="26" y="33" />
+      <polygon fill="rgb(254, 224, 118)" points="31,74 55,33 74,33 74,74" />
+      <polygon fill="rgb(78, 122, 255)"  points="45,74 69,33 74,33 74,74" />
+      <rect class="icon-fill" width="60" height="60" x="20" y="20" rx="9" mask="url(#centerLock-mask)" />
+    </symbol>
     <symbol id="icon-givens" viewBox="0 0 100 100">
       <rect class="icon-fill" width="60" height="60" x="20" y="20" rx="9" mask="url(#centerLock-mask)" />
       <text class="icon-fill" x="50" y="53" font-size="40" text-anchor="middle" dominant-baseline="central">7</text>
     </symbol>
 
-    <symbol id="icon-edit" viewBox="0 0 100 100">
+    <symbol id="icon-setter" viewBox="0 0 100 100">
       <path d="M 65,75 A 7.1 7.1 0 0 0 75,65 L 55,45 A 15 15 0 0 0 35,25 L 45,35 L 35,45 L 25,35 A 15 15 0 0 0 45,55 Z" />
+    </symbol>
+    <symbol id="icon-solver" viewBox="0 0 100 100">
+      <mask id="center-mask-solver">
+        <rect fill="black" width="100" height="100" />
+        <rect fill="white" width="100" height="100" mask="url(#center-mask)" />
+        <polygon fill="black" stroke="none" points="40,45 85,0 100,15 55,60" />
+      </mask>
+      <rect width="60" height="60" x="20" y="20" rx="9" mask="url(#center-mask-solver)" />
+      <path d="M 73,35 L 78,30 L 70,22 L 65,27 Z" />
+      <path d="M 48,60 L 70,38 L 62,30 L 40,52 Z" />
+      <path d="M 35,65 L 44,62 L 38,56 Z" />
     </symbol>
 
     <symbol id="icon-delete" viewBox="0 0 100 100">
@@ -135,19 +152,26 @@
       </svg>
     </div>
     <div class="layout-controls">
-      <div class="fullsize controls">
-        <!-- First row. -->
-        <button class="control-btn button-mode" style="grid-area: 1 / 1 / 2 / 2;" data-mode="filled" title="Full digits">
+      <div id="controls" class="fullsize">
+        <!-- First row, solve mode. -->
+        <button class="control-btn button-mode solver-modes-btn" style="grid-area: 1 / 1 / 2 / 2;" data-mode="filled" title="Full digits">
           <svg class="icon" viewBox="0 0 100 100"><use href="#icon-filled" /></svg>
         </button>
-        <button class="control-btn button-mode control-btn-inv" style="grid-area: 1 / 2 / 2 / 3;" data-mode="corner" title="Corner marks [shift+]">
+        <button class="control-btn button-mode solver-modes-btn control-btn-inv" style="grid-area: 1 / 2 / 2 / 3;" data-mode="corner" title="Corner marks [shift+]">
           <svg class="icon" viewBox="0 0 100 100"><use href="#icon-corner" /></svg>
         </button>
-        <button class="control-btn button-mode control-btn-inv" style="grid-area: 1 / 3 / 2 / 4;" data-mode="center" title="Center marks [alt+]">
+        <button class="control-btn button-mode solver-modes-btn control-btn-inv" style="grid-area: 1 / 3 / 2 / 4;" data-mode="center" title="Center marks [alt+]">
           <svg class="icon" viewBox="0 0 100 100"><use href="#icon-center" /></svg>
         </button>
-        <button class="control-btn button-mode control-btn-inv" style="grid-area: 1 / 4 / 2 / 5;" data-mode="colors" title="Color highlights">
+        <button class="control-btn button-mode solver-modes-btn control-btn-inv" style="grid-area: 1 / 4 / 2 / 5;" data-mode="colors" title="Color highlights">
           <svg class="icon" viewBox="0 0 100 100"><use href="#icon-colors" /></svg>
+        </button>
+        <!-- First row, edit mode. -->
+        <button class="control-btn button-mode setter-modes-btn control-btn-inv" style="grid-area: 1 / 1 / 2 / 2;" data-mode="givens" title="Given digits">
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-givens" /></svg>
+        </button>
+        <button class="control-btn setter-modes-btn control-btn-inv" style="grid-area: 1 / 4 / 2 / 5;" data-mode="gcolor" title="Given color highlights">
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-gcolor" /></svg>
         </button>
         <!-- Gap. -->
         <!-- Third row. -->
@@ -182,35 +206,22 @@
     </div>
     <div class="layout-timer">
       <span>
-        <button class="control-btn" title="Edit mode">
-          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-edit" /></svg>
-        </button>
-      </span>
-      <span>
-        <span id="timer">0:00</span>
-        <button id="button-timer-pause" class="control-btn button-timer" title="Pause timer">
+        <button id="button-timer-pause" class="control-btn" title="Pause timer">
           <svg class="icon" viewBox="0 0 100 100"><use href="#icon-pause" /></svg>
         </button>
-        <button id="button-timer-play" class="control-btn button-timer" title="Restart timer" style="display: none;">
+        <button id="button-timer-play" class="control-btn" title="Restart timer" style="display: none;">
           <svg class="icon" viewBox="0 0 100 100"><use href="#icon-play" /></svg>
         </button>
+        <span id="timer">0:00</span>
       </span>
-    </div>
-    <div class="layout-edit">
-      <div class="fullsize edit">
-        <button class="control-btn button-mode control-btn-inv" style="grid-area: 1 / 1 / 2 / 2;" data-mode="givens" title="Given digits">
-          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-givens" /></svg>
+      <span>
+        <button id="button-modes-setter"  class="control-btn control-btn-inv" title="Puzzle-setting modes">
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-setter" /></svg>
         </button>
-        <button class="control-btn button-mode control-btn-inv" style="grid-area: 1 / 2 / 2 / 3;" data-mode="corner" title="Corner marks [shift+]">
-          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-corner" /></svg>
+        <button id="button-modes-solver" class="control-btn control-btn-inv" title="Solving modes" style="display: none;">
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-solver" /></svg>
         </button>
-        <button class="control-btn button-mode control-btn-inv" style="grid-area: 1 / 3 / 2 / 4;" data-mode="center" title="Center marks [alt+]">
-          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-center" /></svg>
-        </button>
-        <button class="control-btn button-mode control-btn-inv" style="grid-area: 1 / 4 / 2 / 5;" data-mode="colors" title="Color highlights">
-          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-colors" /></svg>
-        </button>
-      </div>
+      </span>
     </div>
   </div>
   <script src="js/script.ts"></script>

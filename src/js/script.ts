@@ -9,6 +9,7 @@ import * as init from "./initialize";
 import * as dataLayer from "./dataLayer";
 import * as utils from "./utils";
 import * as timer from "./timer";
+import "./modes";
 
 const sudoku           = document.getElementById('sudoku')!             as unknown as SVGSVGElement;
 const sudokuColors     = document.getElementById('sudoku-colors')!      as unknown as SVGGElement;

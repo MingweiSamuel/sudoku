@@ -67,17 +67,6 @@ body {
     display: flex;
     justify-content: space-between;
 }
-.layout-edit {
-    position: absolute;
-
-    top: unset;
-    bottom: 0;
-    left: unset;
-    right: 0;
-
-    width: 30%;
-    height: 10.5%;
-}
 
 @media (max-aspect-ratio: 9/10) {
     .layout {
@@ -141,7 +130,7 @@ body {
     height: 100%;
 }
 
-.controls {
+#controls {
     display: grid;
 
     grid-template-rows: 1fr 1.4% 1fr 1fr 1fr 1.4% 1fr;
@@ -149,9 +138,20 @@ body {
     row-gap: 1.5%;
     column-gap: 2%;
 }
-.controls > * {
+#controls > * {
     position: relative;
     min-height: 0;
+}
+#controls .setter-modes-btn {
+    display: none;
+}
+#controls.show-setter {
+    .solver-modes-btn {
+        display: none;
+    }
+    .setter-modes-btn {
+        display: unset;
+    }
 }
 
 .edit {

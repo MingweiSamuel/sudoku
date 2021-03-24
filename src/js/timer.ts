@@ -6,6 +6,9 @@ const timer = document.getElementById('timer')!;
 const timerPause = document.getElementById('button-timer-pause')!;
 const timerPlay = document.getElementById('button-timer-play')!;
 
+timerPause.addEventListener('click', _e => setTicking(false));
+timerPlay.addEventListener('click', _e => setTicking(true));
+
 let ticking = true;
 
 export function init(ref: firebase.database.Reference, onDataUpdate: (elapsedSeconds: number) => void) {
@@ -23,9 +26,6 @@ export function init(ref: firebase.database.Reference, onDataUpdate: (elapsedSec
             onDataUpdate(elapsedSeconds);
         }, 10000);
     });
-
-    timerPause.addEventListener('click', _e => setTicking(false));
-    timerPlay.addEventListener('click', _e => setTicking(true));
 }
 
 export function setTicking(val: boolean): void {

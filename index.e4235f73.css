@@ -59,9 +59,13 @@ body {
 .layout-timer {
   position: absolute;
   top: 0;
-  left: 100%;
-  transform: translateX(-100%);
+  bottom: unset;
+  left: unset;
+  right: 0;
+  width: 30%;
   white-space: nowrap;
+  display: flex;
+  justify-content: space-between;
 }
 
 @media (max-aspect-ratio: 9/10) {
@@ -87,8 +91,11 @@ body {
   }
 
   .layout-timer {
-    position: absolute;
-    top: 65%;
+    top: 64%;
+    bottom: unset;
+    left: 100%;
+    right: unset;
+    width: 45%;
     transform: translateX(-100%);
   }
 }
@@ -125,7 +132,7 @@ body {
   height: 100%;
 }
 
-.controls {
+#controls {
   display: grid;
   grid-template-rows: 1fr 1.4% 1fr 1fr 1fr 1.4% 1fr;
   grid-template-columns: 1fr 1fr 1fr 1fr;
@@ -133,9 +140,28 @@ body {
   column-gap: 2%;
 }
 
-.controls > * {
+#controls > * {
   position: relative;
   min-height: 0;
+}
+
+#controls .setter-modes-btn {
+  display: none;
+}
+
+#controls.show-setter .solver-modes-btn {
+  display: none;
+}
+#controls.show-setter .setter-modes-btn {
+  display: unset;
+}
+
+.edit {
+  display: grid;
+  grid-template-rows: 1fr 1.4% 1fr 1fr 1fr 1.4% 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  row-gap: 1.5%;
+  column-gap: 2%;
 }
 
 .control-btn {
@@ -204,9 +230,9 @@ svg.icon {
   vertical-align: middle;
 }
 
-.button-timer {
+.layout-timer button {
   display: inline;
   width: 0.8em;
   vertical-align: middle;
 }
-/*# sourceMappingURL=index.0aafd846.css.map */
+/*# sourceMappingURL=index.e4235f73.css.map */

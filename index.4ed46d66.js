@@ -26374,6 +26374,8 @@
   const $c226919c184f4d25757b9cccfdb43fbb$var$timer = document.getElementById('timer');
   const $c226919c184f4d25757b9cccfdb43fbb$var$timerPause = document.getElementById('button-timer-pause');
   const $c226919c184f4d25757b9cccfdb43fbb$var$timerPlay = document.getElementById('button-timer-play');
+  $c226919c184f4d25757b9cccfdb43fbb$var$timerPause.addEventListener('click', _e => $c226919c184f4d25757b9cccfdb43fbb$export$setTicking(false));
+  $c226919c184f4d25757b9cccfdb43fbb$var$timerPlay.addEventListener('click', _e => $c226919c184f4d25757b9cccfdb43fbb$export$setTicking(true));
   let $c226919c184f4d25757b9cccfdb43fbb$var$ticking = true;
   function $c226919c184f4d25757b9cccfdb43fbb$export$init(ref, onDataUpdate) {
     ref.once('value', snapshot => {
@@ -26390,8 +26392,6 @@
         onDataUpdate(elapsedSeconds);
       }, 10000);
     });
-    $c226919c184f4d25757b9cccfdb43fbb$var$timerPause.addEventListener('click', _e => $c226919c184f4d25757b9cccfdb43fbb$export$setTicking(false));
-    $c226919c184f4d25757b9cccfdb43fbb$var$timerPlay.addEventListener('click', _e => $c226919c184f4d25757b9cccfdb43fbb$export$setTicking(true));
   }
   function $c226919c184f4d25757b9cccfdb43fbb$export$setTicking(val) {
     $c226919c184f4d25757b9cccfdb43fbb$var$ticking = val;
@@ -26403,6 +26403,19 @@
       $c226919c184f4d25757b9cccfdb43fbb$var$timerPlay.style.display = '';
     }
   }
+  const $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSetter = document.getElementById('button-modes-setter');
+  const $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSolver = document.getElementById('button-modes-solver');
+  const $7fad4442d5945cd1f39d3594599d2b9f$var$controls = document.getElementById('controls');
+  $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSetter.addEventListener('click', _e => {
+    $7fad4442d5945cd1f39d3594599d2b9f$var$controls.classList.add('show-setter');
+    $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSetter.style.setProperty('display', 'none');
+    $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSolver.style.setProperty('display', '');
+  });
+  $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSolver.addEventListener('click', _e => {
+    $7fad4442d5945cd1f39d3594599d2b9f$var$controls.classList.remove('show-setter');
+    $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSolver.style.setProperty('display', 'none');
+    $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSetter.style.setProperty('display', '');
+  });
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku = document.getElementById('sudoku');
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuColors = document.getElementById('sudoku-colors');
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuHighlights = document.getElementById('sudoku-highlights');
@@ -26895,4 +26908,4 @@
   }
 })();
 
-//# sourceMappingURL=index.1458e286.js.map
+//# sourceMappingURL=index.4ed46d66.js.map

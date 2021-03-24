@@ -3,10 +3,10 @@
   	"game": {
       "$gameId": {
         ".read": true,
+        ".write": "null != auth.uid && !data.exists()",
         "frozen": {
-          ".write": "null != auth.uid && !data.exists()"
         },
-				"clients": {
+        "clients": {
           "$userId": {
             ".write": "$userId === auth.uid",
             "ts": {

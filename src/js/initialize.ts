@@ -16,18 +16,30 @@ export const gameKey = (() => {
     if (window.location.hash) {
         return window.location.hash.slice(1);
     }
-    let gameKey = firebase.database().ref('game').push().key!;
+    const gameKey = firebase.database().ref('game').push().key!;
     window.location.hash = '#' + gameKey;
     return gameKey;
 })();
 
-export const authPromise = new Promise<firebase.User>((resolve, reject) => {
-    firebase.auth().onAuthStateChanged(user => {
-        user ? resolve(user) : reject(null);
-    });
-    firebase.auth().signInAnonymously();
-});
-
-const refGame = firebase.database().ref(`game/${gameKey}`);
+export const database = firebase.database();
+export const refGame = database.ref(`game/${gameKey}`);
 export const allClientsData = new dataLayer.DataLayer(refGame.child('clients'));
 export const boardData = new dataLayer.DataLayer(refGame.child('board'));
+
+export const isFrozenPromise = new Promise<boolean>(resolve =>
+    refGame.child('frozen').once('value', snapshot => {
+        const layout = document.getElementById('layout')! as HTMLDivElement;
+        if (snapshot.val()) {
+            layout.classList.add('game-frozen');
+        }
+        else {
+            layout.classList.add('game-playing');
+        }
+        resolve(snapshot.val());
+    })
+);
+
+export const authPromise = new Promise<firebase.User>(resolve => {
+    firebase.auth().onAuthStateChanged(user => user && resolve(user));
+    firebase.auth().signInAnonymously();
+});

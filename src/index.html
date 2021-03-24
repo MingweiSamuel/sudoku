@@ -103,8 +103,14 @@
     <symbol id="icon-play" viewBox="0 0 100 100">
       <polygon class="icon-fill" points="35,30 70,50 35,70"></polygon>
     </symbol>
+
+    <symbol id="icon-share" viewBox="0 0 100 100">
+      <path class="icon-round" fill="none"  stroke-width="6" d="M 40,25 L 25,25 L 25,75 L 75,75 L 75,50" />
+      <path class="icon-round" fill="none"  stroke-width="8" d="M 35,65 A 35 35 0 0 1 70,30" />
+      <path class="icon-round" fill="white" stroke-width="6" d="M 70,20 L 70,40 L 80,30 Z" />
+    </symbol>
   </svg>  
-  <div class="layout">
+  <div id="layout" class="layout">
     <div class="layout-sudoku">
       <svg id="sudoku" viewBox="-5 -5 910 910" xmlns="http://www.w3.org/2000/svg" style="background-color: black;">
         <mask id="highlight-mask">
@@ -215,6 +221,9 @@
         <span id="timer">0:00</span>
       </span>
       <span>
+        <button id="button-share" class="control-btn" title="Share/publish puzzle">
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-share" /></svg>
+        </button>
         <button id="button-modes-setter"  class="control-btn control-btn-inv" title="Puzzle-setting modes">
           <svg class="icon" viewBox="0 0 100 100"><use href="#icon-setter" /></svg>
         </button>
@@ -222,6 +231,11 @@
           <svg class="icon" viewBox="0 0 100 100"><use href="#icon-solver" /></svg>
         </button>
       </span>
+    </div>
+    <div class="layout-frozen">
+      <button id="button-play" class="control-btn" title="Play">
+        Play
+      </button>
     </div>
   </div>
   <script src="js/script.ts"></script>

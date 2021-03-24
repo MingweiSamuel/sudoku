@@ -34,6 +34,15 @@ body {
 
     @include layout-sizing(90vw, 90vh, $layout-ratio-landscape);
 }
+.layout:not(.game-playing) {
+    .layout-controls, .layout-timer {
+        display: none;
+    }
+}
+.layout:not(.game-frozen) .layout-frozen {
+    display: none;
+}
+
 .layout-sudoku {
     position: absolute;
     width: 100% * 2 / 3;
@@ -67,6 +76,18 @@ body {
     display: flex;
     justify-content: space-between;
 }
+.layout-frozen {
+    position: absolute;
+
+    top: 50%;
+    bottom: unset;
+    left: unset;
+    right: 0;
+
+    transform: translateY(-50%);
+
+    width: 30%;
+}
 
 @media (max-aspect-ratio: 9/10) {
     .layout {
@@ -96,6 +117,16 @@ body {
 
         transform: translateX(-100%);
     }
+    .layout-frozen {
+        top: 64%;
+        bottom: unset;
+        left: 50%;
+        right: unset;
+    
+        transform: translateX(-50%);
+    
+        width: 45%;
+    }
 }
 @media print {
     .layout {
@@ -110,6 +141,7 @@ body {
     }
     .layout-controls,
     .layout-timer,
+    .layout-frozen,
     #sudoku-highlights,
     #sudoku-cursor {
         display: none;
@@ -235,4 +267,12 @@ svg.icon {
     display: inline;
     width: 0.8em;
     vertical-align: middle;
+}
+
+
+#button-play {
+    text-transform: uppercase;
+    padding: 0.5em;
+
+    width: 100%;
 }

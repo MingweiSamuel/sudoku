@@ -10,6 +10,7 @@ import * as dataLayer from "./dataLayer";
 import * as utils from "./utils";
 import * as timer from "./timer";
 import "./modes";
+import "./share";
 
 const sudoku           = document.getElementById('sudoku')!             as unknown as SVGSVGElement;
 const sudokuColors     = document.getElementById('sudoku-colors')!      as unknown as SVGGElement;
@@ -248,6 +249,10 @@ function main(user: firebase.User): void {
     },
   }));
 
+  init.isFrozenPromise.then(isFrozen => isFrozen || startSolverMode(userId));
+}
+
+function startSolverMode(userId: string) {
   // Undo if REDO is false.
   // Redo if REDO is true.
   function updateHistory(redo: boolean): boolean {

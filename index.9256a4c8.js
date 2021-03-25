@@ -26421,33 +26421,29 @@
   }
   $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSetter.addEventListener('click', _e => $7fad4442d5945cd1f39d3594599d2b9f$export$setMode(true));
   $7fad4442d5945cd1f39d3594599d2b9f$var$buttonSolver.addEventListener('click', _e => $7fad4442d5945cd1f39d3594599d2b9f$export$setMode(false));
+  function $6bd03f53ceca4c0bf3939f051c446a60$var$cloneAndOpenGame(frozen, parent) {
+    const targetGame = $3bfc4decb8494f8f341894cb417de4cd$export$database.ref('game').push();
+    targetGame.set({
+      parent,
+      frozen,
+      board: $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get()
+    });
+    const win = window.open('#' + targetGame.key, '_blank');
+    if (null == win) {
+      alert('Failed to open window, check your popup settings, or manually open this URL: ' + window.location.href.replace(window.location.hash, '#' + targetGame.key));
+      throw Error('Failed to open window.');
+    }
+    win.focus();
+  }
   const $6bd03f53ceca4c0bf3939f051c446a60$var$buttonShare = document.getElementById('button-share');
   $3bfc4decb8494f8f341894cb417de4cd$export$authPromise.then(_user => {
-    $6bd03f53ceca4c0bf3939f051c446a60$var$buttonShare.addEventListener('click', _e => {
-      const targetGame = $3bfc4decb8494f8f341894cb417de4cd$export$database.ref('game').push();
-      targetGame.set({
-        frozen: true,
-        board: $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get()
-      });
-      const win = window.open('#' + targetGame.key, '_blank');
-      if (null == win) {
-        alert('Failed to open window.');
-        throw Error('Failed to open window,');
-      }
-      win.focus();
-    });
+    $6bd03f53ceca4c0bf3939f051c446a60$var$buttonShare.addEventListener('click', _e => $6bd03f53ceca4c0bf3939f051c446a60$var$cloneAndOpenGame(true, null));
   });
   // TODO: Note there is a bit of a race condition here, on when game data arrives....
   const $6bd03f53ceca4c0bf3939f051c446a60$var$buttonPlay = document.getElementById('button-play');
-  $6bd03f53ceca4c0bf3939f051c446a60$var$buttonPlay.addEventListener('click', _e => {
-    const targetGame = $3bfc4decb8494f8f341894cb417de4cd$export$database.ref('game').push();
-    targetGame.set({
-      parent: $3bfc4decb8494f8f341894cb417de4cd$export$gameKey,
-      board: $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get()
-    });
-    window.location.hash = '#' + targetGame.key;
-    window.location.reload();
-  });
+  $6bd03f53ceca4c0bf3939f051c446a60$var$buttonPlay.addEventListener('click', _e => $6bd03f53ceca4c0bf3939f051c446a60$var$cloneAndOpenGame(null, $3bfc4decb8494f8f341894cb417de4cd$export$gameKey));
+  // Always refresh when hash changes.
+  window.addEventListener('hashchange', _e => window.location.reload());
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku = document.getElementById('sudoku');
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuColors = document.getElementById('sudoku-colors');
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuHighlights = document.getElementById('sudoku-highlights');
@@ -26943,4 +26939,4 @@
   }
 })();
 
-//# sourceMappingURL=index.04e491b4.js.map
+//# sourceMappingURL=index.9256a4c8.js.map

@@ -26274,13 +26274,13 @@
     messagingSenderId: "410365958794",
     appId: "1:410365958794:web:e8fa3326b8d2735ce8ab73"
   });
-  const $3bfc4decb8494f8f341894cb417de4cd$export$gameKey = (() => {
+  const [$3bfc4decb8494f8f341894cb417de4cd$export$gameKey, $3bfc4decb8494f8f341894cb417de4cd$export$isNewGame] = (() => {
     if (window.location.hash) {
-      return window.location.hash.slice(1);
+      return [window.location.hash.slice(1), false];
     }
     const gameKey = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database().ref('game').push().key;
     window.location.hash = '#' + gameKey;
-    return gameKey;
+    return [gameKey, true];
   })();
   const $3bfc4decb8494f8f341894cb417de4cd$export$database = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database();
   const $3bfc4decb8494f8f341894cb417de4cd$export$refGame = $3bfc4decb8494f8f341894cb417de4cd$export$database.ref(`game/${$3bfc4decb8494f8f341894cb417de4cd$export$gameKey}`);
@@ -26299,6 +26299,8 @@
     $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().onAuthStateChanged(user => user && resolve(user));
     $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().signInAnonymously();
   });
+  // Always refresh when hash changes -- only after initial hash is set.
+  setTimeout(() => window.addEventListener('hashchange', _e => window.location.reload()), 1);
   function $a7fdc277ac0520c64854bc7b63570dc1$export$wrap(x) {
     return (x % $abe68232cbb7f72af82010f1f56d44cd$export$SIZE + $abe68232cbb7f72af82010f1f56d44cd$export$SIZE) % $abe68232cbb7f72af82010f1f56d44cd$export$SIZE;
   }
@@ -26384,7 +26386,7 @@
   const $c226919c184f4d25757b9cccfdb43fbb$var$timerPlay = document.getElementById('button-timer-play');
   $c226919c184f4d25757b9cccfdb43fbb$var$timerPause.addEventListener('click', _e => $c226919c184f4d25757b9cccfdb43fbb$export$setTicking(false));
   $c226919c184f4d25757b9cccfdb43fbb$var$timerPlay.addEventListener('click', _e => $c226919c184f4d25757b9cccfdb43fbb$export$setTicking(true));
-  let $c226919c184f4d25757b9cccfdb43fbb$var$ticking = true;
+  let $c226919c184f4d25757b9cccfdb43fbb$var$ticking = false;
   function $c226919c184f4d25757b9cccfdb43fbb$export$init(ref, onDataUpdate) {
     ref.once('value', snapshot => {
       let elapsedSeconds = snapshot.val();
@@ -26442,8 +26444,6 @@
   // TODO: Note there is a bit of a race condition here, on when game data arrives....
   const $6bd03f53ceca4c0bf3939f051c446a60$var$buttonPlay = document.getElementById('button-play');
   $6bd03f53ceca4c0bf3939f051c446a60$var$buttonPlay.addEventListener('click', _e => $6bd03f53ceca4c0bf3939f051c446a60$var$cloneAndOpenGame(null, $3bfc4decb8494f8f341894cb417de4cd$export$gameKey));
-  // Always refresh when hash changes.
-  window.addEventListener('hashchange', _e => window.location.reload());
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku = document.getElementById('sudoku');
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuColors = document.getElementById('sudoku-colors');
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuHighlights = document.getElementById('sudoku-highlights');
@@ -26454,6 +26454,7 @@
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuFilledMask = document.getElementById('sudoku-filled-mask');
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuCenter = document.getElementById('sudoku-center');
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuCorner = document.getElementById('sudoku-corner');
+  $c226919c184f4d25757b9cccfdb43fbb$export$setTicking(!$3bfc4decb8494f8f341894cb417de4cd$export$isNewGame);
   function $aa27b46fdea9a4f013efbd74ec72870e$var$makeTs() {
     return [$b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database.ServerValue.TIMESTAMP, Date.now()];
   }
@@ -26939,4 +26940,4 @@
   }
 })();
 
-//# sourceMappingURL=index.9256a4c8.js.map
+//# sourceMappingURL=index.fc600785.js.map

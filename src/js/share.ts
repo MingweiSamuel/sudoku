@@ -24,6 +24,3 @@ init.authPromise.then(_user => {
 // TODO: Note there is a bit of a race condition here, on when game data arrives....
 const buttonPlay = document.getElementById('button-play')! as HTMLButtonElement;
 buttonPlay.addEventListener('click', _e => cloneAndOpenGame(null, init.gameKey));
-
-// Always refresh when hash changes.
-window.addEventListener('hashchange', _e => window.location.reload());

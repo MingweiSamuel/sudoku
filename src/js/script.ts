@@ -23,9 +23,12 @@ const sudokuFilledMask = document.getElementById('sudoku-filled-mask')! as unkno
 const sudokuCenter     = document.getElementById('sudoku-center')!      as unknown as SVGGElement;
 const sudokuCorner     = document.getElementById('sudoku-corner')!      as unknown as SVGGElement;
 
+timer.setTicking(!init.isNewGame);
+
 function makeTs(): [ typeof firebase.database.ServerValue.TIMESTAMP, number ] {
   return [ firebase.database.ServerValue.TIMESTAMP, Date.now() ];
 }
+
 
 init.authPromise.then(main);
 

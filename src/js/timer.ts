@@ -9,7 +9,7 @@ const timerPlay = document.getElementById('button-timer-play')!;
 timerPause.addEventListener('click', _e => setTicking(false));
 timerPlay.addEventListener('click', _e => setTicking(true));
 
-let ticking = true;
+let ticking = false;
 
 export function init(ref: firebase.database.Reference, onDataUpdate: (elapsedSeconds: number) => void) {
     ref.once('value', snapshot => {

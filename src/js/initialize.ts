@@ -12,13 +12,13 @@ firebase.initializeApp({
     appId: "1:410365958794:web:e8fa3326b8d2735ce8ab73"
 });
 
-export const gameKey = (() => {
+export const [ gameKey, isNewGame ] = ((): [ string, boolean ] => {
     if (window.location.hash) {
-        return window.location.hash.slice(1);
+        return [ window.location.hash.slice(1), false ];
     }
     const gameKey = firebase.database().ref('game').push().key!;
     window.location.hash = '#' + gameKey;
-    return gameKey;
+    return [ gameKey, true ];
 })();
 
 export const database = firebase.database();
@@ -43,3 +43,6 @@ export const authPromise = new Promise<firebase.User>(resolve => {
     firebase.auth().onAuthStateChanged(user => user && resolve(user));
     firebase.auth().signInAnonymously();
 });
+
+// Always refresh when hash changes -- only after initial hash is set.
+setTimeout(() => window.addEventListener('hashchange', _e => window.location.reload()), 1);

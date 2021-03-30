@@ -26299,7 +26299,7 @@
     $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().onAuthStateChanged(user => user && resolve(user));
     $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().signInAnonymously();
   });
-  // Always refresh when hash changes -- only after initial hash is set.
+  // Once the initial hash is set, then if the user changes it refresh the page.
   setTimeout(() => window.addEventListener('hashchange', _e => window.location.reload()), 1);
   function $a7fdc277ac0520c64854bc7b63570dc1$export$wrap(x) {
     return (x % $abe68232cbb7f72af82010f1f56d44cd$export$SIZE + $abe68232cbb7f72af82010f1f56d44cd$export$SIZE) % $abe68232cbb7f72af82010f1f56d44cd$export$SIZE;
@@ -26940,4 +26940,4 @@
   }
 })();
 
-//# sourceMappingURL=index.fc600785.js.map
+//# sourceMappingURL=index.abdfd82b.js.map

@@ -44,5 +44,5 @@ export const authPromise = new Promise<firebase.User>(resolve => {
     firebase.auth().signInAnonymously();
 });
 
-// Always refresh when hash changes -- only after initial hash is set.
+// Once the initial hash is set, then if the user changes it refresh the page.
 setTimeout(() => window.addEventListener('hashchange', _e => window.location.reload()), 1);

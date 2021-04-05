@@ -26279,7 +26279,7 @@
       return [window.location.hash.slice(1), false];
     }
     const gameKey = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database().ref('game').push().key;
-    window.location.hash = '#' + gameKey;
+    history.replaceState(null, document.title, '#' + gameKey);
     return [gameKey, true];
   })();
   const $3bfc4decb8494f8f341894cb417de4cd$export$database = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database();
@@ -26441,6 +26441,8 @@
   $3bfc4decb8494f8f341894cb417de4cd$export$authPromise.then(_user => {
     $6bd03f53ceca4c0bf3939f051c446a60$var$buttonShare.addEventListener('click', _e => $6bd03f53ceca4c0bf3939f051c446a60$var$cloneAndOpenGame(true, null));
   });
+  const $6bd03f53ceca4c0bf3939f051c446a60$var$buttonNew = document.getElementById('button-new');
+  $6bd03f53ceca4c0bf3939f051c446a60$var$buttonNew.addEventListener('click', _e => window.location.hash = '#');
   // TODO: Note there is a bit of a race condition here, on when game data arrives....
   const $6bd03f53ceca4c0bf3939f051c446a60$var$buttonPlay = document.getElementById('button-play');
   $6bd03f53ceca4c0bf3939f051c446a60$var$buttonPlay.addEventListener('click', _e => $6bd03f53ceca4c0bf3939f051c446a60$var$cloneAndOpenGame(null, $3bfc4decb8494f8f341894cb417de4cd$export$gameKey));
@@ -26940,4 +26942,4 @@
   }
 })();
 
-//# sourceMappingURL=index.abdfd82b.js.map
+//# sourceMappingURL=index.185ce654.js.map

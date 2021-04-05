@@ -258,10 +258,17 @@ svg.icon {
   vertical-align: middle;
 }
 
-.layout-timer button {
+.layout-timer .control-btn {
   display: inline;
   width: 0.8em;
   vertical-align: middle;
+}
+
+.layout-timer .meta-buttons {
+  margin-right: -0.08em;
+}
+.layout-timer .meta-buttons * {
+  margin-right: 0.08em;
 }
 
 #button-play {
@@ -273,4 +280,4 @@ svg.icon {
 #sudoku {
   cursor: pointer;
 }
-/*# sourceMappingURL=index.476af71a.css.map */
+/*# sourceMappingURL=index.c1daf6d6.css.map */

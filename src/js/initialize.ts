@@ -17,7 +17,7 @@ export const [ gameKey, isNewGame ] = ((): [ string, boolean ] => {
         return [ window.location.hash.slice(1), false ];
     }
     const gameKey = firebase.database().ref('game').push().key!;
-    window.location.hash = '#' + gameKey;
+    history.replaceState(null, document.title, '#' + gameKey);
     return [ gameKey, true ];
 })();
 

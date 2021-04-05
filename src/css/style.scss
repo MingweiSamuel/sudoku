@@ -263,10 +263,16 @@ svg.icon {
 #timer {
     vertical-align: middle;
 }
-.layout-timer button {
+.layout-timer .control-btn {
     display: inline;
     width: 0.8em;
     vertical-align: middle;
+}
+.layout-timer .meta-buttons {
+    margin-right: -0.08em;
+    * {
+        margin-right: 0.08em;
+    }
 }
 
 

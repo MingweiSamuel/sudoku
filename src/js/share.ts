@@ -21,6 +21,9 @@ init.authPromise.then(_user => {
     buttonShare.addEventListener('click', _e => cloneAndOpenGame(true, null));
 });
 
+const buttonNew = document.getElementById('button-new')! as HTMLButtonElement;
+buttonNew.addEventListener('click', _e => window.location.hash = '#');
+
 // TODO: Note there is a bit of a race condition here, on when game data arrives....
 const buttonPlay = document.getElementById('button-play')! as HTMLButtonElement;
 buttonPlay.addEventListener('click', _e => cloneAndOpenGame(null, init.gameKey));

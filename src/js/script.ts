@@ -106,7 +106,7 @@ function main(user: firebase.User): void {
         const rgb = utils.cidToColor(otherCid);
         fillColor = `rgba(${rgb.join(',')}, 0.4)`;
       }
-      
+
       el.setAttribute('data-cid', otherCid);
       el.setAttribute('x', `${100 * x}`);
       el.setAttribute('y', `${100 * y}`);
@@ -135,7 +135,7 @@ function main(user: firebase.User): void {
       el.setAttribute('width', '100');
       el.setAttribute('height', '100');
       el.setAttribute('fill', 'black');
-      
+
       const [ x, y ] = utils.id2xy(+id);
       el.setAttribute('x', `${100 * x}`);
       el.setAttribute('y', `${100 * y}`);
@@ -166,7 +166,7 @@ function main(user: firebase.User): void {
       el.setAttribute('width', '100');
       el.setAttribute('height', '100');
       el.setAttribute('fill', 'black');
-      
+
       const [ x, y ] = utils.id2xy(+id);
       el.setAttribute('x', `${100 * x}`);
       el.setAttribute('y', `${100 * y}`);
@@ -212,7 +212,7 @@ function main(user: firebase.User): void {
       const el = document.createElementNS(consts.NS_SVG, 'text');
       el.setAttribute('class', 'center');
       el.setAttribute('mask', 'url(#sudoku-filled-mask)');
-      
+
       const [ x, y ] = utils.id2xy(+id);
       el.setAttribute('x', `${100 * x + 50}`);
       el.setAttribute('y', `${100 * y + 50}`);

@@ -26000,7 +26000,7 @@
   })($abe68232cbb7f72af82010f1f56d44cd$export$Mode || ($abe68232cbb7f72af82010f1f56d44cd$export$Mode = {}));
   const $abe68232cbb7f72af82010f1f56d44cd$export$MODE_CYCLE = [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS];
   const $abe68232cbb7f72af82010f1f56d44cd$export$DELETE_ORDER = [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS];
-  const $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_GIVENS = {
+  const $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_FILLED = {
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.GIVENS]: false,
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED]: true,
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER]: true,
@@ -26685,8 +26685,8 @@
     }
     function fillHelper(num, mode) {
       const update = {};
-      const blockedGivens = $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_GIVENS[mode] && $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('givens') || ({});
-      const selected = Object.entries($3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.get(userId, 'selected') || ({})).filter(([_, isSet]) => isSet).map(([id, _]) => id).filter(id => !blockedGivens || !blockedGivens[id]);
+      const blockedFilled = $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_FILLED[mode] ? Object.assign({}, $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('givens'), $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('filled')) : {};
+      const selected = Object.entries($3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.get(userId, 'selected') || ({})).filter(([_, isSet]) => isSet).map(([id, _]) => id).filter(id => !blockedFilled || !blockedFilled[id]);
       if (!selected.length) return false;
       const markData = $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get(mode) || ({});
       switch (mode) {
@@ -26739,6 +26739,29 @@
       });
       return true;
     }
+    window.fillAllGivens = function (grid) {
+      if (!Array.isArray(grid)) throw Error('Grid is not array');
+      if (81 !== grid.length) throw Error(`Bad grid length: ${grid.length}.`);
+      const update = {};
+      for (let i = 0; i < 81; i++) {
+        if (grid[i]) {
+          update[i] = grid[i];
+        }
+      }
+      const history = $3bfc4decb8494f8f341894cb417de4cd$export$boardData.update({
+        givens: update
+      });
+      if (!history) return false;
+      const key = $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.ref.child(`${userId}/history`).push().key;
+      $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.update({
+        [`${userId}/history/${key}`]: {
+          data: JSON.stringify(history),
+          ts: $aa27b46fdea9a4f013efbd74ec72870e$var$makeTs()
+        },
+        [`${userId}/historyUndone`]: null
+      });
+      return true;
+    };
     function loc2xy(xOff, yOff, limitCircle) {
       const {width: elWidth, height: elHeight} = $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.getBoundingClientRect();
       const {x, y, width, height} = $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.viewBox.baseVal;
@@ -26942,4 +26965,4 @@
   }
 })();
 
-//# sourceMappingURL=index.185ce654.js.map
+//# sourceMappingURL=index.cbd97d93.js.map

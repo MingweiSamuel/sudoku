@@ -26742,14 +26742,8 @@
     window.fillAllGivens = function (grid) {
       if (!Array.isArray(grid)) throw Error('Grid is not array');
       if (81 !== grid.length) throw Error(`Bad grid length: ${grid.length}.`);
-      const update = {};
-      for (let i = 0; i < 81; i++) {
-        if (grid[i]) {
-          update[i] = grid[i];
-        }
-      }
       const history = $3bfc4decb8494f8f341894cb417de4cd$export$boardData.update({
-        givens: update
+        givens: grid.map(x => x || undefined)
       });
       if (!history) return false;
       const key = $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.ref.child(`${userId}/history`).push().key;
@@ -26965,4 +26959,4 @@
   }
 })();
 
-//# sourceMappingURL=index.cbd97d93.js.map
+//# sourceMappingURL=index.31ab96a9.js.map

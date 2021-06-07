@@ -366,6 +366,30 @@ function startSolverMode(userId: string) {
     return true;
   }
 
+  ((window as any).fillAllGivens = function(grid: number[]): boolean {
+    if (!Array.isArray(grid)) throw Error('Grid is not array');
+    if (81 !== grid.length) throw Error(`Bad grid length: ${grid.length}.`);
+
+    const update: Record<number, number> = {};
+    for (let i = 0; i < 81; i++) {
+      if (grid[i]) {
+        update[i] = grid[i];
+      }
+    }
+
+    const history = init.boardData.update({ givens: update });
+    if (!history) return false;
+    const key = init.allClientsData.ref.child(`${userId}/history`).push().key;
+    init.allClientsData.update({
+      [`${userId}/history/${key}`]: {
+        data: JSON.stringify(history),
+        ts: makeTs(),
+      },
+      [`${userId}/historyUndone`]: null,
+    });
+    return true;
+  });
+
   function loc2xy(xOff: number, yOff: number, limitCircle: boolean): null | [ utils.XYCoord, utils.XYCoord ] {
     const { width: elWidth, height: elHeight } = sudoku.getBoundingClientRect();
     const { x, y, width, height } = sudoku.viewBox.baseVal;

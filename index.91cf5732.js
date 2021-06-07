@@ -26743,7 +26743,7 @@
       if (!Array.isArray(grid)) throw Error('Grid is not array');
       if (81 !== grid.length) throw Error(`Bad grid length: ${grid.length}.`);
       const history = $3bfc4decb8494f8f341894cb417de4cd$export$boardData.update({
-        givens: grid.map(x => x || undefined)
+        givens: grid.map(x => x || null)
       });
       if (!history) return false;
       const key = $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.ref.child(`${userId}/history`).push().key;
@@ -26959,4 +26959,4 @@
   }
 })();
 
-//# sourceMappingURL=index.31ab96a9.js.map
+//# sourceMappingURL=index.91cf5732.js.map

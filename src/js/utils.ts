@@ -105,3 +105,37 @@ export const stringifyNums = (nums: Record<number, boolean>) => Object.entries(n
     .filter(([ _, flag ]) => flag)
     .map(([ num ]) => num)
     .join('');
+
+export function rleEncode(grid: number[]): string {
+    const out = [];
+    let zeros = 0;
+    for (const x of grid) {
+        if (x || zeros >= 27) {
+            if (1 === zeros) out.push(0);
+            else if (1 < zeros) out.push(String.fromCharCode(63 + zeros));
+            zeros = 0;
+        }
+        if (x) {
+            out.push(x);
+        }
+        else zeros++;
+    }
+    return out.join('');
+}
+
+export function rleDecode(rle: string): (number | null)[] {
+    const grid: (number | null)[] = [];
+    for (let i = 0; i < rle.length; i++) {
+        const c = rle.charCodeAt(i);
+        if (65 <= c && c <= 90) {
+            grid.push(...new Array<null>(c - 63).fill(null));
+        }
+        else if (48 <= c && c <= 57) {
+            grid.push((c - 48) || null);
+        }
+        else {
+            throw Error(`Invalid RLE character: ${rle[i]}, code: ${c}.`);
+        }
+    }
+    return grid;
+}

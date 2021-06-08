@@ -26180,16 +26180,18 @@
       this._watchers = {};
       this._updates = null;
       this._updatesInflight = null;
-      this.ref.on('value', snapshot => {
-        let newData = snapshot.val();
-        if (this._updatesInflight) {
-          newData = $29821818cda24958b32cfc86ab7af955$var$applyUpdate(newData, this._updatesInflight);
-        }
-        if (this._updates) {
-          newData = $29821818cda24958b32cfc86ab7af955$var$applyUpdate(newData, this._updates);
-        }
-        this._onChange(newData);
-      });
+      if (null != this.ref) {
+        this.ref.on('value', snapshot => {
+          let newData = snapshot.val();
+          if (this._updatesInflight) {
+            newData = $29821818cda24958b32cfc86ab7af955$var$applyUpdate(newData, this._updatesInflight);
+          }
+          if (this._updates) {
+            newData = $29821818cda24958b32cfc86ab7af955$var$applyUpdate(newData, this._updates);
+          }
+          this._onChange(newData);
+        });
+      }
     }
     get(...path) {
       let target = this._data;
@@ -26199,6 +26201,14 @@
     update(update) {
       const {forward, back} = $29821818cda24958b32cfc86ab7af955$var$diffUpdate(this._data, update);
       if (0 === Object.keys(forward).length) return null;
+      if (null == this.ref) {
+        const newData = $29821818cda24958b32cfc86ab7af955$var$applyUpdate(this._data, forward);
+        this._onChange(newData);
+        return {
+          forward,
+          back
+        };
+      }
       // Enqueue updates.
       if (null == this._updates) {
         this._updates = {};
@@ -26272,42 +26282,6 @@
       }
     };
   }
-  $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.initializeApp({
-    apiKey: "AIzaSyAmZZULS1wzXF4Sfj6u_eVmigMOL1Ga5NI",
-    authDomain: "sudoku-0.firebaseapp.com",
-    databaseURL: "https://sudoku-0-default-rtdb.firebaseio.com",
-    projectId: "sudoku-0",
-    storageBucket: "sudoku-0.appspot.com",
-    messagingSenderId: "410365958794",
-    appId: "1:410365958794:web:e8fa3326b8d2735ce8ab73"
-  });
-  const [$3bfc4decb8494f8f341894cb417de4cd$export$gameKey, $3bfc4decb8494f8f341894cb417de4cd$export$isNewGame] = (() => {
-    if (window.location.hash) {
-      return [window.location.hash.slice(1), false];
-    }
-    const gameKey = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database().ref('game').push().key;
-    history.replaceState(null, document.title, '#' + gameKey);
-    return [gameKey, true];
-  })();
-  const $3bfc4decb8494f8f341894cb417de4cd$export$database = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database();
-  const $3bfc4decb8494f8f341894cb417de4cd$export$refGame = $3bfc4decb8494f8f341894cb417de4cd$export$database.ref(`game/${$3bfc4decb8494f8f341894cb417de4cd$export$gameKey}`);
-  const $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData = new $29821818cda24958b32cfc86ab7af955$export$DataLayer($3bfc4decb8494f8f341894cb417de4cd$export$refGame.child('clients'));
-  const $3bfc4decb8494f8f341894cb417de4cd$export$boardData = new $29821818cda24958b32cfc86ab7af955$export$DataLayer($3bfc4decb8494f8f341894cb417de4cd$export$refGame.child('board'));
-  const $3bfc4decb8494f8f341894cb417de4cd$export$isFrozenPromise = new Promise(resolve => $3bfc4decb8494f8f341894cb417de4cd$export$refGame.child('frozen').once('value', snapshot => {
-    const layout = document.getElementById('layout');
-    if (snapshot.val()) {
-      layout.classList.add('game-frozen');
-    } else {
-      layout.classList.add('game-playing');
-    }
-    resolve(snapshot.val());
-  }));
-  const $3bfc4decb8494f8f341894cb417de4cd$export$authPromise = new Promise(resolve => {
-    $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().onAuthStateChanged(user => user && resolve(user));
-    $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().signInAnonymously();
-  });
-  // Once the initial hash is set, then if the user changes it refresh the page.
-  setTimeout(() => window.addEventListener('hashchange', _e => window.location.reload()), 1);
   function $a7fdc277ac0520c64854bc7b63570dc1$export$wrap(x) {
     return (x % $abe68232cbb7f72af82010f1f56d44cd$export$SIZE + $abe68232cbb7f72af82010f1f56d44cd$export$SIZE) % $abe68232cbb7f72af82010f1f56d44cd$export$SIZE;
   }
@@ -26388,6 +26362,80 @@
     return bad;
   }
   const $a7fdc277ac0520c64854bc7b63570dc1$export$stringifyNums = nums => Object.entries(nums).filter(([_, flag]) => flag).map(([num]) => num).join('');
+  function $a7fdc277ac0520c64854bc7b63570dc1$export$rleDecode(rle) {
+    const grid = [];
+    for (let i = 0; i < rle.length; i++) {
+      const c = rle.charCodeAt(i);
+      if (65 <= c && c <= 90) {
+        grid.push(...new Array(c - 63).fill(null));
+      } else if (48 <= c && c <= 57) {
+        grid.push(c - 48 || null);
+      } else {
+        throw Error(`Invalid RLE character: ${rle[i]}, code: ${c}.`);
+      }
+    }
+    if (81 !== grid.length) throw Error(`Decoded grid has invalid length: ${grid.length}.`);
+    return grid;
+  }
+  $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.initializeApp({
+    apiKey: "AIzaSyAmZZULS1wzXF4Sfj6u_eVmigMOL1Ga5NI",
+    authDomain: "sudoku-0.firebaseapp.com",
+    databaseURL: "https://sudoku-0-default-rtdb.firebaseio.com",
+    projectId: "sudoku-0",
+    storageBucket: "sudoku-0.appspot.com",
+    messagingSenderId: "410365958794",
+    appId: "1:410365958794:web:e8fa3326b8d2735ce8ab73"
+  });
+  const $3bfc4decb8494f8f341894cb417de4cd$export$database = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database();
+  const {gameKey: $3bfc4decb8494f8f341894cb417de4cd$export$gameKey, isNewGame: $3bfc4decb8494f8f341894cb417de4cd$export$isNewGame, allClientsData: $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData, boardData: $3bfc4decb8494f8f341894cb417de4cd$export$boardData, isFrozenPromise: $3bfc4decb8494f8f341894cb417de4cd$export$isFrozenPromise} = (() => {
+    let gameKey;
+    let isNewGame;
+    if (window.location.hash) {
+      if ('$' === window.location.hash[1]) {
+        const boardData = new $29821818cda24958b32cfc86ab7af955$export$DataLayer(null);
+        boardData.update({
+          givens: $a7fdc277ac0520c64854bc7b63570dc1$export$rleDecode(window.location.hash.slice(2))
+        });
+        return {
+          gameKey: null,
+          isNewGame: false,
+          allClientsData: new $29821818cda24958b32cfc86ab7af955$export$DataLayer(null),
+          boardData,
+          isFrozenPromise: Promise.resolve(true)
+        };
+      }
+      gameKey = window.location.hash.slice(1);
+      isNewGame = false;
+    } else {
+      gameKey = $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database().ref('game').push().key;
+      isNewGame = true;
+      history.replaceState(null, document.title, '#' + gameKey);
+    }
+    const refGame = $3bfc4decb8494f8f341894cb417de4cd$export$database.ref(`game/${gameKey}`);
+    const isFrozenPromise = new Promise(resolve => refGame.child('frozen').once('value', snapshot => resolve(snapshot.val())));
+    return {
+      gameKey,
+      isNewGame,
+      allClientsData: new $29821818cda24958b32cfc86ab7af955$export$DataLayer(refGame.child('clients')),
+      boardData: new $29821818cda24958b32cfc86ab7af955$export$DataLayer(refGame.child('board')),
+      isFrozenPromise
+    };
+  })();
+  const $3bfc4decb8494f8f341894cb417de4cd$export$authPromise = new Promise(resolve => {
+    $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().onAuthStateChanged(user => user && resolve(user));
+    $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.auth().signInAnonymously();
+  });
+  // Once the initial hash is set, then if the user changes it refresh the page.
+  setTimeout(() => window.addEventListener('hashchange', _e => window.location.reload()), 1);
+  // Set frozen CSS classes when resolved, after auth.
+  $3bfc4decb8494f8f341894cb417de4cd$export$authPromise.then(() => $3bfc4decb8494f8f341894cb417de4cd$export$isFrozenPromise).then(frozen => {
+    const layout = document.getElementById('layout');
+    if (frozen) {
+      layout.classList.add('game-frozen');
+    } else {
+      layout.classList.add('game-playing');
+    }
+  });
   const $c226919c184f4d25757b9cccfdb43fbb$var$timer = document.getElementById('timer');
   const $c226919c184f4d25757b9cccfdb43fbb$var$timerPause = document.getElementById('button-timer-pause');
   const $c226919c184f4d25757b9cccfdb43fbb$var$timerPlay = document.getElementById('button-timer-play');
@@ -26437,6 +26485,7 @@
       frozen,
       board: $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get()
     });
+    console.log($3bfc4decb8494f8f341894cb417de4cd$export$boardData.get());
     const win = window.open('#' + targetGame.key, '_blank');
     if (null == win) {
       alert('Failed to open window, check your popup settings, or manually open this URL: ' + window.location.href.replace(window.location.hash, '#' + targetGame.key));
@@ -26474,20 +26523,22 @@
     _allClientsData = $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData;
     window./*TODO*/
     _boardData = $3bfc4decb8494f8f341894cb417de4cd$export$boardData;
-    const refClient = $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.ref.child(userId);
-    refClient.update({
-      // cursor: null,
-      // selected: null,
-      // history: null,
-      // historyUndone: null,
-      online: true,
-      ts: $aa27b46fdea9a4f013efbd74ec72870e$var$makeTs()
-    });
-    refClient.child('online').onDisconnect().set(false);
-    // Setup timer.
-    $c226919c184f4d25757b9cccfdb43fbb$export$init(refClient.child('elapsedSeconds'), elapsedSeconds => $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.update({
-      [`${userId}/elapsedSeconds`]: elapsedSeconds
-    }));
+    if (null != $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.ref) {
+      const refClient = $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.ref.child(userId);
+      refClient.update({
+        // cursor: null,
+        // selected: null,
+        // history: null,
+        // historyUndone: null,
+        online: true,
+        ts: $aa27b46fdea9a4f013efbd74ec72870e$var$makeTs()
+      });
+      refClient.child('online').onDisconnect().set(false);
+      // Setup timer.
+      $c226919c184f4d25757b9cccfdb43fbb$export$init(refClient.child('elapsedSeconds'), elapsedSeconds => $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.update({
+        [`${userId}/elapsedSeconds`]: elapsedSeconds
+      }));
+    }
     // Sticky online (if closed in another tab).
     $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.watch(`${userId}/online`, {
       onChange: function ({newVal}) {
@@ -26966,4 +27017,4 @@
   }
 })();
 
-//# sourceMappingURL=index.5f4e6100.js.map
+//# sourceMappingURL=index.4e385ac5.js.map

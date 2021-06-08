@@ -38,24 +38,26 @@ function main(user: firebase.User): void {
   (window as any /* TODO */)._allClientsData = init.allClientsData;
   (window as any /* TODO */)._boardData = init.boardData;
 
-  const refClient = init.allClientsData.ref.child(userId);
-  refClient.update({
-    // cursor: null,
-    // selected: null,
-    // history: null,
-    // historyUndone: null,
-    online: true,
-    ts: makeTs(),
-  });
-  refClient.child('online').onDisconnect().set(false);
+  if (null != init.allClientsData.ref) {
+    const refClient = init.allClientsData.ref.child(userId);
+    refClient.update({
+      // cursor: null,
+      // selected: null,
+      // history: null,
+      // historyUndone: null,
+      online: true,
+      ts: makeTs(),
+    });
+    refClient.child('online').onDisconnect().set(false);
 
-  // Setup timer.
-  timer.init(
-    refClient.child('elapsedSeconds'),
-    elapsedSeconds => init.allClientsData.update({
-      [`${userId}/elapsedSeconds`]: elapsedSeconds,
-    })
-  );
+    // Setup timer.
+    timer.init(
+      refClient.child('elapsedSeconds'),
+      elapsedSeconds => init.allClientsData.update({
+        [`${userId}/elapsedSeconds`]: elapsedSeconds,
+      })
+    );
+  }
 
   // Sticky online (if closed in another tab).
   init.allClientsData.watch(`${userId}/online`, {
@@ -354,7 +356,7 @@ function startSolverMode(userId: string) {
     // Update and add update to history.
     const history = init.boardData.update(update);
     if (!history) return false;
-    const key = init.allClientsData.ref.child(`${userId}/history`).push().key;
+    const key = init.allClientsData.ref!.child(`${userId}/history`).push().key;
     init.allClientsData.update({
       [`${userId}/history/${key}`]: {
         data: JSON.stringify(history),
@@ -371,7 +373,7 @@ function startSolverMode(userId: string) {
 
     const history = init.boardData.update({ givens: grid.map(x => x || null) });
     if (!history) return false;
-    const key = init.allClientsData.ref.child(`${userId}/history`).push().key;
+    const key = init.allClientsData.ref!.child(`${userId}/history`).push().key;
     init.allClientsData.update({
       [`${userId}/history/${key}`]: {
         data: JSON.stringify(history),

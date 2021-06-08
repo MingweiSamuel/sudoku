@@ -7,6 +7,7 @@ function cloneAndOpenGame(frozen: true | null, parent: string | null) {
         frozen,
         board: init.boardData.get(),
     });
+    console.log(init.boardData.get());
     const win = window.open('#' + targetGame.key, '_blank');
     if (null == win) {
         alert('Failed to open window, check your popup settings, or manually open this URL: '

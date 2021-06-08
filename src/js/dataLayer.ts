@@ -126,7 +126,7 @@ function forEachPattern(
     if ('string' === typeof pattern) {
         pattern = pattern.split('/');
     }
-    
+
     const root = !pattern || !pattern.length;
     if (root) {
         func(_path, oldData, newData);
@@ -165,14 +165,14 @@ export interface Watcher {
 }
 
 export class DataLayer {
-    readonly ref: firebase.database.Reference;
+    readonly ref: firebase.database.Reference | null;
     private _data: Data;
     private _delay: number;
     private _watchers: Record<string, Watcher[]>;
     private _updates: null | Update;
-    private _updatesInflight: null | Update; 
+    private _updatesInflight: null | Update;
 
-    constructor(ref: firebase.database.Reference, delay = 250) {
+    constructor(ref: firebase.database.Reference | null, delay = 250) {
         this.ref = ref;
         this._data = undefined;
         this._delay = delay;
@@ -180,18 +180,20 @@ export class DataLayer {
         this._updates = null;
         this._updatesInflight = null;
 
-        this.ref.on('value', snapshot => {
-            let newData = snapshot.val();
+        if (null != this.ref) {
+            this.ref.on('value', snapshot => {
+                let newData = snapshot.val();
 
-            if (this._updatesInflight) {
-                newData = applyUpdate(newData, this._updatesInflight);
-            }
-            if (this._updates) {
-                newData = applyUpdate(newData, this._updates);
-            }
+                if (this._updatesInflight) {
+                    newData = applyUpdate(newData, this._updatesInflight);
+                }
+                if (this._updates) {
+                    newData = applyUpdate(newData, this._updates);
+                }
 
-            this._onChange(newData);
-        });
+                this._onChange(newData);
+            });
+        }
     }
 
     get<T>(...path: string[]): T | undefined {
@@ -205,12 +207,18 @@ export class DataLayer {
         if (0 === Object.keys(forward).length)
             return null;
 
+        if (null == this.ref) {
+            const newData = applyUpdate(this._data, forward);
+            this._onChange(newData);
+            return { forward, back };
+        }
+
         // Enqueue updates.
         if (null == this._updates) {
             this._updates = {};
             setTimeout(() => {
                 if (null == this._updates) return;
-                this.ref.update(this._updates, e => {
+                this.ref!.update(this._updates, e => {
                     // TODO?
                     if (e) console.error('Update error!', e);
                     this._updatesInflight = null;

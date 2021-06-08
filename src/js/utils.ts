@@ -107,6 +107,11 @@ export const stringifyNums = (nums: Record<number, boolean>) => Object.entries(n
     .join('');
 
 export function rleEncode(grid: number[]): string {
+    if (!Array.isArray(grid))
+        throw Error(`Attempted to encode non-array grid: ${grid}.`);
+    if (81 !== grid.length)
+        throw Error(`Attempted to encode invalid grid (length ${grid.length}): [${grid.join(', ')}].`);
+
     const out = [];
     let zeros = 0;
     for (const x of grid) {
@@ -137,5 +142,9 @@ export function rleDecode(rle: string): (number | null)[] {
             throw Error(`Invalid RLE character: ${rle[i]}, code: ${c}.`);
         }
     }
+
+    if (81 !== grid.length)
+        throw Error(`Decoded grid has invalid length: ${grid.length}.`);
+
     return grid;
 }

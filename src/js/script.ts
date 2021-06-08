@@ -300,15 +300,14 @@ function startSolverMode(userId: string) {
   function fillHelper(num: null | number, mode: consts.Mode): boolean {
     const update: dataLayer.Update = {};
 
-    const blockedFilled = consts.BLOCKED_BY_FILLED[mode]
-      ? Object.assign({},
-        init.boardData.get<Record<string | utils.IdCoord, number>>('givens'),
-        init.boardData.get<Record<string | utils.IdCoord, number>>('filled'))
-      : {};
+    const blocked = Object.assign({},
+        consts.BLOCKED_BY_GIVENS[mode] ? init.boardData.get<Record<string | utils.IdCoord, number>>('givens') : null,
+        consts.BLOCKED_BY_FILLED[mode] ? init.boardData.get<Record<string | utils.IdCoord, number>>('filled') : null);
+
     const selected = Object.entries(init.allClientsData.get<Record<utils.IdCoord, boolean>>(userId, 'selected') || {})
       .filter(([ _, isSet ]) => isSet)
       .map(([ id, _ ]) => id)
-      .filter(id => !blockedFilled || !blockedFilled[id as any]);
+      .filter(id => !blocked || !blocked[id as any]);
 
     if (!selected.length) return false;
 

@@ -19,9 +19,17 @@ export const DELETE_ORDER = [
   Mode.COLORS,
 ] as const;
 
-export const BLOCKED_BY_FILLED = {
+export const BLOCKED_BY_GIVENS = {
   [Mode.GIVENS]: false,
   [Mode.FILLED]: true,
+  [Mode.CORNER]: true,
+  [Mode.CENTER]: true,
+  [Mode.COLORS]: false,
+} as const;
+
+export const BLOCKED_BY_FILLED = {
+  [Mode.GIVENS]: false,
+  [Mode.FILLED]: false,
   [Mode.CORNER]: true,
   [Mode.CENTER]: true,
   [Mode.COLORS]: false,

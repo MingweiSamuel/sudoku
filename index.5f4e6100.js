@@ -26000,9 +26000,16 @@
   })($abe68232cbb7f72af82010f1f56d44cd$export$Mode || ($abe68232cbb7f72af82010f1f56d44cd$export$Mode = {}));
   const $abe68232cbb7f72af82010f1f56d44cd$export$MODE_CYCLE = [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS];
   const $abe68232cbb7f72af82010f1f56d44cd$export$DELETE_ORDER = [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS];
-  const $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_FILLED = {
+  const $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_GIVENS = {
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.GIVENS]: false,
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED]: true,
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER]: true,
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER]: true,
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS]: false
+  };
+  const $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_FILLED = {
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.GIVENS]: false,
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED]: false,
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER]: true,
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER]: true,
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS]: false
@@ -26685,8 +26692,8 @@
     }
     function fillHelper(num, mode) {
       const update = {};
-      const blockedFilled = $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_FILLED[mode] ? Object.assign({}, $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('givens'), $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('filled')) : {};
-      const selected = Object.entries($3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.get(userId, 'selected') || ({})).filter(([_, isSet]) => isSet).map(([id, _]) => id).filter(id => !blockedFilled || !blockedFilled[id]);
+      const blocked = Object.assign({}, $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_GIVENS[mode] ? $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('givens') : null, $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_FILLED[mode] ? $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('filled') : null);
+      const selected = Object.entries($3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.get(userId, 'selected') || ({})).filter(([_, isSet]) => isSet).map(([id, _]) => id).filter(id => !blocked || !blocked[id]);
       if (!selected.length) return false;
       const markData = $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get(mode) || ({});
       switch (mode) {
@@ -26959,4 +26966,4 @@
   }
 })();
 
-//# sourceMappingURL=index.91cf5732.js.map
+//# sourceMappingURL=index.5f4e6100.js.map

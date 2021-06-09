@@ -302,14 +302,21 @@ function startSolverMode(userId: string) {
   function fillHelper(num: null | number, mode: consts.Mode): boolean {
     const update: dataLayer.Update = {};
 
-    const blocked = Object.assign({},
-        consts.BLOCKED_BY_GIVENS[mode] ? init.boardData.get<Record<string | utils.IdCoord, number>>('givens') : null,
-        consts.BLOCKED_BY_FILLED[mode] ? init.boardData.get<Record<string | utils.IdCoord, number>>('filled') : null);
+    type BlockedGrid = (null | number)[] | Record<string | utils.IdCoord, number>;
+    const blocked: Record<string | utils.IdCoord, boolean> = {};
+    const entries = [
+      ...Object.entries(consts.BLOCKED_BY_GIVENS[mode] && init.boardData.get<BlockedGrid>('givens') || {}),
+      ...Object.entries(consts.BLOCKED_BY_FILLED[mode] && init.boardData.get<BlockedGrid>('filled') || {}),
+    ];
+    for (const [ id, val ] of entries) {
+      if (null != val)
+        blocked[id] = true;
+    }
 
     const selected = Object.entries(init.allClientsData.get<Record<utils.IdCoord, boolean>>(userId, 'selected') || {})
       .filter(([ _, isSet ]) => isSet)
       .map(([ id, _ ]) => id)
-      .filter(id => !blocked || !blocked[id as any]);
+      .filter(id => null == blocked[id as any]);
 
     if (!selected.length) return false;
 

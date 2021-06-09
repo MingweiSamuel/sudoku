@@ -125,6 +125,7 @@ export function rleEncode(grid: number[]): string {
         }
         else zeros++;
     }
+    // Note: trailing zeros are ignored.
     return out.join('');
 }
 
@@ -142,8 +143,9 @@ export function rleDecode(rle: string): (number | null)[] {
             throw Error(`Invalid RLE character: ${rle[i]}, code: ${c}.`);
         }
     }
+    // Note: trailing zeros are ignored.
 
-    if (81 !== grid.length)
+    if (81 < grid.length)
         throw Error(`Decoded grid has invalid length: ${grid.length}.`);
 
     return grid;

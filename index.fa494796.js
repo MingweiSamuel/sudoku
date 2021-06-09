@@ -26374,7 +26374,8 @@
         throw Error(`Invalid RLE character: ${rle[i]}, code: ${c}.`);
       }
     }
-    if (81 !== grid.length) throw Error(`Decoded grid has invalid length: ${grid.length}.`);
+    // Note: trailing zeros are ignored.
+    if (81 < grid.length) throw Error(`Decoded grid has invalid length: ${grid.length}.`);
     return grid;
   }
   $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.initializeApp({
@@ -27021,4 +27022,4 @@
   }
 })();
 
-//# sourceMappingURL=index.546e6aed.js.map
+//# sourceMappingURL=index.fa494796.js.map

@@ -26743,8 +26743,12 @@
     }
     function fillHelper(num, mode) {
       const update = {};
-      const blocked = Object.assign({}, $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_GIVENS[mode] ? $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('givens') : null, $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_FILLED[mode] ? $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('filled') : null);
-      const selected = Object.entries($3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.get(userId, 'selected') || ({})).filter(([_, isSet]) => isSet).map(([id, _]) => id).filter(id => !blocked || !blocked[id]);
+      const blocked = {};
+      const entries = [...Object.entries($abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_GIVENS[mode] && $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('givens') || ({})), ...Object.entries($abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_FILLED[mode] && $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get('filled') || ({}))];
+      for (const [id, val] of entries) {
+        if (null != val) blocked[id] = true;
+      }
+      const selected = Object.entries($3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.get(userId, 'selected') || ({})).filter(([_, isSet]) => isSet).map(([id, _]) => id).filter(id => null == blocked[id]);
       if (!selected.length) return false;
       const markData = $3bfc4decb8494f8f341894cb417de4cd$export$boardData.get(mode) || ({});
       switch (mode) {
@@ -27017,4 +27021,4 @@
   }
 })();
 
-//# sourceMappingURL=index.4e385ac5.js.map
+//# sourceMappingURL=index.546e6aed.js.map

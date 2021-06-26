@@ -26362,22 +26362,42 @@
     return bad;
   }
   const $a7fdc277ac0520c64854bc7b63570dc1$export$stringifyNums = nums => Object.entries(nums).filter(([_, flag]) => flag).map(([num]) => num).join('');
-  function $a7fdc277ac0520c64854bc7b63570dc1$export$rleDecode(rle) {
+  function $a7fdc277ac0520c64854bc7b63570dc1$var$validateGrid(grid, strictLength) {
+    if (!Array.isArray(grid)) throw Error(`Grid is not an array: ${grid}.`);
+    if (strictLength ? 81 !== grid.length : 81 < grid.length) throw Error(`Grid is bad length: ${grid.length} [${grid.join(', ')}].`);
+  }
+  function $a7fdc277ac0520c64854bc7b63570dc1$export$rleDecode(enc) {
     const grid = [];
-    for (let i = 0; i < rle.length; i++) {
-      const c = rle.charCodeAt(i);
+    for (let i = 0; i < enc.length; i++) {
+      const c = enc.charCodeAt(i);
       if (65 <= c && c <= 90) {
         grid.push(...new Array(c - 63).fill(null));
       } else if (48 <= c && c <= 57) {
         grid.push(c - 48 || null);
       } else {
-        throw Error(`Invalid RLE character: ${rle[i]}, code: ${c}.`);
+        throw Error(`Invalid RLE character: '${enc[i]}'.`);
       }
     }
     // Note: trailing zeros are ignored.
-    if (81 < grid.length) throw Error(`Decoded grid has invalid length: ${grid.length}.`);
+    $a7fdc277ac0520c64854bc7b63570dc1$var$validateGrid(grid, false);
     return grid;
   }
+  const $a7fdc277ac0520c64854bc7b63570dc1$var$CTC_ENCODING_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwx';
+  function $a7fdc277ac0520c64854bc7b63570dc1$export$ctcDecode(enc) {
+    const grid = [];
+    for (const c of enc) {
+      // const i = 51 * (x >> 6 & 1) + 26 * (x >> 5 & 1) + (x & 0b11111) - 42;
+      const i = $a7fdc277ac0520c64854bc7b63570dc1$var$CTC_ENCODING_CHARS.indexOf(c);
+      if (0 > i) throw Error(`Invalid CTC character: '${c}'.`);
+      grid.push(i % 10 || null, ...Array(Math.floor(i / 10)).fill(null));
+    }
+    $a7fdc277ac0520c64854bc7b63570dc1$var$validateGrid(grid, false);
+    return grid;
+  }
+  const $a7fdc277ac0520c64854bc7b63570dc1$export$DECODE_TABLE = {
+    '$': $a7fdc277ac0520c64854bc7b63570dc1$export$rleDecode,
+    '.': $a7fdc277ac0520c64854bc7b63570dc1$export$ctcDecode
+  };
   $b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.initializeApp({
     apiKey: "AIzaSyAmZZULS1wzXF4Sfj6u_eVmigMOL1Ga5NI",
     authDomain: "sudoku-0.firebaseapp.com",
@@ -26392,10 +26412,11 @@
     let gameKey;
     let isNewGame;
     if (window.location.hash) {
-      if ('$' === window.location.hash[1]) {
+      const char1 = window.location.hash[1];
+      if ((char1 in $a7fdc277ac0520c64854bc7b63570dc1$export$DECODE_TABLE)) {
         const boardData = new $29821818cda24958b32cfc86ab7af955$export$DataLayer(null);
         boardData.update({
-          givens: $a7fdc277ac0520c64854bc7b63570dc1$export$rleDecode(window.location.hash.slice(2))
+          givens: $a7fdc277ac0520c64854bc7b63570dc1$export$DECODE_TABLE[char1](window.location.hash.slice(2))
         });
         return {
           gameKey: null,
@@ -27022,4 +27043,4 @@
   }
 })();
 
-//# sourceMappingURL=index.fa494796.js.map
+//# sourceMappingURL=index.94cdb9d5.js.map

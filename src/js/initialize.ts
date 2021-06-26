@@ -1,7 +1,7 @@
 import firebase from "firebase/app";
 
 import * as dataLayer from "./dataLayer";
-import { rleDecode } from "./utils";
+import { DECODE_TABLE } from "./utils";
 
 firebase.initializeApp({
     apiKey: "AIzaSyAmZZULS1wzXF4Sfj6u_eVmigMOL1Ga5NI",
@@ -24,9 +24,12 @@ export const {
     let gameKey;
     let isNewGame;
     if (window.location.hash) {
-        if ('$' === window.location.hash[1]) {
+        const char1 = window.location.hash[1];
+        if (char1 in DECODE_TABLE) {
             const boardData = new dataLayer.DataLayer(null);
-            boardData.update({ givens: rleDecode(window.location.hash.slice(2)) });
+            boardData.update({
+                givens: DECODE_TABLE[char1 as keyof typeof DECODE_TABLE](window.location.hash.slice(2)),
+            });
             return {
                 gameKey: null,
                 isNewGame: false,

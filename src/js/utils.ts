@@ -106,11 +106,15 @@ export const stringifyNums = (nums: Record<number, boolean>) => Object.entries(n
     .map(([ num ]) => num)
     .join('');
 
-export function rleEncode(grid: number[]): string {
+function validateGrid(grid: (number | null)[], strictLength: boolean) {
     if (!Array.isArray(grid))
-        throw Error(`Attempted to encode non-array grid: ${grid}.`);
-    if (81 !== grid.length)
-        throw Error(`Attempted to encode invalid grid (length ${grid.length}): [${grid.join(', ')}].`);
+        throw Error(`Grid is not an array: ${grid}.`);
+    if (strictLength ? (81 !== grid.length) : (81 < grid.length))
+        throw Error(`Grid is bad length: ${grid.length} [${grid.join(', ')}].`);
+}
+
+export function rleEncode(grid: number[]): string {
+    validateGrid(grid, true);
 
     const out = [];
     let zeros = 0;
@@ -129,10 +133,10 @@ export function rleEncode(grid: number[]): string {
     return out.join('');
 }
 
-export function rleDecode(rle: string): (number | null)[] {
+export function rleDecode(enc: string): (number | null)[] {
     const grid: (number | null)[] = [];
-    for (let i = 0; i < rle.length; i++) {
-        const c = rle.charCodeAt(i);
+    for (let i = 0; i < enc.length; i++) {
+        const c = enc.charCodeAt(i);
         if (65 <= c && c <= 90) {
             grid.push(...new Array<null>(c - 63).fill(null));
         }
@@ -140,13 +144,54 @@ export function rleDecode(rle: string): (number | null)[] {
             grid.push((c - 48) || null);
         }
         else {
-            throw Error(`Invalid RLE character: ${rle[i]}, code: ${c}.`);
+            throw Error(`Invalid RLE character: '${enc[i]}'.`);
         }
     }
     // Note: trailing zeros are ignored.
 
-    if (81 < grid.length)
-        throw Error(`Decoded grid has invalid length: ${grid.length}.`);
+    validateGrid(grid, false);
 
     return grid;
 }
+
+const CTC_ENCODING_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwx';
+
+export function ctcEncode(grid: number[]): string {
+    validateGrid(grid, true);
+
+    const out: string[] = [];
+
+    let digit = grid[0];
+    let trail = 0;
+    for (let i = 1; i < grid.length; i++) {
+        if (5 <= trail || grid[i]) {
+            // 48 + 7 * (i > 9) + 6 * (i > 35) + i
+            out.push(CTC_ENCODING_CHARS.charAt(digit + 10 * trail));
+            digit = grid[i];
+            trail = 0;
+        }
+        else trail++;
+    }
+    out.push(CTC_ENCODING_CHARS.charAt(digit + 10 * trail))
+    return out.join('');
+}
+
+export function ctcDecode(enc: string): (number | null)[] {
+
+    const grid: (number | null)[] = [];
+    for (const c of enc) {
+        // const i = 51 * (x >> 6 & 1) + 26 * (x >> 5 & 1) + (x & 0b11111) - 42;
+        const i = CTC_ENCODING_CHARS.indexOf(c);
+        if (0 > i) throw Error(`Invalid CTC character: '${c}'.`);
+        grid.push((i % 10) || null, ...Array<null>(Math.floor(i / 10)).fill(null));
+    }
+
+    validateGrid(grid, false);
+
+    return grid;
+}
+
+export const DECODE_TABLE = {
+    '$': rleDecode,
+    '.': ctcDecode,
+} as const;

@@ -27,11 +27,15 @@
         },
         "board": {
           ".write": "null != auth.uid && true != data.parent().child('frozen').val()",
+          "givens": {
+          },
           "filled": {
           },
           "center": {
           },
           "corner": {
+          },
+          "drawing": {
           }
         }
       }

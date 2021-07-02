@@ -286,13 +286,17 @@ export function makeBind<T extends Element>(parent: Element, { create, update = 
             parent.appendChild(el);
         },
         onRemove({ path, oldVal: _ }) {
-            const el = parent.querySelector(`[data-path="${path.join('.')}"]`) as T;
+            const el = getBindEl(parent, path) as T;
             if (!el) console.warn(`Failed to find element for path ${path.join('.')}.`);
             else parent.removeChild(el);
         },
         onChange({ path, oldVal: _, newVal }) {
-            const el = parent.querySelector(`[data-path="${path.join('.')}"]`) as T;
+            const el = getBindEl(parent, path) as T;
             update && update(el, path, newVal);
         },
     };
+}
+
+export function getBindEl(parent: Element, path: string[]): unknown {
+    return parent.querySelector(`[data-path="${path.join('.')}"]`) as unknown;
 }

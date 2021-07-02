@@ -258,7 +258,6 @@ function main(user: firebase.User): void {
   // Drawings.
   init.boardData.watch(`${consts.Mode.DRAWING}/*`, dataLayer.makeBind(sudokuDrawing, {
     create() {
-      console.log('drawing!');
       const el = document.createElementNS(consts.NS_SVG, 'path');
       el.setAttribute('class', 'drawing');
 
@@ -468,6 +467,7 @@ function startSolverMode(userId: string) {
       SELECTING,
       DESELECTING,
       DRAWING,
+      ERASING,
     }
     let selectingMode: SelectingMode = SelectingMode.NONE;
 
@@ -482,6 +482,45 @@ function startSolverMode(userId: string) {
       return d;
     }
 
+    function flushDrawing(): void {
+      const d = updateDrawing();
+      const key = `${consts.Mode.DRAWING}/${drawingKey}`;
+      pushHistory({
+        forward: {
+          [key]: d,
+        },
+        back: {
+          [key]: null,
+        }
+      });
+      drawingPoints.length = 0; // Clear the list of points.
+    }
+
+    function findDrawing(xySvg: [ number, number ]): null | string {
+      for (const key of Object.keys(init.boardData.get<Record<string, string>>(consts.Mode.DRAWING) || {})) {
+        const pathEl = dataLayer.getBindEl(sudokuDrawing, [ key ]) as null | SVGPathElement;
+        if (!pathEl) continue;
+
+        // console.log(xySvg, pathEl.getPointAtLength(0));
+
+        for (let dist = 0; dist <= pathEl.getTotalLength(); dist += 5) {
+          const { x, y } = pathEl.getPointAtLength(dist);
+
+          if (50 > Math.pow(xySvg[0] - x, 2) + Math.pow(xySvg[1] - y, 2)) {
+            return key
+          }
+        }
+      }
+      return null;
+    }
+
+    function deleteDrawing(drawingKey: string): void {
+      const history = init.boardData.update({
+        [`${consts.Mode.DRAWING}/${drawingKey}`]: null,
+      });
+      pushHistory(history);
+    }
+
     sudoku.addEventListener('mousedown', e => {
       if (SelectingMode.NONE === selectingMode) {
         if (consts.Mode.DRAWING === fillMode) {
@@ -491,6 +530,9 @@ function startSolverMode(userId: string) {
           selectingMode = SelectingMode.DRAWING;
           drawingKey = init.boardData.ref!.child(consts.Mode.DRAWING).push().key!;
           drawingPoints.push(xySvg.join(','));
+        }
+        else if (consts.Mode.ERASING === fillMode) {
+          selectingMode = SelectingMode.ERASING;
         }
         else {
           const xy = loc2xy(e.offsetX, e.offsetY, false);
@@ -508,12 +550,20 @@ function startSolverMode(userId: string) {
     });
 
     sudoku.addEventListener('mousemove', e => {
-      if (SelectingMode.DRAWING == selectingMode) {
+      if (SelectingMode.DRAWING === selectingMode) {
         const xySvg = loc2svg(e.offsetX, e.offsetY);
         if (!xySvg) return;
 
         drawingPoints.push(xySvg.join(','));
         updateDrawing();
+      }
+      else if (SelectingMode.ERASING === selectingMode) {
+        const xySvg = loc2svg(e.offsetX, e.offsetY);
+        if (!xySvg) return;
+
+        const drawingKey = findDrawing(xySvg);
+        if (null != drawingKey)
+          deleteDrawing(drawingKey);
       }
       else if (SelectingMode.NONE !== selectingMode) {
         const xy = loc2xy(e.offsetX, e.offsetY, true);
@@ -525,18 +575,7 @@ function startSolverMode(userId: string) {
 
     window.addEventListener('mouseup', _e => {
       if (SelectingMode.DRAWING === selectingMode) {
-        const d = updateDrawing();
-
-        const key = `${consts.Mode.DRAWING}/${drawingKey}`;
-        pushHistory({
-          forward: {
-            [key]: d,
-          },
-          back: {
-            [key]: null,
-          }
-        });
-        drawingPoints.length = 0; // Clear the list of points.
+        flushDrawing();
       }
       selectingMode = SelectingMode.NONE;
     });

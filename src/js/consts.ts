@@ -9,6 +9,7 @@ export enum Mode {
   CENTER = 'center',
   COLORS = 'colors',
   DRAWING = 'drawing',
+  ERASING = 'erasing',
 }
 
 export const MODE_CYCLE = [ Mode.FILLED, Mode.CORNER, Mode.CENTER, Mode.COLORS ];
@@ -19,6 +20,7 @@ export const DELETE_ORDER = [
   Mode.CENTER,
   Mode.COLORS,
   Mode.DRAWING, // Ignored.
+  Mode.DRAWING, // Ignored.
 ] as const;
 
 export const BLOCKED_BY_GIVENS = {
@@ -28,6 +30,7 @@ export const BLOCKED_BY_GIVENS = {
   [Mode.CENTER]: true,
   [Mode.COLORS]: false,
   [Mode.DRAWING]: false, // Ignored.
+  [Mode.ERASING]: false, // Ignored.
 } as const;
 
 export const BLOCKED_BY_FILLED = {
@@ -37,6 +40,7 @@ export const BLOCKED_BY_FILLED = {
   [Mode.CENTER]: true,
   [Mode.COLORS]: false,
   [Mode.DRAWING]: false, // Ignored.
+  [Mode.ERASING]: false, // Ignored.
 } as const;
 
 export const SIZE = 9;

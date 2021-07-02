@@ -22,7 +22,7 @@ const sudokuFilled     = document.getElementById('sudoku-filled')!      as unkno
 const sudokuFilledMask = document.getElementById('sudoku-filled-mask')! as unknown as SVGGElement;
 const sudokuCenter     = document.getElementById('sudoku-center')!      as unknown as SVGGElement;
 const sudokuCorner     = document.getElementById('sudoku-corner')!      as unknown as SVGGElement;
-const sudokuDrawing    = document.getElementById('sudoku-corner')!      as unknown as SVGGElement;
+const sudokuDrawing    = document.getElementById('sudoku-drawing')!     as unknown as SVGGElement;
 
 timer.setTicking(!init.isNewGame);
 
@@ -377,6 +377,10 @@ function startSolverMode(userId: string) {
     }
     // Update and add update to history.
     const history = init.boardData.update(update);
+    return pushHistory(history);
+  }
+
+  function pushHistory(history: dataLayer.Diff | null): boolean {
     if (!history) return false;
     const key = init.allClientsData.ref!.child(`${userId}/history`).push().key;
     init.allClientsData.update({
@@ -470,10 +474,12 @@ function startSolverMode(userId: string) {
     const drawingPoints: string[] = [];
     let drawingKey: string = "NULL";
 
-    function updateDrawing() {
+    function updateDrawing(): string {
+      const d = 'M ' + drawingPoints.join(' L ');
       init.boardData.update({
-        [`${consts.Mode.DRAWING}/${drawingKey}`]: 'M ' + drawingPoints.join(' L '),
+        [`${consts.Mode.DRAWING}/${drawingKey}`]: d,
       });
+      return d;
     }
 
     sudoku.addEventListener('mousedown', e => {
@@ -519,7 +525,17 @@ function startSolverMode(userId: string) {
 
     window.addEventListener('mouseup', _e => {
       if (SelectingMode.DRAWING === selectingMode) {
-        updateDrawing();
+        const d = updateDrawing();
+
+        const key = `${consts.Mode.DRAWING}/${drawingKey}`;
+        pushHistory({
+          forward: {
+            [key]: d,
+          },
+          back: {
+            [key]: null,
+          }
+        });
         drawingPoints.length = 0; // Clear the list of points.
       }
       selectingMode = SelectingMode.NONE;

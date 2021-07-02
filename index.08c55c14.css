@@ -19,6 +19,12 @@
   fill: #36a;
 }
 
+.drawing {
+  fill: transparent;
+  stroke: #777;
+  stroke-width: 3px;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -280,4 +286,4 @@ svg.icon {
 #sudoku {
   cursor: pointer;
 }
-/*# sourceMappingURL=index.c1daf6d6.css.map */
+/*# sourceMappingURL=index.08c55c14.css.map */

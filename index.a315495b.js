@@ -25997,22 +25997,31 @@
     Mode["CORNER"] = "corner";
     Mode["CENTER"] = "center";
     Mode["COLORS"] = "colors";
+    Mode["DRAWING"] = "drawing";
+    Mode["ERASING"] = "erasing";
   })($abe68232cbb7f72af82010f1f56d44cd$export$Mode || ($abe68232cbb7f72af82010f1f56d44cd$export$Mode = {}));
   const $abe68232cbb7f72af82010f1f56d44cd$export$MODE_CYCLE = [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS];
-  const $abe68232cbb7f72af82010f1f56d44cd$export$DELETE_ORDER = [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS];
+  const $abe68232cbb7f72af82010f1f56d44cd$export$DELETE_ORDER = [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.DRAWING, // Ignored.
+  $abe68232cbb7f72af82010f1f56d44cd$export$Mode.DRAWING];
   const $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_GIVENS = {
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.GIVENS]: false,
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED]: true,
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER]: true,
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER]: true,
-    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS]: false
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS]: false,
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.DRAWING]: false,
+    // Ignored.
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.ERASING]: false
   };
   const $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_FILLED = {
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.GIVENS]: false,
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED]: false,
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER]: true,
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER]: true,
-    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS]: false
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS]: false,
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.DRAWING]: false,
+    // Ignored.
+    [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.ERASING]: false
   };
   const $abe68232cbb7f72af82010f1f56d44cd$export$SIZE = 9;
   const $abe68232cbb7f72af82010f1f56d44cd$export$CODES = {
@@ -26273,14 +26282,17 @@
         parent.appendChild(el);
       },
       onRemove: function ({path, oldVal: _}) {
-        const el = parent.querySelector(`[data-path="${path.join('.')}"]`);
+        const el = $29821818cda24958b32cfc86ab7af955$export$getBindEl(parent, path);
         if (!el) console.warn(`Failed to find element for path ${path.join('.')}.`); else parent.removeChild(el);
       },
       onChange: function ({path, oldVal: _, newVal}) {
-        const el = parent.querySelector(`[data-path="${path.join('.')}"]`);
+        const el = $29821818cda24958b32cfc86ab7af955$export$getBindEl(parent, path);
         update && update(el, path, newVal);
       }
     };
+  }
+  function $29821818cda24958b32cfc86ab7af955$export$getBindEl(parent, path) {
+    return parent.querySelector(`[data-path="${path.join('.')}"]`);
   }
   function $a7fdc277ac0520c64854bc7b63570dc1$export$wrap(x) {
     return (x % $abe68232cbb7f72af82010f1f56d44cd$export$SIZE + $abe68232cbb7f72af82010f1f56d44cd$export$SIZE) % $abe68232cbb7f72af82010f1f56d44cd$export$SIZE;
@@ -26534,6 +26546,7 @@
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuFilledMask = document.getElementById('sudoku-filled-mask');
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuCenter = document.getElementById('sudoku-center');
   const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuCorner = document.getElementById('sudoku-corner');
+  const $aa27b46fdea9a4f013efbd74ec72870e$var$sudokuDrawing = document.getElementById('sudoku-drawing');
   $c226919c184f4d25757b9cccfdb43fbb$export$setTicking(!$3bfc4decb8494f8f341894cb417de4cd$export$isNewGame);
   function $aa27b46fdea9a4f013efbd74ec72870e$var$makeTs() {
     return [$b7a74ed9b193a5c616f3a6d2584cd3b1$export$default.database.ServerValue.TIMESTAMP, Date.now()];
@@ -26724,6 +26737,17 @@
         el.setAttribute('fill', `rgba(${color.join(',')})`);
       }
     }));
+    // Drawings.
+    $3bfc4decb8494f8f341894cb417de4cd$export$boardData.watch(`${$abe68232cbb7f72af82010f1f56d44cd$export$Mode.DRAWING}/*`, $29821818cda24958b32cfc86ab7af955$export$makeBind($aa27b46fdea9a4f013efbd74ec72870e$var$sudokuDrawing, {
+      create: function () {
+        const el = document.createElementNS($abe68232cbb7f72af82010f1f56d44cd$export$NS_SVG, 'path');
+        el.setAttribute('class', 'drawing');
+        return el;
+      },
+      update: function (el, [_id], val) {
+        el.setAttribute('d', val);
+      }
+    }));
     $3bfc4decb8494f8f341894cb417de4cd$export$isFrozenPromise.then(isFrozen => isFrozen || $aa27b46fdea9a4f013efbd74ec72870e$var$startSolverMode(userId));
   }
   function $aa27b46fdea9a4f013efbd74ec72870e$var$startSolverMode(userId) {
@@ -26812,6 +26836,9 @@
       }
       // Update and add update to history.
       const history = $3bfc4decb8494f8f341894cb417de4cd$export$boardData.update(update);
+      return pushHistory(history);
+    }
+    function pushHistory(history) {
       if (!history) return false;
       const key = $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.ref.child(`${userId}/history`).push().key;
       $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.update({
@@ -26840,12 +26867,18 @@
       });
       return true;
     };
-    function loc2xy(xOff, yOff, limitCircle) {
+    function loc2svg(xOff, yOff) {
       const {width: elWidth, height: elHeight} = $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.getBoundingClientRect();
       const {x, y, width, height} = $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.viewBox.baseVal;
       if (xOff < 0 || yOff < 0) return null;
-      const xf = (width * xOff / elWidth + x) / 100;
-      const yf = (height * yOff / elHeight + y) / 100;
+      const xPx = width * xOff / elWidth + x;
+      const yPx = height * yOff / elHeight + y;
+      return [xPx, yPx];
+    }
+    function loc2xy(xOff, yOff, limitCircle) {
+      const svgLoc = loc2svg(xOff, yOff);
+      if (!svgLoc) return null;
+      const [xf, yf] = svgLoc.map(px => px / 100);
       if ($abe68232cbb7f72af82010f1f56d44cd$export$SIZE <= xf || $abe68232cbb7f72af82010f1f56d44cd$export$SIZE <= yf) return null;
       if (limitCircle) {
         // Limit to circles.
@@ -26877,33 +26910,104 @@
       });
       return true;
     }
+    let fillMode = $abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED;
     {
-      let selectingMode = 0;
-      // 0 for none, 1 for selecting, 2 for deselecting.
+      let SelectingMode;
+      (function (SelectingMode) {
+        SelectingMode[SelectingMode["NONE"] = 0] = "NONE";
+        SelectingMode[SelectingMode["SELECTING"] = 1] = "SELECTING";
+        SelectingMode[SelectingMode["DESELECTING"] = 2] = "DESELECTING";
+        SelectingMode[SelectingMode["DRAWING"] = 3] = "DRAWING";
+        SelectingMode[SelectingMode["ERASING"] = 4] = "ERASING";
+      })(SelectingMode || (SelectingMode = {}));
+      let selectingMode = SelectingMode.NONE;
+      const drawingPoints = [];
+      let drawingKey = "NULL";
+      function updateDrawing() {
+        const d = 'M ' + drawingPoints.join(' L ');
+        $3bfc4decb8494f8f341894cb417de4cd$export$boardData.update({
+          [`${$abe68232cbb7f72af82010f1f56d44cd$export$Mode.DRAWING}/${drawingKey}`]: d
+        });
+        return d;
+      }
+      function flushDrawing() {
+        const d = updateDrawing();
+        const key = `${$abe68232cbb7f72af82010f1f56d44cd$export$Mode.DRAWING}/${drawingKey}`;
+        pushHistory({
+          forward: {
+            [key]: d
+          },
+          back: {
+            [key]: null
+          }
+        });
+        drawingPoints.length = 0;
+      }
+      function findDrawing(xySvg) {
+        for (const key of Object.keys($3bfc4decb8494f8f341894cb417de4cd$export$boardData.get($abe68232cbb7f72af82010f1f56d44cd$export$Mode.DRAWING) || ({}))) {
+          const pathEl = $29821818cda24958b32cfc86ab7af955$export$getBindEl($aa27b46fdea9a4f013efbd74ec72870e$var$sudokuDrawing, [key]);
+          if (!pathEl) continue;
+          // console.log(xySvg, pathEl.getPointAtLength(0));
+          for (let dist = 0; dist <= pathEl.getTotalLength(); dist += 5) {
+            const {x, y} = pathEl.getPointAtLength(dist);
+            if (50 > Math.pow(xySvg[0] - x, 2) + Math.pow(xySvg[1] - y, 2)) {
+              return key;
+            }
+          }
+        }
+        return null;
+      }
+      function deleteDrawing(drawingKey) {
+        const history = $3bfc4decb8494f8f341894cb417de4cd$export$boardData.update({
+          [`${$abe68232cbb7f72af82010f1f56d44cd$export$Mode.DRAWING}/${drawingKey}`]: null
+        });
+        pushHistory(history);
+      }
       $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.addEventListener('mousedown', e => {
-        if (0 === selectingMode) {
-          const xy = loc2xy(e.offsetX, e.offsetY, false);
-          if (!xy) return;
-          if (0b0001 === e.buttons) {
-            selectingMode = 1;
-            select(...xy, !e.shiftKey && !e.ctrlKey && !e.altKey);
-          } else if (0b0010 === e.buttons) {
-            selectingMode = 2;
-            select(...xy, false, null);
+        if (SelectingMode.NONE === selectingMode) {
+          if ($abe68232cbb7f72af82010f1f56d44cd$export$Mode.DRAWING === fillMode) {
+            const xySvg = loc2svg(e.offsetX, e.offsetY);
+            if (!xySvg) return;
+            selectingMode = SelectingMode.DRAWING;
+            drawingKey = $3bfc4decb8494f8f341894cb417de4cd$export$boardData.ref.child($abe68232cbb7f72af82010f1f56d44cd$export$Mode.DRAWING).push().key;
+            drawingPoints.push(xySvg.join(','));
+          } else if ($abe68232cbb7f72af82010f1f56d44cd$export$Mode.ERASING === fillMode) {
+            selectingMode = SelectingMode.ERASING;
+          } else {
+            const xy = loc2xy(e.offsetX, e.offsetY, false);
+            if (!xy) return;
+            if (0b0001 === e.buttons) {
+              selectingMode = SelectingMode.SELECTING;
+              select(...xy, !e.shiftKey && !e.ctrlKey && !e.altKey);
+            } else if (0b0010 === e.buttons) {
+              selectingMode = SelectingMode.DESELECTING;
+              select(...xy, false, null);
+            }
           }
         }
       });
       $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.addEventListener('mousemove', e => {
-        if (0 !== selectingMode) {
+        if (SelectingMode.DRAWING === selectingMode) {
+          const xySvg = loc2svg(e.offsetX, e.offsetY);
+          if (!xySvg) return;
+          drawingPoints.push(xySvg.join(','));
+          updateDrawing();
+        } else if (SelectingMode.ERASING === selectingMode) {
+          const xySvg = loc2svg(e.offsetX, e.offsetY);
+          if (!xySvg) return;
+          const drawingKey = findDrawing(xySvg);
+          if (null != drawingKey) deleteDrawing(drawingKey);
+        } else if (SelectingMode.NONE !== selectingMode) {
           const xy = loc2xy(e.offsetX, e.offsetY, true);
           if (!xy) return;
-          select(...xy, false, 1 === selectingMode ? true : null);
+          select(...xy, false, SelectingMode.SELECTING === selectingMode ? true : null);
         }
       });
       window.addEventListener('mouseup', _e => {
-        if (0 !== selectingMode) {
-          selectingMode = 0;
+        if (SelectingMode.DRAWING === selectingMode) {
+          flushDrawing();
         }
+        selectingMode = SelectingMode.NONE;
       });
       $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.addEventListener('contextmenu', e => {
         e.preventDefault();
@@ -26923,7 +27027,6 @@
       $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.addEventListener('touchstart', e => handleTouch(e, 1 === e.targetTouches.length));
       $aa27b46fdea9a4f013efbd74ec72870e$var$sudoku.addEventListener('touchmove', e => handleTouch(e));
     }
-    let fillMode = $abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED;
     function setFillMode(arg) {
       let el;
       let mode;
@@ -27043,4 +27146,4 @@
   }
 })();
 
-//# sourceMappingURL=index.94cdb9d5.js.map
+//# sourceMappingURL=index.a315495b.js.map

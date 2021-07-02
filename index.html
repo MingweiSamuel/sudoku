@@ -21,7 +21,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet"> 
 
   <link rel="stylesheet" href="index.148ae59b.css">
-  <link rel="stylesheet" href="index.c1daf6d6.css">
+  <link rel="stylesheet" href="index.08c55c14.css">
 </head>
 <body>
   <svg id="icons" xmlns="http://www.w3.org/2000/svg" width="1" height="1">
@@ -65,6 +65,16 @@
       <rect class="icon-fill" width="60" height="60" x="20" y="20" rx="9" mask="url(#centerLock-mask)"></rect>
       <text class="icon-fill" x="50" y="53" font-size="40" text-anchor="middle" dominant-baseline="central">7</text>
     </symbol>
+    <symbol id="icon-drawing" viewbox="0 0 100 100">
+      <rect class="icon-fill" width="60" height="60" x="20" y="20" rx="9" mask="url(#centerLock-mask)"></rect>
+      <path d="M 73,40 L 78,35 L 70,27 L 65,32 Z"></path>
+      <path d="M 48,65 L 70,43 L 62,35 L 40,57 Z"></path>
+      <path d="M 35,70 L 44,67 L 38,61 Z"></path>
+    </symbol>
+    <symbol id="icon-erasing" viewbox="0 0 100 100">
+      <rect class="icon-fill" width="60" height="60" x="20" y="20" rx="9" mask="url(#centerLock-mask)"></rect>
+      <path d="M 44,66 L 52,66 L 65,53 L 57,45 L 40,62 Z"></path>
+    </symbol>
 
     <symbol id="icon-setter" viewbox="0 0 100 100">
       <path d="M 65,75 A 7.1 7.1 0 0 0 75,65 L 55,45 A 15 15 0 0 0 35,25 L 45,35 L 35,45 L 25,35 A 15 15 0 0 0 45,55 Z"></path>
@@ -97,7 +107,7 @@
     <symbol id="icon-check" viewbox="0 0 100 100">
       <path class="icon-round" fill="none" stroke-width="6" d="M 30,55 L 42,67 L 75,37"></path>
     </symbol>
-    
+
     <symbol id="icon-pause" viewbox="0 0 100 100">
       <polygon class="icon-fill" points="33,30 43,30 43,70 33,70"></polygon>
       <polygon class="icon-fill" points="57,30 67,30 67,70 57,70"></polygon>
@@ -115,7 +125,7 @@
     <symbol id="icon-new" viewbox="0 0 100 100">
       <path class="icon-round" fill="none" stroke-width="6" d="M 55,25 L 30,25 L 30,75 L 70,75 L 70,45 L 55,45 L 55,25 L 70,45"></path>
     </symbol>
-  </svg>  
+  </svg>
   <div id="layout" class="layout">
     <div class="layout-sudoku">
       <svg id="sudoku" viewbox="-5 -5 910 910" xmlns="http://www.w3.org/2000/svg" style="background-color: black;
@@ -129,12 +139,12 @@
           <rect fill="#333" width="84" height="84" x="8" y="8" rx="8"></rect>
         </mask>
         <defs>
-          <rect class="highlight" id="highlight" width="100" height="100" mask="url(#highlight-mask)"></rect>
-          <rect class="highlight" id="highlight-self" width="100" height="100" mask="url(#highlight-mask-self)"></rect>
+          <rect id="highlight" class="highlight" width="100" height="100" mask="url(#highlight-mask)"></rect>
+          <rect id="highlight-self" class="highlight" width="100" height="100" mask="url(#highlight-mask-self)"></rect>
 
           <polygon id="cursor" points="0,0 15,0 0,15"></polygon>
-          
-          <rect class="colors" id="colors" width="100" height="100"></rect>
+
+          <rect id="colors" class="colors" width="100" height="100"></rect>
 
           <pattern id="smallGrid" width="100" height="100" patternunits="userSpaceOnUse">
             <rect width="100" height="100" fill="none" stroke="#111" opacity="0.8" stroke-width="2"></rect>
@@ -157,6 +167,7 @@
         <g id="sudoku-colors"></g>
         <g id="sudoku-highlights"></g>
         <g id="sudoku-cursor"></g>
+        <g id="sudoku-drawing"></g>
         <g id="sudoku-givens"></g>
         <g id="sudoku-filled"></g>
         <g id="sudoku-center"></g>
@@ -188,10 +199,17 @@
 " data-mode="givens" title="Given digits">
           <svg class="icon" viewbox="0 0 100 100"><use href="#icon-givens"></use></svg>
         </button>
-        <button class="control-btn setter-modes-btn control-btn-inv" style="grid-area: 1 / 4 / 2 / 5;
-" data-mode="gcolor" title="Given color highlights">
-          <svg class="icon" viewbox="0 0 100 100"><use href="#icon-gcolor"></use></svg>
+        <button class="control-btn button-mode setter-modes-btn control-btn-inv" style="grid-area: 1 / 3 / 2 / 4;
+" data-mode="drawing" title="Free drawing">
+          <svg class="icon" viewbox="0 0 100 100"><use href="#icon-drawing"></use></svg>
         </button>
+        <button class="control-btn button-mode setter-modes-btn control-btn-inv" style="grid-area: 1 / 4 / 2 / 5;
+" data-mode="erasing" title="Erase drawings">
+          <svg class="icon" viewbox="0 0 100 100"><use href="#icon-erasing"></use></svg>
+        </button>
+        <!-- <button class="control-btn setter-modes-btn control-btn-inv" style="grid-area: 1 / 4 / 2 / 5;" data-mode="gcolor" title="Given color highlights">
+          <svg class="icon" viewBox="0 0 100 100"><use href="#icon-gcolor" /></svg>
+        </button> -->
         <!-- Gap. -->
         <!-- Third row. -->
         <button class="control-btn button-input" style="grid-area: 3 / 1 / 4 / 2;
@@ -267,6 +285,6 @@
       </button>
     </div>
   </div>
-  <script src="index.94cdb9d5.js"></script>
+  <script src="index.a315495b.js"></script>
 </body>
 </html>

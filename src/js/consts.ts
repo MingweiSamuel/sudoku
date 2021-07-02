@@ -8,6 +8,7 @@ export enum Mode {
   CORNER = 'corner',
   CENTER = 'center',
   COLORS = 'colors',
+  DRAWING = 'drawing',
 }
 
 export const MODE_CYCLE = [ Mode.FILLED, Mode.CORNER, Mode.CENTER, Mode.COLORS ];
@@ -17,6 +18,7 @@ export const DELETE_ORDER = [
   Mode.CORNER,
   Mode.CENTER,
   Mode.COLORS,
+  Mode.DRAWING, // Ignored.
 ] as const;
 
 export const BLOCKED_BY_GIVENS = {
@@ -25,6 +27,7 @@ export const BLOCKED_BY_GIVENS = {
   [Mode.CORNER]: true,
   [Mode.CENTER]: true,
   [Mode.COLORS]: false,
+  [Mode.DRAWING]: false, // Ignored.
 } as const;
 
 export const BLOCKED_BY_FILLED = {
@@ -33,6 +36,7 @@ export const BLOCKED_BY_FILLED = {
   [Mode.CORNER]: true,
   [Mode.CENTER]: true,
   [Mode.COLORS]: false,
+  [Mode.DRAWING]: false, // Ignored.
 } as const;
 
 export const SIZE = 9;

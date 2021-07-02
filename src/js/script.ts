@@ -22,6 +22,7 @@ const sudokuFilled     = document.getElementById('sudoku-filled')!      as unkno
 const sudokuFilledMask = document.getElementById('sudoku-filled-mask')! as unknown as SVGGElement;
 const sudokuCenter     = document.getElementById('sudoku-center')!      as unknown as SVGGElement;
 const sudokuCorner     = document.getElementById('sudoku-corner')!      as unknown as SVGGElement;
+const sudokuDrawing    = document.getElementById('sudoku-corner')!      as unknown as SVGGElement;
 
 timer.setTicking(!init.isNewGame);
 
@@ -254,6 +255,20 @@ function main(user: firebase.User): void {
     },
   }));
 
+  // Drawings.
+  init.boardData.watch(`${consts.Mode.DRAWING}/*`, dataLayer.makeBind(sudokuDrawing, {
+    create() {
+      console.log('drawing!');
+      const el = document.createElementNS(consts.NS_SVG, 'path');
+      el.setAttribute('class', 'drawing');
+
+      return el;
+    },
+    update(el, [ _id ], val: string) {
+      el.setAttribute('d', val);
+    }
+  }));
+
   init.isFrozenPromise.then(isFrozen => isFrozen || startSolverMode(userId));
 }
 
@@ -391,12 +406,19 @@ function startSolverMode(userId: string) {
     return true;
   });
 
-  function loc2xy(xOff: number, yOff: number, limitCircle: boolean): null | [ utils.XYCoord, utils.XYCoord ] {
+  function loc2svg(xOff: number, yOff: number): null | [ number, number ] {
     const { width: elWidth, height: elHeight } = sudoku.getBoundingClientRect();
     const { x, y, width, height } = sudoku.viewBox.baseVal;
     if (xOff < 0 || yOff < 0) return null;
-    const xf = (width  * xOff / elWidth  + x) / 100;
-    const yf = (height * yOff / elHeight + y) / 100;
+    const xPx = (width  * xOff / elWidth  + x);
+    const yPx = (height * yOff / elHeight + y);
+    return [ xPx, yPx ];
+  }
+
+  function loc2xy(xOff: number, yOff: number, limitCircle: boolean): null | [ utils.XYCoord, utils.XYCoord ] {
+    const svgLoc = loc2svg(xOff, yOff);
+    if (!svgLoc) return null;
+    const [ xf, yf ] = svgLoc.map(px => px / 100);
     if (consts.SIZE <= xf || consts.SIZE <= yf) return null;
 
     if (limitCircle) {
@@ -434,37 +456,73 @@ function startSolverMode(userId: string) {
     return true;
   }
 
+  let fillMode: consts.Mode = consts.Mode.FILLED;
 
   {
-    let selectingMode = 0; // 0 for none, 1 for selecting, 2 for deselecting.
+    enum SelectingMode {
+      NONE,
+      SELECTING,
+      DESELECTING,
+      DRAWING,
+    }
+    let selectingMode: SelectingMode = SelectingMode.NONE;
+
+    const drawingPoints: string[] = [];
+    let drawingKey: string = "NULL";
+
+    function updateDrawing() {
+      init.boardData.update({
+        [`${consts.Mode.DRAWING}/${drawingKey}`]: 'M ' + drawingPoints.join(' L '),
+      });
+    }
 
     sudoku.addEventListener('mousedown', e => {
-      if (0 === selectingMode) {
-        const xy = loc2xy(e.offsetX, e.offsetY, false);
-        if (!xy) return;
-        if (0b0001 === e.buttons) {
-          selectingMode = 1;
-          select(...xy, !e.shiftKey && !e.ctrlKey && !e.altKey);
+      if (SelectingMode.NONE === selectingMode) {
+        if (consts.Mode.DRAWING === fillMode) {
+          const xySvg = loc2svg(e.offsetX, e.offsetY);
+          if (!xySvg) return;
+
+          selectingMode = SelectingMode.DRAWING;
+          drawingKey = init.boardData.ref!.child(consts.Mode.DRAWING).push().key!;
+          drawingPoints.push(xySvg.join(','));
         }
-        else if (0b0010 === e.buttons) {
-          selectingMode = 2;
-          select(...xy, false, null)
+        else {
+          const xy = loc2xy(e.offsetX, e.offsetY, false);
+          if (!xy) return;
+          if (0b0001 === e.buttons) {
+            selectingMode = SelectingMode.SELECTING;
+            select(...xy, !e.shiftKey && !e.ctrlKey && !e.altKey);
+          }
+          else if (0b0010 === e.buttons) {
+            selectingMode = SelectingMode.DESELECTING;
+            select(...xy, false, null)
+          }
         }
       }
     });
 
     sudoku.addEventListener('mousemove', e => {
-      if (0 !== selectingMode) {
+      if (SelectingMode.DRAWING == selectingMode) {
+        const xySvg = loc2svg(e.offsetX, e.offsetY);
+        if (!xySvg) return;
+
+        drawingPoints.push(xySvg.join(','));
+        updateDrawing();
+      }
+      else if (SelectingMode.NONE !== selectingMode) {
         const xy = loc2xy(e.offsetX, e.offsetY, true);
         if (!xy) return;
-        select(...xy, false, 1 === selectingMode ? true : null);
+
+        select(...xy, false, SelectingMode.SELECTING === selectingMode ? true : null);
       }
     });
 
     window.addEventListener('mouseup', _e => {
-      if (0 !== selectingMode) {
-        selectingMode = 0;
+      if (SelectingMode.DRAWING === selectingMode) {
+        updateDrawing();
+        drawingPoints.length = 0; // Clear the list of points.
       }
+      selectingMode = SelectingMode.NONE;
     });
 
     sudoku.addEventListener('contextmenu', e => {
@@ -488,8 +546,6 @@ function startSolverMode(userId: string) {
     sudoku.addEventListener('touchstart', e => handleTouch(e, 1 === e.targetTouches.length));
     sudoku.addEventListener('touchmove', e => handleTouch(e));
   }
-
-  let fillMode: consts.Mode = consts.Mode.FILLED;
 
   function setFillMode(arg: string | HTMLButtonElement): void {
     let el: HTMLButtonElement;

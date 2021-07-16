@@ -20,7 +20,7 @@ export const DELETE_ORDER = [
   Mode.CENTER,
   Mode.COLORS,
   Mode.DRAWING, // Ignored.
-  Mode.DRAWING, // Ignored.
+  Mode.ERASING, // Ignored.
 ] as const;
 
 export const BLOCKED_BY_GIVENS = {

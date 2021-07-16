@@ -26002,7 +26002,7 @@
   })($abe68232cbb7f72af82010f1f56d44cd$export$Mode || ($abe68232cbb7f72af82010f1f56d44cd$export$Mode = {}));
   const $abe68232cbb7f72af82010f1f56d44cd$export$MODE_CYCLE = [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS];
   const $abe68232cbb7f72af82010f1f56d44cd$export$DELETE_ORDER = [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.DRAWING, // Ignored.
-  $abe68232cbb7f72af82010f1f56d44cd$export$Mode.DRAWING];
+  $abe68232cbb7f72af82010f1f56d44cd$export$Mode.ERASING];
   const $abe68232cbb7f72af82010f1f56d44cd$export$BLOCKED_BY_GIVENS = {
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.GIVENS]: false,
     [$abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED]: true,
@@ -27146,4 +27146,4 @@
   }
 })();
 
-//# sourceMappingURL=index.a315495b.js.map
+//# sourceMappingURL=index.b64bdded.js.map

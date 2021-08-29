@@ -360,7 +360,7 @@ function startSolverMode(userId: string) {
         else {
           let allSet = true;
           for (const id of selected) {
-            allSet &&= !!markData[id] && (markData[id] as Record<utils.IdCoord, boolean>)[num];
+            allSet = allSet && !!markData[id] && (markData[id] as Record<utils.IdCoord, boolean>)[num];
             update[`${mode}/${id}/${num}`] = true;
           }
           // If they are all set, unset all.

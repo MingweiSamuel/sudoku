@@ -26820,7 +26820,7 @@
           } else {
             let allSet = true;
             for (const id of selected) {
-              allSet &&= !!markData[id] && markData[id][num];
+              allSet = allSet && !!markData[id] && markData[id][num];
               update[`${mode}/${id}/${num}`] = true;
             }
             // If they are all set, unset all.
@@ -27146,4 +27146,4 @@
   }
 })();
 
-//# sourceMappingURL=index.b64bdded.js.map
+//# sourceMappingURL=index.13e13bd4.js.map

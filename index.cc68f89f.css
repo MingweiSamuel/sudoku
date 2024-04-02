@@ -214,8 +214,10 @@ body {
   text-align: center;
   transition: background-color 0.1s ease-in-out;
   border-radius: 0.2em;
+  touch-action: manipulation;
   -webkit-appearance: none;
   -moz-appearance: none;
+  appearance: none;
 }
 
 .control-btn:hover {
@@ -285,5 +287,6 @@ svg.icon {
 
 #sudoku {
   cursor: pointer;
+  touch-action: manipulation;
 }
-/*# sourceMappingURL=index.08c55c14.css.map */
+/*# sourceMappingURL=index.cc68f89f.css.map */

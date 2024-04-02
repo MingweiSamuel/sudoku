@@ -216,9 +216,11 @@ body {
     transition: background-color 0.1s ease-in-out;
 
     border-radius: 0.2em;
+    touch-action: manipulation; // Prevent double-click zoom.
 
     -webkit-appearance: none;
     -moz-appearance: none;
+    appearance: none;
 }
 
 .control-btn:hover {
@@ -285,4 +287,5 @@ svg.icon {
 
 #sudoku {
     cursor: pointer;
+    touch-action: manipulation; // Prevent double-click zoom.
 }

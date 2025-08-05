@@ -26978,7 +26978,7 @@
             if (!xy) return;
             if (0b0001 === e.buttons) {
               selectingMode = SelectingMode.SELECTING;
-              select(...xy, !e.shiftKey && !e.ctrlKey && !e.altKey);
+              select(...xy, !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey);
             } else if (0b0010 === e.buttons) {
               selectingMode = SelectingMode.DESELECTING;
               select(...xy, false, null);
@@ -27112,16 +27112,16 @@
             x = $a7fdc277ac0520c64854bc7b63570dc1$export$wrap(cx + dx);
             y = $a7fdc277ac0520c64854bc7b63570dc1$export$wrap(cy + dy);
           }
-          select(x, y, !e.shiftKey && !e.ctrlKey && !e.altKey);
+          select(x, y, !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey);
           return;
         } else if ('KeyZ' === e.code) {
-          if (e.ctrlKey) {
+          if (e.ctrlKey || e.metaKey) {
             e.preventDefault();
             updateHistory(e.shiftKey);
           }
           return;
         } else if ('KeyY' === e.code) {
-          if (e.ctrlKey) {
+          if (e.ctrlKey || e.metaKey) {
             e.preventDefault();
             updateHistory(true);
           }
@@ -27135,7 +27135,7 @@
         if (e.shiftKey) {
           fill(num, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CORNER);
           setFillMode($abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED);
-        } else if (e.ctrlKey || e.altKey) {
+        } else if (e.ctrlKey || e.metaKey || e.altKey) {
           fill(num, $abe68232cbb7f72af82010f1f56d44cd$export$Mode.CENTER);
           setFillMode($abe68232cbb7f72af82010f1f56d44cd$export$Mode.FILLED);
         } else {
@@ -27146,4 +27146,4 @@
   }
 })();
 
-//# sourceMappingURL=index.13e13bd4.js.map
+//# sourceMappingURL=index.aa2fb4a4.js.map

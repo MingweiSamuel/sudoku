@@ -539,7 +539,7 @@ function startSolverMode(userId: string) {
           if (!xy) return;
           if (0b0001 === e.buttons) {
             selectingMode = SelectingMode.SELECTING;
-            select(...xy, !e.shiftKey && !e.ctrlKey && !e.altKey);
+            select(...xy, !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey);
           }
           else if (0b0010 === e.buttons) {
             selectingMode = SelectingMode.DESELECTING;
@@ -703,18 +703,18 @@ function startSolverMode(userId: string) {
           x = utils.wrap(cx + dx);
           y = utils.wrap(cy + dy);
         }
-        select(x, y, !e.shiftKey && !e.ctrlKey && !e.altKey);
+        select(x, y, !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey);
         return;
       }
       else if ('KeyZ' === e.code) {
-        if (e.ctrlKey) {
+        if (e.ctrlKey || e.metaKey) {
           e.preventDefault();
           updateHistory(e.shiftKey);
         }
         return;
       }
       else if ('KeyY' === e.code) {
-        if (e.ctrlKey) {
+        if (e.ctrlKey || e.metaKey) {
           e.preventDefault();
           updateHistory(true);
         }
@@ -732,7 +732,7 @@ function startSolverMode(userId: string) {
         fill(num, consts.Mode.CORNER);
         setFillMode(consts.Mode.FILLED);
       }
-      else if (e.ctrlKey || e.altKey) {
+      else if (e.ctrlKey || e.metaKey || e.altKey) {
         fill(num, consts.Mode.CENTER);
         setFillMode(consts.Mode.FILLED);
       }

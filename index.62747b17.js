@@ -26980,8 +26980,10 @@
               selectingMode = SelectingMode.SELECTING;
               select(...xy, !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey);
             } else if (0b0010 === e.buttons) {
-              selectingMode = SelectingMode.DESELECTING;
-              select(...xy, false, null);
+              const id = $a7fdc277ac0520c64854bc7b63570dc1$export$xy2id(...xy);
+              const isSelected = $3bfc4decb8494f8f341894cb417de4cd$export$allClientsData.get(userId, 'selected', id);
+              selectingMode = isSelected ? SelectingMode.DESELECTING : SelectingMode.SELECTING;
+              select(...xy, false, isSelected ? null : true);
             }
           }
         }
@@ -27146,4 +27148,4 @@
   }
 })();
 
-//# sourceMappingURL=index.aa2fb4a4.js.map
+//# sourceMappingURL=index.62747b17.js.map

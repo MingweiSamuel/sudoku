@@ -542,8 +542,10 @@ function startSolverMode(userId: string) {
             select(...xy, !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey);
           }
           else if (0b0010 === e.buttons) {
-            selectingMode = SelectingMode.DESELECTING;
-            select(...xy, false, null)
+            const id = utils.xy2id(...xy);
+            const isSelected = init.allClientsData.get(userId, 'selected', id);
+            selectingMode = isSelected ? SelectingMode.DESELECTING : SelectingMode.SELECTING;
+            select(...xy, false, isSelected ? null : true)
           }
         }
       }

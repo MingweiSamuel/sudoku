@@ -2,8 +2,19 @@ $color-input: #36a;
 $color-button: #36a;
 $color-button-hover: #47c;
 
-$color-invbutton: #fff;
-$color-invbutton-hover: #def;
+:root {
+    color-scheme: light dark;
+
+    --color-bg:              light-dark(#fff, #1a1a1a);
+    --color-surface:         light-dark(#fff, #222);
+    --color-grid-border:     light-dark(#000, #ccc);
+    --color-grid-line:       light-dark(#111, #bbb);
+    --color-givens:          light-dark(#111, #eee);
+    --color-drawing:         light-dark(#777, #999);
+    --color-invbutton:       light-dark(#fff, #333);
+    --color-invbutton-hover: light-dark(#def, #445);
+    --color-invbutton-border: light-dark(#888, #666);
+}
 
 $layout-ratio-landscape: 3 / 2;
 $layout-ratio-portrait:  3 / 5;
@@ -24,6 +35,7 @@ $font-ratio: 0.04;
 body {
     font-family: Montserrat, Arial, sans-serif;
     font-weight: 500;
+    background-color: var(--color-bg);
 }
 
 .layout {
@@ -228,11 +240,11 @@ body {
 }
 
 .control-btn-inv {
-    border: 0.01em solid #888;
-    background: $color-invbutton;
+    border: 0.01em solid var(--color-invbutton-border);
+    background: var(--color-invbutton);
 }
 .control-btn-inv:hover {
-    background: $color-invbutton-hover;
+    background: var(--color-invbutton-hover);
 }
 
 svg.icon {
@@ -288,4 +300,14 @@ svg.icon {
 #sudoku {
     cursor: pointer;
     touch-action: manipulation; // Prevent double-click zoom.
+    background-color: var(--color-grid-line);
+}
+
+.sudoku-bg {
+    fill: var(--color-surface);
+}
+
+#smallGrid > rect,
+#grid > rect {
+    stroke: var(--color-grid-line);
 }

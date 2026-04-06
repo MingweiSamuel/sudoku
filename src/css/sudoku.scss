@@ -6,7 +6,7 @@
     font-size: 65px;
 }
 .givens {
-    fill: #111;
+    fill: var(--color-givens);
 }
 .center, .corner {
     font-size: 25px;
@@ -16,6 +16,6 @@
 }
 .drawing {
     fill: transparent;
-    stroke: #777;
+    stroke: var(--color-drawing);
     stroke-width: 3px;
 }

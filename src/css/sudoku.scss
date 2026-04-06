@@ -12,7 +12,7 @@
     font-size: 25px;
 }
 .filled, .center, .corner {
-    fill: $color-input;
+    fill: var(--color-input);
 }
 .drawing {
     fill: transparent;

@@ -1,7 +1,3 @@
-$color-input: #36a;
-$color-button: #36a;
-$color-button-hover: #47c;
-
 :root {
     color-scheme: light dark;
 
@@ -14,6 +10,10 @@ $color-button-hover: #47c;
     --color-invbutton:       light-dark(#fff, #333);
     --color-invbutton-hover: light-dark(#def, #445);
     --color-invbutton-border: light-dark(#888, #666);
+    --color-button:          light-dark(#36a, #6af);
+    --color-button-hover:    light-dark(#47c, #7bf);
+    --color-button-text:     light-dark(#fff, #111);
+    --color-input:           light-dark(#36a, #6af);
 }
 
 $layout-ratio-landscape: 3 / 2;
@@ -216,9 +216,9 @@ body {
     padding: 0;
     margin: 0;
     text-decoration: none;
-    background: $color-button;
-    border: 0.01em solid $color-button;
-    color: #fff;
+    background: var(--color-button);
+    border: 0.01em solid var(--color-button);
+    color: var(--color-button-text);
     font-family: inherit;
     font-weight: inherit;
     font-size: 100%;
@@ -236,7 +236,7 @@ body {
 }
 
 .control-btn:hover {
-    background: $color-button-hover;
+    background: var(--color-button-hover);
 }
 
 .control-btn-inv {
@@ -250,22 +250,22 @@ body {
 svg.icon {
     display: block;
     width: 100%;
-    fill: #fff;
-    stroke: #fff;
+    fill: var(--color-button-text);
+    stroke: var(--color-button-text);
 }
 .control-btn-inv svg.icon {
-    fill: $color-button;
-    stroke: $color-button;
+    fill: var(--color-button);
+    stroke: var(--color-button);
 }
 
 .icon > svg {
     display: block;
 }
 .icon .icon-fill {
-    fill: #fff;
+    fill: var(--color-button-text);
 }
 .control-btn-inv .icon .icon-fill {
-    fill: $color-button;
+    fill: var(--color-button);
 }
 
 .icon-round {
@@ -310,4 +310,10 @@ svg.icon {
 #smallGrid > rect,
 #grid > rect {
     stroke: var(--color-grid-line);
+}
+
+@media (prefers-color-scheme: dark) {
+    #sudoku-colors {
+        filter: invert(1);
+    }
 }

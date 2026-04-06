@@ -618,10 +618,13 @@ function startSolverMode(userId: string) {
     fillMode = mode as consts.Mode;
 
     // Update button appearance.
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     for (const inputButton of Array.from(document.getElementsByClassName('button-input')) as HTMLButtonElement[]) {
       const num = JSON.parse(inputButton.getAttribute('data-input')!);
       if (null != num) {
-        inputButton.style.color = consts.Mode.COLORS === mode ? `rgb(${consts.COLORS[num].slice(0, 3).join(',')})` : '';
+        const [r, g, b] = consts.COLORS[num].slice(0, 3) as [number, number, number];
+        const displayColor = isDark ? [255 - r, 255 - g, 255 - b] : [r, g, b];
+        inputButton.style.color = consts.Mode.COLORS === mode ? `rgb(${displayColor.join(',')})` : '';
         inputButton.innerText = consts.Mode.COLORS === mode ? '\u25A8' : num;
       }
     }

@@ -1,3 +1,16 @@
+:root {
+  color-scheme: light dark;
+  --color-bg: light-dark(#fff, #1a1a1a);
+  --color-surface: light-dark(#fff, #222);
+  --color-grid-border: light-dark(#000, #ccc);
+  --color-grid-line: light-dark(#111, #bbb);
+  --color-givens: light-dark(#111, #eee);
+  --color-drawing: light-dark(#777, #999);
+  --color-invbutton: light-dark(#fff, #333);
+  --color-invbutton-hover: light-dark(#def, #445);
+  --color-invbutton-border: light-dark(#888, #666);
+}
+
 .givens, .filled, .center, .corner {
   text-anchor: middle;
   dominant-baseline: central;
@@ -8,7 +21,7 @@
 }
 
 .givens {
-  fill: #111;
+  fill: var(--color-givens);
 }
 
 .center, .corner {
@@ -21,7 +34,7 @@
 
 .drawing {
   fill: transparent;
-  stroke: #777;
+  stroke: var(--color-drawing);
   stroke-width: 3px;
 }
 
@@ -32,6 +45,7 @@
 body {
   font-family: Montserrat, Arial, sans-serif;
   font-weight: 500;
+  background-color: var(--color-bg);
 }
 
 .layout {
@@ -225,12 +239,12 @@ body {
 }
 
 .control-btn-inv {
-  border: 0.01em solid #888;
-  background: #fff;
+  border: 0.01em solid var(--color-invbutton-border);
+  background: var(--color-invbutton);
 }
 
 .control-btn-inv:hover {
-  background: #def;
+  background: var(--color-invbutton-hover);
 }
 
 svg.icon {
@@ -288,5 +302,15 @@ svg.icon {
 #sudoku {
   cursor: pointer;
   touch-action: manipulation;
+  background-color: var(--color-grid-line);
 }
-/*# sourceMappingURL=index.cc68f89f.css.map */
+
+.sudoku-bg {
+  fill: var(--color-surface);
+}
+
+#smallGrid > rect,
+#grid > rect {
+  stroke: var(--color-grid-line);
+}
+/*# sourceMappingURL=index.991b0802.css.map */

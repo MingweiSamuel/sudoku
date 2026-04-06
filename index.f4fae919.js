@@ -27041,10 +27041,13 @@
       }
       fillMode = mode;
       // Update button appearance.
+      const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       for (const inputButton of Array.from(document.getElementsByClassName('button-input'))) {
         const num = JSON.parse(inputButton.getAttribute('data-input'));
         if (null != num) {
-          inputButton.style.color = $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS === mode ? `rgb(${$abe68232cbb7f72af82010f1f56d44cd$export$COLORS[num].slice(0, 3).join(',')})` : '';
+          const [r, g, b] = $abe68232cbb7f72af82010f1f56d44cd$export$COLORS[num].slice(0, 3);
+          const displayColor = isDark ? [255 - r, 255 - g, 255 - b] : [r, g, b];
+          inputButton.style.color = $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS === mode ? `rgb(${displayColor.join(',')})` : '';
           inputButton.innerText = $abe68232cbb7f72af82010f1f56d44cd$export$Mode.COLORS === mode ? '\u25A8' : num;
         }
       }
@@ -27148,4 +27151,4 @@
   }
 })();
 
-//# sourceMappingURL=index.62747b17.js.map
+//# sourceMappingURL=index.f4fae919.js.map

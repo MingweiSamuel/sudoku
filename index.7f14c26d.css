@@ -9,6 +9,10 @@
   --color-invbutton: light-dark(#fff, #333);
   --color-invbutton-hover: light-dark(#def, #445);
   --color-invbutton-border: light-dark(#888, #666);
+  --color-button: light-dark(#36a, #6af);
+  --color-button-hover: light-dark(#47c, #7bf);
+  --color-button-text: light-dark(#fff, #111);
+  --color-input: light-dark(#36a, #6af);
 }
 
 .givens, .filled, .center, .corner {
@@ -29,7 +33,7 @@
 }
 
 .filled, .center, .corner {
-  fill: #36a;
+  fill: var(--color-input);
 }
 
 .drawing {
@@ -217,9 +221,9 @@ body {
   padding: 0;
   margin: 0;
   text-decoration: none;
-  background: #36a;
-  border: 0.01em solid #36a;
-  color: #fff;
+  background: var(--color-button);
+  border: 0.01em solid var(--color-button);
+  color: var(--color-button-text);
   font-family: inherit;
   font-weight: inherit;
   font-size: 100%;
@@ -235,7 +239,7 @@ body {
 }
 
 .control-btn:hover {
-  background: #47c;
+  background: var(--color-button-hover);
 }
 
 .control-btn-inv {
@@ -250,13 +254,13 @@ body {
 svg.icon {
   display: block;
   width: 100%;
-  fill: #fff;
-  stroke: #fff;
+  fill: var(--color-button-text);
+  stroke: var(--color-button-text);
 }
 
 .control-btn-inv svg.icon {
-  fill: #36a;
-  stroke: #36a;
+  fill: var(--color-button);
+  stroke: var(--color-button);
 }
 
 .icon > svg {
@@ -264,11 +268,11 @@ svg.icon {
 }
 
 .icon .icon-fill {
-  fill: #fff;
+  fill: var(--color-button-text);
 }
 
 .control-btn-inv .icon .icon-fill {
-  fill: #36a;
+  fill: var(--color-button);
 }
 
 .icon-round {
@@ -313,4 +317,10 @@ svg.icon {
 #grid > rect {
   stroke: var(--color-grid-line);
 }
-/*# sourceMappingURL=index.991b0802.css.map */
+
+@media (prefers-color-scheme: dark) {
+  #sudoku-colors {
+    filter: invert(1);
+  }
+}
+/*# sourceMappingURL=index.7f14c26d.css.map */
